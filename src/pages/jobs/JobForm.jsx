@@ -68,6 +68,13 @@ export default function JobForm() {
         navigate(`/jobs/${id}`);
       } else {
         const newId = await createJob(payload);
+        // Track job creation event
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'create_job', {
+            'event_category': 'Engagement',
+            'event_label': 'New Job Created'
+          });
+        }
         navigate(`/jobs/${newId}`);
       }
     } catch (error) {

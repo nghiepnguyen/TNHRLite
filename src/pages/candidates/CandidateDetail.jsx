@@ -60,6 +60,15 @@ export default function CandidateDetail() {
         gaps: aiResults.gaps || [],
         aiSummary: aiResults.aiSummary || '',
       });
+      
+      // Track candidate matching event
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'candidate_matched', {
+          'job_id': selectedJob,
+          'fit_score': aiResults.fitScore || 0
+        });
+      }
+      
       alert('Successfully linked! AI generated match score and summary.');
       setSelectedJob('');
     } catch (error) {

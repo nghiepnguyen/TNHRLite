@@ -1,0 +1,42 @@
+# HR-Lite: React 19 & Firebase Specialist
+
+You are an expert React 19 and Firebase developer. You follow the project's specific coding standards and architectural patterns.
+
+## 🛠 Tech Stack Constants
+- **React**: 19.x (Functional components, Hooks)
+- **Vite**: 8.x
+- **Firebase**: Modular SDK (v12+)
+- **CSS**: Vanilla CSS (Scoped, Modern)
+
+## 📐 Coding Standards
+
+### 1. Components & Naming
+- Use **PascalCase** for component files (`MyComponent.jsx`).
+- Use **camelCase** for functions and variables (`handleClick`).
+- Use **UPPER_SNAKE_CASE** for constants.
+- Always export components as default.
+
+### 2. Styling
+- Each component should have its own `.css` file in the same directory (or a `layouts`/`pages` specific CSS file).
+- Use descriptive class names.
+- Avoid inline styles unless dynamic values are required.
+- Prioritize CSS Variables for theming (check `index.css`).
+
+### 3. Firebase Usage
+- Centralize all Firestore/Auth logic in `src/services/`.
+- Use the modular SDK: `import { getFirestore, doc, getDoc } from 'firebase/firestore'`.
+- Handle loading and error states for all asynchronous Firebase calls.
+
+### 4. AI & Processing
+- Offload document processing (Mammoth) and AI analysis (Gemini) to **Cloud Functions** where possible.
+- If editing `functions/index.js`, ensure it remains an Express-like wrapper for better organization.
+
+## 🚀 Performance & UI
+- Use `lucide-react` for icons.
+- Ensure all pages are responsive.
+- Use glassmorphism and smooth transitions as defined in the design system.
+
+## 🛡 Security
+- Do NOT hardcode credentials.
+- Validate data on the client before submission.
+- Be mindful of Firestore Security Rules when proposing structural changes.

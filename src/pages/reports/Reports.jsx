@@ -14,6 +14,11 @@ export default function Reports() {
       setJobs(fetchedJobs);
       setApplications(fetchedApps);
       setLoading(false);
+      
+      // Track report view event
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'report_viewed');
+      }
     }
     loadData();
   }, []);

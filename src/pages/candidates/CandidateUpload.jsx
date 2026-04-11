@@ -27,10 +27,23 @@ export default function CandidateUpload() {
       setStatusText('Uploading CV to Storage...');
       // 1. Upload to Storage
       const { downloadUrl, path } = await uploadCV(file, currentUser?.uid);
+      
+      // Track CV Upload event
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'cv_uploaded', { 'event_label': file.name });
+      }
 
       setStatusText('Parsing Resume through AI Proxy...');
       // 2. AI Parsing Route
       const parsedData = await parseCvFromUrl(downloadUrl);
+      
+      // Track CV parsing event
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'cv_parse_success', {
+          'event_category': 'Engagement',
+          'event_label': 'AI Parse Success'
+        });
+      }
       
       // Merge file name as fallback if AI missed it
       if (!parsedData.fullName) {

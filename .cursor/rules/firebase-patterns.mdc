@@ -1,0 +1,26 @@
+# Firebase Patterns: HR-Lite
+
+This rule defines how to handle Firebase services (Firestore, Auth, Storage) in HR-Lite.
+
+## 📦 SDK Version
+- Always use the **Modular SDK** (`firebase/auth`, `firebase/firestore`, `firebase/storage`).
+- **DO NOT** use the legacy namespaced version (`firebase.auth()`).
+
+## 🏗 Service Layers
+- Place all Firestore queries and Auth calls in `src/services/`.
+- Examples: `src/services/jobService.js`, `src/services/candidateService.js`.
+- Components should only call these services, not the SDK directly.
+
+## 🔍 Firestore Rules
+- Be aware of the existing security rules (defined in `firestore.rules`).
+- Use `where()`, `orderBy()`, and `limit()` to optimize queries.
+- Prefer `onSnapshot()` for real-time dashboards and `getDoc()` for static pages.
+
+## 📄 File Processing
+- Upload files to Firebase Storage first.
+- Save the storage URL/path in Firestore.
+- Hand off processing (Mammoth, Gemini AI) to **Cloud Functions**.
+
+## 🛡 Auth Flow
+- Always use the `useAuth` custom hook (check `src/contexts/AuthContext.js`).
+- Protect internal pages via the `DashboardLayout` or higher-level route guards.

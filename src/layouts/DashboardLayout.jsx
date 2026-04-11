@@ -8,6 +8,8 @@ export default function DashboardLayout() {
   const { currentUser, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [aiStatus, setAiStatus] = useState('checking');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileRef = React.useRef(null);
 
   useEffect(() => {
     const checkAI = async () => {
@@ -23,6 +25,17 @@ export default function DashboardLayout() {
     checkAI();
     const interval = setInterval(checkAI, 30000); // Re-check every 30s
     return () => clearInterval(interval);
+  }, []);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   async function handleLogout() {
@@ -74,12 +87,6 @@ export default function DashboardLayout() {
             </NavLink>
           )}
         </nav>
-        <div className="sidebar-footer">
-          <button className="nav-item btn-logout" onClick={handleLogout}>
-            <LogOut size={20} />
-            <span>Log Out</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Content */}
@@ -99,14 +106,28 @@ export default function DashboardLayout() {
             </div>
 
             <div style={{ position: 'relative' }}>
-              <Bell size={20} className="text-secondary" />
+              <Bell size={20} className="text-secondary" style={{ cursor: 'pointer' }} />
               <span style={{ position: 'absolute', top: -2, right: -2, width: '8px', height: '8px', backgroundColor: 'var(--color-danger)', borderRadius: '50%', border: '2px solid var(--color-surface-card)' }}></span>
             </div>
-            <div className="user-profile">
-              <div className="avatar">
+            
+            <div className="user-profile-wrapper" ref={profileRef} style={{ position: 'relative' }}>
+              <div className="avatar clickable" onClick={() => setShowProfileMenu(!showProfileMenu)}>
                 {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
               </div>
-              <span className="user-name">{currentUser?.email || 'User'}</span>
+
+              {showProfileMenu && (
+                <div className="profile-dropdown">
+                  <div className="dropdown-header">
+                    <p className="dropdown-name">{currentUser?.displayName || 'Recruiter'}</p>
+                    <p className="dropdown-email">{currentUser?.email}</p>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <button className="dropdown-item text-danger" onClick={handleLogout}>
+                    <LogOut size={16} />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

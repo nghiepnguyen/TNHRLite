@@ -48,6 +48,15 @@ export default function Pipeline() {
     if (selectedApp?.id === appId) {
       setSelectedApp(prev => ({ ...prev, stage: newStage }));
     }
+    
+    // Track pipeline stage change event
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'pipeline_stage_changed', {
+        'to_stage': newStage,
+        'app_id': appId
+      });
+    }
+    
     await updateApplicationStage(appId, newStage);
   };
 

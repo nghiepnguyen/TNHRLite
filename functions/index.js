@@ -33,7 +33,9 @@ const verifyAdmin = async (req, res, next) => {
   const token = authHeader.split('Bearer ')[1];
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    if (decodedToken.email !== 'thanhnghiep@gmail.com') {
+    // Use environment variable for admin email check
+    const adminEmail = process.env.ADMIN_EMAIL || 'thanhnghiep@gmail.com';
+    if (decodedToken.email !== adminEmail) {
       return res.status(403).json({ error: 'Forbidden: Admin access required' });
     }
     req.user = decodedToken;

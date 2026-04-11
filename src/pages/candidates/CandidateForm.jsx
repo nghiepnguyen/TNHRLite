@@ -71,6 +71,13 @@ export default function CandidateForm() {
         navigate(`/candidates/${id}`);
       } else {
         const newId = await createCandidate(payload);
+        // Track manual candidate creation event
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'create_candidate', {
+            'event_category': 'Engagement',
+            'event_label': 'Manual Candidate Created'
+          });
+        }
         navigate(`/candidates/${newId}`);
       }
     } catch (error) {

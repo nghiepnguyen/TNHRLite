@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /cvs/{userId}/{allPaths=**} {
+      // Allow the user who owns the folder to read and write
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Optionally allow the admin to read everything (add check for admin custom claim if implemented)
+      // For now, only the owner can access.
+    }
+    
+    // Default deny for everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -28,8 +28,16 @@ export default function Login() {
           return;
         }
         await register(email, password);
+        // Track signup event
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'signup_completed', { 'method': 'email' });
+        }
       } else {
         await login(email, password);
+        // Track login event
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'login_success', { 'method': 'email' });
+        }
       }
       navigate('/');
     } catch (err) {
@@ -49,6 +57,10 @@ export default function Login() {
       setError('');
       setLoading(true);
       await loginWithGoogle();
+      // Track login event (Google)
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'login_success', { 'method': 'google' });
+      }
       navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to sign in with Google.');
@@ -140,6 +152,12 @@ export default function Login() {
           >
             {isSignUp ? 'Already have an account? Log In' : "Don't have an account? Sign Up"}
           </button>
+        </div>
+        
+        <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+          This site is protected by reCAPTCHA and the Google 
+          <a href="https://policies.google.com/privacy" className="text-secondary" style={{ margin: '0 4px' }}>Privacy Policy</a> and
+          <a href="https://policies.google.com/terms" className="text-secondary" style={{ margin: '0 4px' }}>Terms of Service</a> apply.
         </div>
       </div>
     </div>

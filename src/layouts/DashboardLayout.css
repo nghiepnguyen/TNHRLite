@@ -61,18 +61,7 @@
 }
 
 .sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid var(--color-surface-border);
-}
-
-.btn-logout {
-  color: var(--color-danger);
-  justify-content: flex-start;
-}
-
-.btn-logout:hover {
-  background-color: var(--color-danger-bg);
-  color: var(--color-danger);
+  display: none;
 }
 
 .main-wrapper {
@@ -141,9 +130,84 @@
   font-weight: 600;
 }
 
-.user-name {
+.avatar.clickable {
+  transition: transform 0.2s;
+}
+
+.avatar.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 4px var(--color-surface-hover);
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  width: 240px;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  padding: 0.5rem;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 1rem 0.75rem;
+}
+
+.dropdown-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.dropdown-email {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--color-surface-border);
+  margin: 0.5rem 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.dropdown-item.text-danger {
+  color: var(--color-danger);
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: var(--color-danger-bg);
 }
 
 .main-content {

@@ -112,7 +112,11 @@ export default function DashboardLayout() {
             
             <div className="user-profile-wrapper" ref={profileRef} style={{ position: 'relative' }}>
               <div className="avatar clickable" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-                {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
+                {currentUser?.photoURL ? (
+                  <img src={currentUser.photoURL} alt="Avatar" className="avatar-img" />
+                ) : (
+                  currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'
+                )}
               </div>
 
               {showProfileMenu && (

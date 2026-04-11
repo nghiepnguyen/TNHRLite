@@ -54,10 +54,17 @@ export const updateJob = async (id, data) => {
 
 export const deleteJob = async (id) => {
   try {
-    // 1. Delete associated applications
-    const q = query(collection(db, 'applications'), where('jobId', '==', id));
+    if (!auth.currentUser) return;
+    // 1. Fetch user applications and filter in-memory (to avoid composite index requirement)
+    const q = query(
+      collection(db, 'applications'), 
+      where('createdBy', '==', auth.currentUser.uid)
+    );
     const snap = await getDocs(q);
-    const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'applications', d.id)));
+    const deletePromises = snap.docs
+      .filter(doc => doc.data().jobId === id)
+      .map(d => deleteDoc(doc(db, 'applications', d.id)));
+      
     await Promise.all(deletePromises);
     
     // 2. Delete job record
@@ -112,10 +119,17 @@ export const updateCandidate = async (candidateId, data) => {
 
 export const deleteCandidate = async (id) => {
   try {
-    // 1. Delete associated applications
-    const q = query(collection(db, 'applications'), where('candidateId', '==', id));
+    if (!auth.currentUser) return;
+    // 1. Fetch user applications and filter in-memory (to avoid composite index requirement)
+    const q = query(
+      collection(db, 'applications'), 
+      where('createdBy', '==', auth.currentUser.uid)
+    );
     const snap = await getDocs(q);
-    const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'applications', d.id)));
+    const deletePromises = snap.docs
+      .filter(doc => doc.data().candidateId === id)
+      .map(d => deleteDoc(doc(db, 'applications', d.id)));
+      
     await Promise.all(deletePromises);
     
     // 2. Delete candidate record
@@ -130,11 +144,32 @@ export const deleteCandidate = async (id) => {
 // --- APPLICATIONS (Linking Pipeline) ---
 export const getApplicationsByJob = async (jobId) => {
   try {
-    const q = query(collection(db, 'applications'), where('jobId', '==', jobId));
+    if (!auth.currentUser) return [];
+    const q = query(
+      collection(db, 'applications'), 
+      where('jobId', '==', jobId),
+      where('createdBy', '==', auth.currentUser.uid)
+    );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(formatDoc);
   } catch (error) {
     console.error("Error fetching applications:", error);
+    return [];
+  }
+};
+
+export const getApplicationsByCandidate = async (candidateId) => {
+  try {
+    if (!auth.currentUser) return [];
+    const q = query(
+      collection(db, 'applications'), 
+      where('candidateId', '==', candidateId),
+      where('createdBy', '==', auth.currentUser.uid)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(formatDoc);
+  } catch (error) {
+    console.error("Error fetching applications for candidate:", error);
     return [];
   }
 };

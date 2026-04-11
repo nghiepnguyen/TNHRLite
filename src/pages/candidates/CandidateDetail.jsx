@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, ExternalLink, Link as LinkIcon, FileText, Trash2, Edit } from 'lucide-react';
-import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate } from '../../services/db';
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, ExternalLink, Link as LinkIcon, FileText, Trash2, Edit, Layers, GraduationCap, Award, Zap } from 'lucide-react';
+import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate, getApplicationsByCandidate } from '../../services/db';
 import { compareCandidateToJob } from '../../services/ai';
 
 export default function CandidateDetail() {
@@ -12,20 +12,25 @@ export default function CandidateDetail() {
   const [selectedJob, setSelectedJob] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
+  const [linkedApplications, setLinkedApplications] = useState([]);
   const [savingNotes, setSavingNotes] = useState(false);
   const [linking, setLinking] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      const dbCandidate = await getCandidate(id);
+      const [dbCandidate, activeJobs, dbApps] = await Promise.all([
+        getCandidate(id),
+        getJobs(),
+        getApplicationsByCandidate(id)
+      ]);
+
       if (dbCandidate) {
         setCandidate(dbCandidate);
         setNotes(dbCandidate.recruiterNotes || '');
       }
 
-      // Fetch active jobs to link candidate
-      const activeJobs = await getJobs();
       setJobs(activeJobs.filter(j => j.status === 'Active'));
+      setLinkedApplications(dbApps);
       setLoading(false);
     }
     fetchData();
@@ -71,6 +76,10 @@ export default function CandidateDetail() {
       
       alert('Successfully linked! AI generated match score and summary.');
       setSelectedJob('');
+      
+      // Refresh linked applications list
+      const updatedApps = await getApplicationsByCandidate(id);
+      setLinkedApplications(updatedApps);
     } catch (error) {
       console.error(error);
       alert('Failed to link applicant. Try again.');
@@ -96,32 +105,55 @@ export default function CandidateDetail() {
 
   return (
     <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Link to="/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <ArrowLeft size={16} /> Back to Talent Pool
-        </Link>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '64px', height: '64px', backgroundColor: 'var(--color-surface-hover)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <User size={32} className="text-secondary" />
+      <div style={{ marginBottom: '2.5rem', padding: '2rem', backgroundColor: 'var(--color-surface-base)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-surface-border)', position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle Background Decoration */}
+        <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', backgroundColor: 'var(--color-primary-bg)', borderRadius: '50%', opacity: 0.1, zIndex: 0 }}></div>
+        
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <Link to="/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+            <ArrowLeft size={16} /> Back to Talent Pool
+          </Link>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', border: '1px solid var(--color-primary-border)' }}>
+                <User size={40} />
+              </div>
+              <div>
+                <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>{candidate.fullName}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-text-primary)', fontWeight: 500 }}>{candidate.currentTitle}</span>
+                  <span className="text-secondary" style={{ fontSize: '1rem' }}>at</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-primary)', fontWeight: 600 }}>{candidate.currentCompany}</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{candidate.fullName}</h1>
-              <p className="text-secondary" style={{ fontSize: '1rem', marginTop: '0.25rem' }}>{candidate.currentTitle} at {candidate.currentCompany}</p>
+            
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <Link to={`/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
+                 <Edit size={18} /> Edit
+              </Link>
+              <button onClick={handleDelete} className="btn" style={{ height: '42px', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+            <div className="badge badge-primary" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+              <Briefcase size={18} /> {candidate.yearsExperience} Years Exp.
+            </div>
+            <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+              <MapPin size={18} /> {candidate.location || 'Remote/TBD'}
+            </div>
+            <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+              <GraduationCap size={18} /> {candidate.education?.split(',')[0] || 'Degree N/A'}
+            </div>
             {candidate.cvFileUrl && (
-              <a href={candidate.cvFileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                <ExternalLink size={16} /> View Original CV
+              <a href={candidate.cvFileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginLeft: 'auto', height: '44px' }}>
+                <ExternalLink size={18} /> Full CV
               </a>
             )}
-            <Link to={`/candidates/${id}/edit`} className="btn btn-secondary">
-               <Edit size={16} /> Edit
-            </Link>
-            <button onClick={handleDelete} className="btn" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
-              <Trash2 size={16} style={{ marginRight: '0.5rem' }} /> Delete Candidate
-            </button>
           </div>
         </div>
       </div>
@@ -130,34 +162,79 @@ export default function CandidateDetail() {
         {/* Left Column: Parsed Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              <Mail size={16} /> {candidate.email || 'N/A'}
+          <div className="card" style={{ padding: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', backgroundColor: 'var(--color-surface-hover)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
+              <Mail size={16} className="text-primary" /> {candidate.email || 'N/A'}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              <Phone size={16} /> {candidate.phone || 'N/A'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
+              <Phone size={16} className="text-primary" /> {candidate.phone || 'N/A'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
               <MapPin size={16} /> {candidate.location || 'N/A'}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              <Briefcase size={16} /> {candidate.yearsExperience ? `${candidate.yearsExperience} yrs exp.` : 'Exp N/A'}
+          </div>
+
+          <div className="card" style={{ padding: '2rem', borderLeft: '4px solid var(--color-primary)' }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Zap size={20} style={{ color: 'var(--color-warning)' }} /> AI Execution Summary
+            </h2>
+            <div style={{ fontSize: '1rem', color: 'var(--color-text-primary)', lineHeight: 1.6, fontWeight: 500, fontStyle: 'italic' }}>
+              "{candidate.parsedResume || 'No summary available.'}"
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className="card" style={{ padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
+                <GraduationCap size={18} /> Education
+              </h3>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.education || 'Not specified'}</p>
+            </div>
+            <div className="card" style={{ padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
+                <Award size={18} /> Certifications
+              </h3>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.certifications || 'No certifications detected'}</p>
             </div>
           </div>
 
           <div className="card" style={{ padding: '2rem' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.5rem' }}>Structure Resume Data</h2>
-            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>
-              {candidate.parsedResume || 'No resume data parsed.'}
-            </div>
-          </div>
-
-          <div className="card" style={{ padding: '2rem' }}>
-             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Extracted Skills</h3>
-             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem' }}>Technical Skills & Expertise</h3>
+             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                 {candidate.skills && candidate.skills.length > 0 ? candidate.skills.map((s, i) => (
-                  <span key={i} className="badge badge-neutral" style={{ padding: '0.375rem 0.75rem' }}>{s}</span>
+                  <span key={i} className="badge badge-primary" style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', fontSize: '0.875rem', fontWeight: 500 }}>{s}</span>
                 )) : <span className="text-muted">None</span>}
+             </div>
+          </div>
+
+          {/* Linked Pipelines Section */}
+          <div className="card" style={{ padding: '2rem' }}>
+             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Layers size={18} className="text-primary" /> Linked Pipelines
+             </h3>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {linkedApplications.length === 0 ? (
+                  <p className="text-muted" style={{ fontSize: '0.875rem' }}>This candidate is not linked to any active jobs yet.</p>
+                ) : linkedApplications.map(app => {
+                  const job = jobs.find(j => j.id === app.jobId);
+                  return (
+                    <div key={app.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-surface-border)' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{job?.title || 'Unknown Job'}</div>
+                        <div className="text-secondary" style={{ fontSize: '0.75rem' }}>{job?.clientName || 'N/A'}</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div className={app.fitScore > 75 ? 'text-success' : 'text-warning'} style={{ fontWeight: 700, fontSize: '0.875rem' }}>{app.fitScore}% Match</div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>{app.stage}</div>
+                        </div>
+                        <Link to="/pipeline" className="btn btn-secondary" style={{ padding: '0.375rem' }}>
+                          <ExternalLink size={14} />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
              </div>
           </div>
         </div>

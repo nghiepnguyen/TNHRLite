@@ -10,20 +10,27 @@ export default function Pipeline() {
   const [applications, setApplications] = useState([]);
   const [candidatesMap, setCandidatesMap] = useState({});
   const [loading, setLoading] = useState(true);
-  
+  const [error, setError] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
-
+  
   useEffect(() => {
     async function init() {
-      const activeJobs = await getJobs();
-      setJobs(activeJobs.filter(j => j.status === 'Active'));
+      try {
+        setLoading(true);
+        setError('');
+        const activeJobs = await getJobs();
+        setJobs(activeJobs.filter(j => j.status === 'Active'));
 
-      const candidates = await getCandidates();
-      const cMap = {};
-      candidates.forEach(c => cMap[c.id] = c);
-      setCandidatesMap(cMap);
-      
-      setLoading(false);
+        const candidates = await getCandidates();
+        const cMap = {};
+        candidates.forEach(c => cMap[c.id] = c);
+        setCandidatesMap(cMap);
+      } catch (err) {
+        console.error('Initialization error:', err);
+        setError('Failed to load initial data. Please check your connection or permissions.');
+      } finally {
+        setLoading(false);
+      }
     }
     init();
   }, []);
@@ -34,10 +41,17 @@ export default function Pipeline() {
         setApplications([]);
         return;
       }
-      setLoading(true);
-      const apps = await getApplicationsByJob(selectedJob);
-      setApplications(apps);
-      setLoading(false);
+      try {
+        setLoading(true);
+        setError('');
+        const apps = await getApplicationsByJob(selectedJob);
+        setApplications(apps);
+      } catch (err) {
+        console.error('Fetch applications error:', err);
+        setError('Failed to load applications for this job. You might not have sufficient permissions.');
+      } finally {
+        setLoading(false);
+      }
     }
     fetchApps();
   }, [selectedJob]);
@@ -87,6 +101,12 @@ export default function Pipeline() {
           </select>
         </div>
       </div>
+
+      {error && (
+        <div className="badge badge-danger" style={{ display: 'block', padding: '1rem', marginBottom: '1.5rem', whiteSpace: 'normal', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
 
       {!selectedJob && (
          <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>

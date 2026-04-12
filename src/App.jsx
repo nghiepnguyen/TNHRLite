@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
+
 import Login from './pages/Login';
 import DashboardLayout from './layouts/DashboardLayout';
 
@@ -29,8 +31,10 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
+      <ToastProvider>
+        <AuthProvider>
+          <Routes>
+
           <Route path="/login" element={<Login />} />
           
           <Route path="/" element={
@@ -60,7 +64,8 @@ function App() {
             <Route path="admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
+      </ToastProvider>
     </Router>
   );
 }

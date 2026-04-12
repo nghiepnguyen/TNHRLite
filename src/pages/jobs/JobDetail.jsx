@@ -63,7 +63,7 @@ export default function JobDetail() {
                 <Briefcase size={16} /> {job.employmentType || 'Full-time'}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <Calendar size={16} /> Created: {job.createdAt?.toDate ? job.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                <Calendar size={16} /> Created: {job.createdAt?.toDate ? job.createdAt.toDate().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Just now'}
               </div>
             </div>
           </div>

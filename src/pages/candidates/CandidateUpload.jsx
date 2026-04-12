@@ -33,24 +33,25 @@ export default function CandidateUpload() {
         window.gtag('event', 'cv_uploaded', { 'event_label': file.name });
       }
 
-      setStatusText('Parsing Resume through AI Proxy...');
+      setStatusText('AI is analyzing resume patterns & experience...');
       // 2. AI Parsing Route
       const parsedData = await parseCvFromUrl(downloadUrl);
       
+      const isFallback = parsedData.email === 'dummy@example.com';
+
       // Track CV parsing event
       if (typeof window.gtag === 'function') {
-        window.gtag('event', 'cv_parse_success', {
+        window.gtag('event', isFallback ? 'cv_parse_fallback' : 'cv_parse_success', {
           'event_category': 'Engagement',
-          'event_label': 'AI Parse Success'
+          'event_label': isFallback ? 'AI Key Missing' : 'AI Parse Success'
         });
       }
       
-      // Merge file name as fallback if AI missed it
-      if (!parsedData.fullName) {
-         parsedData.fullName = file.name.split('.')[0].replace(/[-_]/g, ' ');
+      if (isFallback) {
+        setStatusText('AI Key Missing. Proceeding with manual entry mode...');
+      } else {
+        setStatusText('Successfully extracted candidate data!');
       }
-
-      setStatusText('Saving Candidate Record...');
       // 3. Save Candidate to Firestore
       const candidateId = await createCandidate({
         ...parsedData,
@@ -91,7 +92,7 @@ export default function CandidateUpload() {
           }}>
             <input 
               type="file" 
-              accept=".pdf,.doc,.docx"
+              accept=".pdf,.doc,.docx,.txt"
               onChange={handleFileChange}
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
             />
@@ -106,7 +107,7 @@ export default function CandidateUpload() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                 <UploadCloud size={48} className="text-muted" />
                 <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>Click or drag file to upload</p>
-                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Supports PDF, DOC, DOCX up to 10MB</p>
+                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Supports PDF, DOCX, TXT up to 10MB</p>
               </div>
             )}
           </div>

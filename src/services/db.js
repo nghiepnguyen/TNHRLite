@@ -2,7 +2,7 @@ import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc,
   query, orderBy, serverTimestamp, where 
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage, auth } from '../firebase';
 
 const formatDoc = (doc) => ({
@@ -119,8 +119,11 @@ export const updateCandidate = async (candidateId, data) => {
 
 export const deleteCandidate = async (id) => {
   try {
-    if (!auth.currentUser) return;
-    // 1. Fetch user applications and filter in-memory (to avoid composite index requirement)
+    // 1. Fetch candidate to get storage path before deleting doc
+    const candDoc = await getDoc(doc(db, 'candidates', id));
+    const candData = candDoc.exists() ? candDoc.data() : null;
+
+    // 2. Delete associated Applications (filter in-memory)
     const q = query(
       collection(db, 'applications'), 
       where('createdBy', '==', auth.currentUser.uid)
@@ -132,7 +135,18 @@ export const deleteCandidate = async (id) => {
       
     await Promise.all(deletePromises);
     
-    // 2. Delete candidate record
+    // 3. Delete CV file from Storage if path exists
+    if (candData && candData.cvStoragePath) {
+      try {
+        const fileRef = ref(storage, candData.cvStoragePath);
+        await deleteObject(fileRef);
+        console.log("Successfully deleted CV file from Storage:", candData.cvStoragePath);
+      } catch (storageErr) {
+        console.error("Warning: Could not delete CV file from storage (it might have been deleted already or is missing):", storageErr);
+      }
+    }
+
+    // 4. Delete candidate record
     await deleteDoc(doc(db, 'candidates', id));
   } catch (error) {
     console.error("Failed to delete candidate and relations", error);

@@ -16,12 +16,18 @@ export default function JobForm() {
   const [formData, setFormData] = useState({
     title: '',
     clientName: '',
+    department: '',
     location: '',
     employmentType: 'Full-time',
     status: 'Active',
+    totalRoles: 1,
+    deadline: '',
     jdText: '',
     requiredSkills: '',
-    optionalSkills: ''
+    optionalSkills: '',
+    workingMode: 'On-site',
+    salaryRange: '',
+    hrContact: ''
   });
 
   useEffect(() => {
@@ -32,12 +38,18 @@ export default function JobForm() {
           setFormData({
             title: job.title || '',
             clientName: job.clientName || '',
+            department: job.department || '',
             location: job.location || '',
             employmentType: job.employmentType || 'Full-time',
             status: job.status || 'Active',
+            totalRoles: job.totalRoles || 1,
+            deadline: job.deadline ? job.deadline.split('T')[0] : '',
             jdText: job.jdText || '',
             requiredSkills: Array.isArray(job.requiredSkills) ? job.requiredSkills.join(', ') : '',
-            optionalSkills: Array.isArray(job.optionalSkills) ? job.optionalSkills.join(', ') : ''
+            optionalSkills: Array.isArray(job.optionalSkills) ? job.optionalSkills.join(', ') : '',
+            workingMode: job.workingMode || 'On-site',
+            salaryRange: job.salaryRange || '',
+            hrContact: job.hrContact || ''
           });
         }
         setFetching(false);
@@ -57,6 +69,7 @@ export default function JobForm() {
 
     const payload = {
       ...formData,
+      totalRoles: parseInt(formData.totalRoles),
       requiredSkills: formData.requiredSkills.split(',').map(s => s.trim()).filter(Boolean),
       optionalSkills: formData.optionalSkills.split(',').map(s => s.trim()).filter(Boolean),
       createdBy: currentUser?.uid || 'anonymous'
@@ -112,8 +125,23 @@ export default function JobForm() {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Department</label>
+              <input type="text" name="department" className="form-control" value={formData.department} onChange={handleChange} placeholder="e.g. Engineering, Sales" />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">Location</label>
               <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} placeholder="e.g. Remote, San Francisco" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Headcount (Total Roles)</label>
+              <input type="number" name="totalRoles" className="form-control" value={formData.totalRoles} onChange={handleChange} min="1" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Submission Deadline</label>
+              <input type="date" name="deadline" className="form-control" value={formData.deadline} onChange={handleChange} />
             </div>
 
             <div className="form-group">
@@ -133,6 +161,25 @@ export default function JobForm() {
                 <option value="Closed">Closed</option>
                 <option value="Draft">Draft</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Working Mode</label>
+              <select name="workingMode" className="form-control" value={formData.workingMode} onChange={handleChange}>
+                <option value="On-site">On-site</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Salary Range</label>
+              <input type="text" name="salaryRange" className="form-control" value={formData.salaryRange} onChange={handleChange} placeholder="e.g. $5,000 - $8,000" />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label className="form-label">HR Contact Information</label>
+              <input type="text" name="hrContact" className="form-control" value={formData.hrContact} onChange={handleChange} placeholder="Name, Email or Phone of the primary recruiter" />
             </div>
 
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
@@ -162,3 +209,4 @@ export default function JobForm() {
     </div>
   );
 }
+

@@ -68,7 +68,9 @@ export default function Candidates() {
                     </div>
                   </td>
                   <td className="text-secondary" style={{ fontSize: '0.875rem' }}>
-                    {cand.createdAt?.toDate ? cand.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                    {cand.createdAt?.toDate 
+                      ? cand.createdAt.toDate().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                      : 'Just now'}
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <Link to={`/candidates/${cand.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem' }}>

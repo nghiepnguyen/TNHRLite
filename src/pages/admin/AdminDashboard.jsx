@@ -130,7 +130,9 @@ export default function AdminDashboard() {
                       {u.email}
                       {u.email === 'thanhnghiep@gmail.com' && <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>Admin</span>}
                     </td>
-                    <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>{new Date(u.creationTime).toLocaleDateString()}</td>
+                    <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>
+                      {new Date(u.creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.jobsCount}</td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.candidatesCount}</td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>

@@ -22,6 +22,21 @@ const PORT = process.env.PORT || 3001;
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
+/**
+ * Utility to extract JSON from AI response, handling markdown blocks or extra chatter.
+ */
+function cleanJsonResponse(text) {
+  try {
+    // Attempt to find content between ```json and ``` or just ``` and ```
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, text];
+    const rawJson = jsonMatch[1].trim();
+    return JSON.parse(rawJson);
+  } catch (e) {
+    console.error("Critical: Failed to extract valid JSON from Gemini response. Raw text:", text);
+    throw new Error("AI returned an invalid data format.");
+  }
+}
+
 app.post('/api/parse-cv', async (req, res) => {
   try {
     const { cvUrl } = req.body;
@@ -54,8 +69,10 @@ app.post('/api/parse-cv', async (req, res) => {
     console.log(`Downloaded buffer size: ${buffer.length} bytes`);
     if (buffer.length === 0) throw new Error("Downloaded CV buffer is empty.");
 
-    // 2. Determine file type (simple extension check from URL, then content if needed)
-    const isDocx = cvUrl.toLowerCase().includes('.docx') || cvUrl.toLowerCase().includes('.doc');
+    // 2. Determine file type from URL
+    const urlLower = cvUrl.toLowerCase();
+    const isDocx = urlLower.includes('.docx');
+    const isTxt = urlLower.includes('.txt');
     let aiInput;
 
     const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
@@ -83,8 +100,12 @@ app.post('/api/parse-cv', async (req, res) => {
       const result = await mammoth.extractRawText({ buffer });
       const extractedText = result.value;
       aiInput = [basePrompt + "\n\nResume Text Content:\n" + extractedText];
+    } else if (isTxt) {
+      console.log("TXT detected. Reading as UTF-8...");
+      const extractedText = buffer.toString('utf8');
+      aiInput = [basePrompt + "\n\nResume Text Content:\n" + extractedText];
     } else {
-      console.log("PDF detected. Passing as inlineData...");
+      console.log("PDF/Other detected. Passing as inlineData...");
       aiInput = [
         basePrompt,
         {
@@ -96,16 +117,14 @@ app.post('/api/parse-cv', async (req, res) => {
       ];
     }
 
-    // 3. Pass to Gemini
-    console.log("Calling Gemini 3 Flash...");
+    // 3. Pass to Gemini 2026 Spec Model
+    console.log("Calling Gemini 3 Flash (v1beta/2026-spec)...");
     const result = await model.generateContent(aiInput);
 
     const responseText = result.response.text();
-    // Strip rough markdown blocks if Gemini returns them
-    const jsonStr = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsedData = JSON.parse(jsonStr);
+    const parsedData = cleanJsonResponse(responseText);
 
-    console.log("Parse successful:", parsedData.fullName);
+    console.log("Parse successful for Candidate:", parsedData.fullName || 'Anonymous');
     res.json(parsedData);
   } catch (error) {
     console.error('Error parsing CV:', error.message || error);
@@ -145,8 +164,8 @@ app.post('/api/compare', async (req, res) => {
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
-    const jsonStr = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    res.json(JSON.parse(jsonStr));
+    const comparisonResult = cleanJsonResponse(responseText);
+    res.json(comparisonResult);
 
   } catch (error) {
     console.error('Error comparing:', error.message || error);

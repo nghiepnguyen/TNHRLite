@@ -8,7 +8,8 @@ export default function CandidateDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(null);
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState([]); // Store Active jobs for selection
+  const [allJobs, setAllJobs] = useState([]); // Store ALL jobs for status resolution
   const [selectedJob, setSelectedJob] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,7 @@ export default function CandidateDetail() {
         setNotes(dbCandidate.recruiterNotes || '');
       }
 
+      setAllJobs(activeJobs);
       setJobs(activeJobs.filter(j => j.status === 'Active'));
       setLinkedApplications(dbApps);
       setLoading(false);
@@ -216,12 +218,41 @@ export default function CandidateDetail() {
                 {linkedApplications.length === 0 ? (
                   <p className="text-muted" style={{ fontSize: '0.875rem' }}>This candidate is not linked to any active jobs yet.</p>
                 ) : linkedApplications.map(app => {
-                  const job = jobs.find(j => j.id === app.jobId);
+                  const job = allJobs.find(j => j.id === app.jobId);
+                  const isJobInactive = job && job.status !== 'Active';
+                  
                   return (
-                    <div key={app.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-surface-border)' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{job?.title || 'Unknown Job'}</div>
-                        <div className="text-secondary" style={{ fontSize: '0.75rem' }}>{job?.clientName || 'N/A'}</div>
+                    <div 
+                      key={app.id} 
+                      style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        padding: '1rem', 
+                        backgroundColor: isJobInactive ? 'var(--color-surface-base)' : 'var(--color-surface-hover)', 
+                        borderRadius: 'var(--radius-md)', 
+                        border: '1px solid var(--color-surface-border)',
+                        opacity: isJobInactive ? 0.75 : 1
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{job?.title || 'Unknown/Deleted Job'}</span>
+                          {job && (
+                            <span style={{ 
+                              fontSize: '0.65rem', 
+                              textTransform: 'uppercase', 
+                              padding: '2px 6px', 
+                              borderRadius: '4px',
+                              backgroundColor: job.status === 'Active' ? 'var(--color-success-bg)' : job.status === 'Closed' ? 'var(--color-danger-bg)' : 'var(--color-warning-bg)',
+                              color: job.status === 'Active' ? 'var(--color-success)' : job.status === 'Closed' ? 'var(--color-danger)' : 'var(--color-warning)',
+                              fontWeight: 700
+                            }}>
+                              {job.status}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-secondary" style={{ fontSize: '0.75rem' }}>{job?.clientName || 'Archive'}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <div style={{ textAlign: 'right' }}>

@@ -205,12 +205,31 @@ export const createApplication = async (data) => {
     createdBy: auth.currentUser?.uid || data.createdBy,
     stage: 'New', 
     createdAt: serverTimestamp(),
+    lastStageChangedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
   return docRef.id;
 };
 
 export const updateApplicationStage = async (id, stage) => {
-  await updateDoc(doc(db, 'applications', id), { stage });
+  await updateDoc(doc(db, 'applications', id), { 
+    stage,
+    lastStageChangedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+};
+
+export const updateApplication = async (id, data) => {
+  try {
+    const updateData = { ...data, updatedAt: serverTimestamp() };
+    if (data.stage) {
+      updateData.lastStageChangedAt = serverTimestamp();
+    }
+    await updateDoc(doc(db, 'applications', id), updateData);
+  } catch (error) {
+    console.error("Error updating application:", error);
+    throw error;
+  }
 };
 
 

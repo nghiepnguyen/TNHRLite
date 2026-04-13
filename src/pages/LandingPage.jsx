@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
@@ -674,10 +674,10 @@ const LandingPage = () => {
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50">© 2024 HR Lite. Tuyển dụng, đơn giản hơn.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
-            <a className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" href="#">Chính sách bảo mật</a>
-            <a className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" href="#">Điều khoản dịch vụ</a>
-            <a className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" href="#">Chính sách Cookie</a>
-            <a className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" href="#">Liên hệ hỗ trợ</a>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/privacy-policy">Chính sách bảo mật</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/terms-of-service">Điều khoản dịch vụ</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/cookie-policy">Chính sách Cookie</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/contact-support">Liên hệ hỗ trợ</Link>
           </div>
         </div>
       </footer>

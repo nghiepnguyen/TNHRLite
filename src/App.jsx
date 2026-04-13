@@ -21,6 +21,11 @@ import Dashboard from './pages/dashboard/Dashboard';
 import Reports from './pages/reports/Reports';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import TermsOfService from './pages/legal/TermsOfService';
+import CookiePolicy from './pages/legal/CookiePolicy';
+import ContactSupport from './pages/support/ContactSupport';
+
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
   const location = window.location.pathname;
@@ -44,6 +49,11 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
+            <Route path="/contact-support" element={<ContactSupport />} />
             
             <Route path="/dashboard" element={
               <ProtectedRoute>

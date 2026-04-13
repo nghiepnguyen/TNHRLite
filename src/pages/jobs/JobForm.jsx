@@ -78,7 +78,7 @@ export default function JobForm() {
     try {
       if (isEditing) {
         await updateJob(id, payload);
-        navigate(`/jobs/${id}`);
+        navigate(`/dashboard/jobs/${id}`);
       } else {
         const newId = await createJob(payload);
         // Track job creation event
@@ -88,7 +88,7 @@ export default function JobForm() {
             'event_label': 'New Job Created'
           });
         }
-        navigate(`/jobs/${newId}`);
+        navigate(`/dashboard/jobs/${newId}`);
       }
     } catch (error) {
       console.error(error);
@@ -102,7 +102,7 @@ export default function JobForm() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to={isEditing ? `/jobs/${id}` : "/jobs"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+        <Link to={isEditing ? `/dashboard/jobs/${id}` : "/dashboard/jobs"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <ArrowLeft size={16} /> Back
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -199,7 +199,7 @@ export default function JobForm() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/jobs/${id}` : "/jobs"} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/jobs/${id}` : "/dashboard/jobs"} className="btn btn-secondary">Cancel</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Job')}
             </button>

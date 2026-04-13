@@ -68,7 +68,7 @@ export default function CandidateForm() {
     try {
       if (isEditing) {
         await updateCandidate(id, payload);
-        navigate(`/candidates/${id}`);
+        navigate(`/dashboard/candidates/${id}`);
       } else {
         const newId = await createCandidate(payload);
         // Track manual candidate creation event
@@ -78,7 +78,7 @@ export default function CandidateForm() {
             'event_label': 'Manual Candidate Created'
           });
         }
-        navigate(`/candidates/${newId}`);
+        navigate(`/dashboard/candidates/${newId}`);
       }
     } catch (error) {
       console.error(error);
@@ -93,7 +93,7 @@ export default function CandidateForm() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to={isEditing ? `/candidates/${id}` : "/candidates"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+        <Link to={isEditing ? `/dashboard/candidates/${id}` : "/dashboard/candidates"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <ArrowLeft size={16} /> Back
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -163,7 +163,7 @@ export default function CandidateForm() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/candidates/${id}` : "/candidates"} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/candidates/${id}` : "/dashboard/candidates"} className="btn btn-secondary">Cancel</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
               <Save size={16} /> {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Candidate')}
             </button>

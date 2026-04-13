@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Briefcase, Users, Kanban, BarChart3, LogOut, Search, Bell, Cpu, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './DashboardLayout.css';
@@ -48,11 +48,11 @@ export default function DashboardLayout() {
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Jobs', path: '/jobs', icon: Briefcase },
-    { name: 'Candidates', path: '/candidates', icon: Users },
-    { name: 'Pipeline', path: '/pipeline', icon: Kanban },
-    { name: 'Reports', path: '/reports', icon: BarChart3 },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Jobs', path: '/dashboard/jobs', icon: Briefcase },
+    { name: 'Candidates', path: '/dashboard/candidates', icon: Users },
+    { name: 'Pipeline', path: '/dashboard/pipeline', icon: Kanban },
+    { name: 'Reports', path: '/dashboard/reports', icon: BarChart3 },
   ];
 
   return (
@@ -60,16 +60,17 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="logo">
+          <Link to="/dashboard" className="logo" style={{ textDecoration: 'none' }}>
             <Briefcase className="logo-icon" size={24} />
             HR Lite
-          </div>
+          </Link>
         </div>
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <NavLink 
               key={item.name} 
               to={item.path} 
+              end={item.path === '/dashboard'}
               className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}
             >
               <item.icon size={20} />
@@ -78,12 +79,12 @@ export default function DashboardLayout() {
           ))}
           {isAdmin && (
             <NavLink 
-              to="/admin" 
+              to="/dashboard/admin" 
               className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}
               style={{ marginTop: 'auto', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1rem' }}
             >
-              <Shield size={20} className="text-primary" />
-              <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Admin Portal</span>
+              <Shield size={20} />
+              <span style={{ fontWeight: 600 }}>Admin Portal</span>
             </NavLink>
           )}
         </nav>

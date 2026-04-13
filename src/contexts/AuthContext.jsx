@@ -40,7 +40,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
-      setIsAdmin(user?.email === 'thanhnghiep@gmail.com');
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'thanhnghiep@gmail.com';
+      setIsAdmin(user?.email === adminEmail);
       setLoading(false);
     });
 

@@ -39,7 +39,7 @@ export default function Login() {
           window.gtag('event', 'login_success', { 'method': 'email' });
         }
       }
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
          setError('Invalid email or password. You may need to Sign Up first.');
@@ -61,7 +61,7 @@ export default function Login() {
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'login_success', { 'method': 'google' });
       }
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to sign in with Google.');
       setLoading(false);

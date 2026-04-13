@@ -46,18 +46,22 @@
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   font-weight: 500;
-  transition: all 0.2s;
+  transition: var(--transition-smooth);
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .nav-item:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-text-primary);
+  transform: translateX(4px);
 }
 
 .nav-item.active {
-  background-color: var(--color-primary);
+  background: var(--color-brand-primary-container);
   color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .sidebar-footer {

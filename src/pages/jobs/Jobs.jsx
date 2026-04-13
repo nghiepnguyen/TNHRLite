@@ -137,7 +137,7 @@ export default function Jobs() {
         setRefreshKey(prev => prev + 1);
         return;
       } else if (type === 'report') {
-        navigate(`/jobs/${mandate.id}`);
+        navigate(`/dashboard/jobs/${mandate.id}`);
         return;
       } else if (type === 'extend') {
         const newDeadline = new Date(mandate.deadline);
@@ -194,7 +194,7 @@ export default function Jobs() {
             <h1 className="portal-main-title">Recruiting Mandates</h1>
             <p className="portal-sub-title">Overview of current hiring requirements and pipeline status</p>
           </div>
-          <Link to="/jobs/new" className="btn btn-primary btn-lg">
+          <Link to="/dashboard/jobs/new" className="btn btn-primary btn-lg">
             <Plus size={20} /> Create New Mandate
           </Link>
         </header>
@@ -335,58 +335,59 @@ export default function Jobs() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 40px;
+          margin-bottom: 2.5rem;
         }
 
         .portal-main-title {
-          font-size: 1.5rem;
-          font-weight: 600;
+          font-size: 1.875rem;
+          font-weight: 800;
           color: var(--color-text-primary);
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
+          letter-spacing: -0.025em;
         }
 
         .portal-sub-title {
           color: var(--color-text-secondary);
-          font-size: 0.9375rem;
+          font-size: 1rem;
         }
 
         /* Dashboard KPI Layout */
         .portal-dashboard {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          margin-bottom: 40px;
+          gap: 1.5rem;
+          margin-bottom: 2.5rem;
         }
 
         .kpi-box {
           background: white;
-          padding: 24px;
-          border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          padding: 1.5rem;
+          border-radius: var(--radius-lg);
+          border: 1px solid var(--color-surface-border);
           display: flex;
           align-items: center;
-          gap: 20px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          gap: 1.25rem;
+          box-shadow: var(--shadow-sm);
+          transition: var(--transition-smooth);
         }
 
         .kpi-box:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 25px -5px rgba(0,0,0,0.1);
+          box-shadow: var(--shadow-md);
         }
 
         .kpi-icon-base {
           width: 56px;
           height: 56px;
-          border-radius: 16px;
+          border-radius: var(--radius-md);
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
-        .kpi-icon-base.active { background: #eff6ff; color: #2563eb; }
-        .kpi-icon-base.expiring { background: #fff7ed; color: #ea580c; }
-        .kpi-icon-base.roles { background: #f0fdf4; color: #16a34a; }
+        .kpi-icon-base.active { background: var(--color-primary-bg); color: var(--color-primary); }
+        .kpi-icon-base.expiring { background: var(--color-warning-bg); color: var(--color-warning); }
+        .kpi-icon-base.roles { background: var(--color-success-bg); color: var(--color-success); }
 
         .kpi-text-base {
           display: flex;
@@ -395,21 +396,21 @@ export default function Jobs() {
         }
 
         .kpi-tag-label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #64748b;
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: var(--color-text-secondary);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
         .kpi-value-main {
-          font-size: 2rem;
-          font-weight: 800;
-          color: #0f172a;
+          font-size: 2.25rem;
+          font-weight: 900;
+          color: var(--color-text-primary);
           line-height: 1;
         }
 
-        .kpi-value-main.highlight { color: #ea580c; }
+        .kpi-value-main.highlight { color: var(--color-warning); }
 
         .kpi-value-group {
           display: flex;
@@ -418,10 +419,10 @@ export default function Jobs() {
         }
 
         .kpi-mini-badge {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #94a3b8;
-          background: #f1f5f9;
+          font-size: 0.6875rem;
+          font-weight: 700;
+          color: var(--color-text-muted);
+          background: var(--color-surface-hover);
           padding: 2px 8px;
           border-radius: 6px;
         }
@@ -429,24 +430,24 @@ export default function Jobs() {
         /* Portal Table & Components */
         .portal-table-card {
           background: white;
-          border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          border-radius: var(--radius-lg);
+          border: 1px solid var(--color-surface-border);
           overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          box-shadow: var(--shadow-sm);
           position: relative;
         }
 
         .portal-table-header {
-          padding: 20px 24px;
+          padding: 1.25rem 1.5rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
           background: #fff;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid var(--color-surface-border);
         }
 
         .portal-tabs-container {
-          background: #f1f5f9;
+          background: var(--color-surface-hover);
           padding: 4px;
           border-radius: 12px;
           display: inline-flex;
@@ -459,37 +460,39 @@ export default function Jobs() {
 
         .portal-tab {
           padding: 8px 16px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #64748b;
+          font-size: 0.8125rem;
+          font-weight: 700;
+          color: var(--color-text-secondary);
           border-radius: 8px;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: var(--transition-smooth);
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
+          text-transform: uppercase;
+          letter-spacing: 0.025em;
         }
 
-        .portal-tab:hover { color: #0f172a; }
+        .portal-tab:hover { color: var(--color-text-primary); }
 
         .portal-tab.active {
           background: white;
-          color: #2563eb;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          color: var(--color-primary);
+          box-shadow: var(--shadow-sm);
         }
 
         .tab-count {
-          font-size: 0.75rem;
-          background: #e2e8f0;
+          font-size: 0.6875rem;
+          background: var(--color-surface-border);
           padding: 2px 8px;
           border-radius: 6px;
-          color: #64748b;
+          color: var(--color-text-muted);
           margin-left: 4px;
         }
 
         .portal-tab.active .tab-count {
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--color-primary-bg);
+          color: var(--color-primary);
         }
 
         .portal-filter-btn {
@@ -498,16 +501,16 @@ export default function Jobs() {
           gap: 8px;
           padding: 10px 20px;
           font-size: 0.875rem;
-          font-weight: 600;
-          color: #475569;
+          font-weight: 700;
+          color: var(--color-text-secondary);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--color-surface-border);
           background: white;
-          transition: 0.2s;
+          transition: var(--transition-smooth);
         }
 
-        .portal-filter-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .portal-filter-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
+        .portal-filter-btn:hover { background: var(--color-surface-hover); border-color: var(--color-text-muted); }
+        .portal-filter-btn.active { background: var(--color-brand-on-surface); color: white; border-color: var(--color-brand-on-surface); }
 
         .portal-accordion {
           max-height: 0;
@@ -517,43 +520,46 @@ export default function Jobs() {
 
         .portal-accordion.visible {
           max-height: 300px;
-          padding: 24px;
-          background: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
+          padding: 1.5rem;
+          background: var(--color-surface-hover);
+          border-bottom: 1px solid var(--color-surface-border);
         }
 
         .portal-accordion-inner {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+          gap: 1.5rem;
         }
 
         .filter-input-field label {
           display: block;
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #64748b;
+          font-size: 0.6875rem;
+          font-weight: 800;
+          color: var(--color-text-muted);
           text-transform: uppercase;
           margin-bottom: 8px;
+          letter-spacing: 0.05em;
         }
 
         .filter-input-field select {
           width: 100%;
           padding: 10px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--color-surface-border);
           border-radius: 10px;
           background: white;
+          font-size: 0.875rem;
+          font-weight: 500;
         }
 
         .portal-table-footer {
-          padding: 20px 24px;
-          background: #f8fafc;
+          padding: 1.25rem 1.5rem;
+          background: var(--color-surface-hover);
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
 
-        .results-count { font-size: 0.875rem; color: #64748b; }
+        .results-count { font-size: 0.8125rem; color: var(--color-text-secondary); }
 
         .pagination-controls { display: flex; gap: 6px; }
 
@@ -561,16 +567,19 @@ export default function Jobs() {
           width: 36px;
           height: 36px;
           border-radius: 10px;
-          font-weight: 600;
-          font-size: 0.875rem;
-          transition: 0.2s;
+          font-weight: 700;
+          font-size: 0.8125rem;
+          transition: var(--transition-smooth);
           display: flex;
           align-items: center;
           justify-content: center;
+          background: white;
+          border: 1px solid var(--color-surface-border);
+          color: var(--color-text-secondary);
         }
 
-        .page-control.active { background: #2563eb; color: white; }
-        .page-control:not(.active):hover { background: #e2e8f0; }
+        .page-control.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+        .page-control:not(.active):hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
 
         .portal-spinner-overlay {
           position: absolute;
@@ -586,8 +595,8 @@ export default function Jobs() {
         .portal-spinner {
           width: 2rem;
           height: 2rem;
-          border: 3px solid #e2e8f0;
-          border-top-color: #2563eb;
+          border: 3px solid var(--color-surface-border);
+          border-top-color: var(--color-primary);
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
@@ -596,12 +605,12 @@ export default function Jobs() {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .error-screen {
-          padding: 80px 24px;
+          padding: 5rem 1.5rem;
           text-align: center;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 16px;
+          gap: 1rem;
         }
 
         @media (max-width: 1024px) {
@@ -610,8 +619,8 @@ export default function Jobs() {
         }
 
         @media (max-width: 640px) {
-          .portal-header { flex-direction: column; align-items: stretch; gap: 24px; }
-          .portal-table-footer { flex-direction: column; gap: 20px; text-align: center; }
+          .portal-header { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+          .portal-table-footer { flex-direction: column; gap: 1.25rem; text-align: center; }
         }
       `}} />
     </div>

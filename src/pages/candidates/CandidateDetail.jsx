@@ -94,7 +94,7 @@ export default function CandidateDetail() {
     if (window.confirm('Are you sure you want to permanently delete this candidate? Pipeline history forms will be wiped.')) {
       try {
         await deleteCandidate(id);
-        navigate('/candidates');
+        navigate('/dashboard/candidates');
       } catch (error) {
         console.error(error);
         alert('Could not delete the candidate.');
@@ -112,7 +112,7 @@ export default function CandidateDetail() {
         <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', backgroundColor: 'var(--color-primary-bg)', borderRadius: '50%', opacity: 0.1, zIndex: 0 }}></div>
         
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Link to="/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+          <Link to="/dashboard/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
             <ArrowLeft size={16} /> Back to Talent Pool
           </Link>
           
@@ -132,7 +132,7 @@ export default function CandidateDetail() {
             </div>
             
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <Link to={`/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
+              <Link to={`/dashboard/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
                  <Edit size={18} /> Edit
               </Link>
               <button onClick={handleDelete} className="btn" style={{ height: '42px', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
@@ -259,7 +259,7 @@ export default function CandidateDetail() {
                           <div className={app.fitScore > 75 ? 'text-success' : 'text-warning'} style={{ fontWeight: 700, fontSize: '0.875rem' }}>{app.fitScore}% Match</div>
                           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>{app.stage}</div>
                         </div>
-                        <Link to="/pipeline" className="btn btn-secondary" style={{ padding: '0.375rem' }}>
+                        <Link to="/dashboard/pipeline" className="btn btn-secondary" style={{ padding: '0.375rem' }}>
                           <ExternalLink size={14} />
                         </Link>
                       </div>

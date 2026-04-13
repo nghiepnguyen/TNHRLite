@@ -12,6 +12,8 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": true,
+    "trailingSlash": false,
     "rewrites": [
       {
         "source": "/api/**",

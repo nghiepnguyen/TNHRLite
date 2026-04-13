@@ -16,7 +16,7 @@ export default function JobDetail() {
         setJob(fetchedJob);
       } else {
         // If not found in mock/real db, back to list
-        navigate('/jobs');
+        navigate('/dashboard/jobs');
       }
       setLoading(false);
     }
@@ -27,7 +27,7 @@ export default function JobDetail() {
     if (window.confirm('Are you sure you want to delete this job? All candidate links in the pipeline will be removed.')) {
       try {
         await deleteJob(id);
-        navigate('/jobs');
+        navigate('/dashboard/jobs');
       } catch (error) {
         console.error(error);
         alert('Failed to delete job');
@@ -41,7 +41,7 @@ export default function JobDetail() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to="/jobs" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+        <Link to="/dashboard/jobs" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <ArrowLeft size={16} /> Back to Jobs
         </Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -71,7 +71,7 @@ export default function JobDetail() {
             <button onClick={handleDelete} className="btn" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
               <Trash2 size={16} /> Delete
             </button>
-            <Link to={`/jobs/${job.id}/edit`} className="btn btn-secondary">
+            <Link to={`/dashboard/jobs/${job.id}/edit`} className="btn btn-secondary">
               <Edit size={16} /> Edit Job
             </Link>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Save, X, AlertCircle, Calendar, 
-  Users, FileText, ChevronDown, Globe,
+  Users, FileText, Globe,
   DollarSign, User
 } from 'lucide-react';
 import { updateJob } from '../services/db';
@@ -116,7 +116,6 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 <option value="Closed">Closed</option>
                 <option value="Expired">Expired</option>
               </select>
-              <ChevronDown className="select-icon" size={16} />
             </div>
           </div>
 
@@ -171,7 +170,6 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 <option value="Remote">Remote</option>
                 <option value="Hybrid">Hybrid</option>
               </select>
-              <ChevronDown className="select-icon" size={16} />
             </div>
           </div>
 
@@ -278,12 +276,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
         }
 
         .select-icon {
-          position: absolute;
-          right: 0.75rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: var(--color-text-muted);
-          pointer-events: none;
+          display: none;
         }
 
         .input-with-icon {
@@ -304,7 +297,8 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
         }
 
         .form-control {
-          select-appearance: none;
+          appearance: none;
+          -webkit-appearance: none;
           width: 100%;
           padding: 0.625rem 0.75rem 0.625rem 2.25rem;
           border: 1px solid var(--color-surface-border);

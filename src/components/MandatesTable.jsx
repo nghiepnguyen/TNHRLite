@@ -203,7 +203,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           background: var(--color-surface-hover);
           padding: 1rem 1.5rem;
           font-size: 0.75rem;
-          font-weight: 600;
+          font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.05em;
           color: var(--color-text-secondary);
@@ -212,7 +212,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
         .interactive-row {
           cursor: pointer;
-          transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: var(--transition-smooth);
         }
 
         .interactive-row:hover {
@@ -228,32 +228,32 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
         /* Status Badges */
         .status-badge {
           display: inline-flex;
-          padding: 0.25rem 0.625rem;
+          padding: 0.25rem 0.75rem;
           border-radius: 99px;
-          font-size: 0.7rem;
-          font-weight: 700;
+          font-size: 0.6875rem;
+          font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.025em;
+          letter-spacing: 0.05em;
         }
 
-        .badge-active { background: #dcfce7; color: #15803d; }
-        .badge-on-hold { background: #fef9c3; color: #a16207; }
-        .badge-closed { background: #f1f5f9; color: #475569; }
-        .badge-expired { background: #fee2e2; color: #b91c1c; }
+        .badge-active { background: var(--color-success-bg); color: var(--color-success); }
+        .badge-on-hold { background: var(--color-warning-bg); color: var(--color-warning); }
+        .badge-closed { background: var(--color-surface-hover); color: var(--color-text-secondary); }
+        .badge-expired { background: var(--color-danger-bg); color: var(--color-danger); }
 
         /* Progress Components */
         .progress-track {
           height: 6px;
-          background: #e2e8f0;
+          background: var(--color-surface-hover);
           border-radius: 10px;
           overflow: hidden;
         }
 
         .progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, var(--color-primary), #60a5fa);
+          background: var(--color-brand-primary-container);
           border-radius: 10px;
-          transition: width 0.6s ease;
+          transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Mobile Card Styling */
@@ -270,7 +270,10 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           border-radius: var(--radius-lg);
           padding: 1.25rem;
           box-shadow: var(--shadow-sm);
+          transition: var(--transition-smooth);
         }
+
+        .mandate-mobile-card:active { transform: scale(0.98); }
 
         .card-mobile-header {
           display: flex;
@@ -281,15 +284,16 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
         .mobile-deadline {
           font-size: 0.75rem;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--color-text-muted);
         }
 
         .mobile-title {
           font-size: 1.125rem;
-          font-weight: 700;
+          font-weight: 800;
           color: var(--color-text-primary);
           margin-bottom: 0.25rem;
+          letter-spacing: -0.01em;
         }
 
         .mobile-client {
@@ -297,7 +301,8 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           align-items: center;
           gap: 0.5rem;
           font-size: 0.8125rem;
-          color: var(--color-text-secondary);
+          color: var(--color-primary);
+          font-weight: 600;
           margin-bottom: 1.25rem;
         }
 
@@ -309,6 +314,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           font-size: 0.75rem;
           margin-bottom: 0.5rem;
           color: var(--color-text-secondary);
+          font-weight: 600;
         }
 
         .m-action-group {
@@ -318,17 +324,19 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
         }
 
         .m-action-btn {
-          height: 36px;
+          height: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: 8px;
+          border-radius: 10px;
           background: var(--color-surface-hover);
           color: var(--color-text-secondary);
           gap: 0.5rem;
-          font-size: 0.85rem;
+          font-size: 0.8125rem;
+          font-weight: 700;
+          transition: var(--transition-smooth);
         }
-        .m-action-btn:hover { background: #f1f5f9; color: var(--color-primary); }
+        .m-action-btn:hover { background: var(--color-surface-border); color: var(--color-text-primary); }
         .m-action-btn.btn-danger { color: var(--color-danger); }
 
         @media (max-width: 768px) {
@@ -336,30 +344,44 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           .mobile-only { display: flex !important; }
         }
 
-        /* ... remaining existing styles for desktop ... */
         .mandate-info { display: flex; flex-direction: column; gap: 0.25rem; }
-        .mandate-name { font-weight: 600; color: var(--color-primary); font-size: 0.9375rem; }
-        .mandate-meta { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: var(--color-text-secondary); }
+        .mandate-name { font-weight: 800; color: var(--color-text-primary); font-size: 1rem; letter-spacing: -0.01em; transition: color 0.2s; }
+        .interactive-row:hover .mandate-name { color: var(--color-primary); }
+        .mandate-meta { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: var(--color-text-secondary); font-weight: 500; }
         .roles-progress-container { width: 140px; }
-        .roles-labels { display: flex; align-items: baseline; gap: 2px; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.375rem; }
+        .roles-labels { display: flex; align-items: baseline; gap: 2px; font-size: 1rem; font-weight: 900; margin-bottom: 0.375rem; color: var(--color-text-primary); }
         .roles-divider { color: var(--color-text-muted); font-weight: 400; }
-        .roles-total { color: var(--color-text-secondary); font-weight: 500; }
-        .deadline-display { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text-secondary); }
-        .expiring-soon { color: #d97706; }
-        .expired { color: #dc2626; }
-        .urgent-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
-        .action-button-group { display: flex; gap: 0.5rem; justify-content: flex-end; opacity: 0.6; transition: all 0.3s ease; }
-        .interactive-row:hover .action-button-group { opacity: 1; transform: scale(1.02); }
-        .interactive-row:hover .action-btn { transform: scale(1.05); }
-        .action-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--color-text-secondary); background: transparent; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
-        .action-btn:hover { background: var(--color-surface-card); color: var(--color-primary) !important; transform: scale(1.15) !important; box-shadow: var(--shadow-sm); z-index: 10; }
-        .action-btn.btn-danger:hover { color: #dc2626; }
-        .action-btn.btn-info:hover { color: #0284c7; }
-        [data-tooltip]::before { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px); padding: 0.4rem 0.6rem; background: #1e293b; color: white; font-size: 0.7rem; border-radius: 4px; white-space: nowrap; pointer-events: none; opacity: 0; transition: all 0.2s ease; z-index: 100; }
-        [data-tooltip]:hover::before { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+        .roles-total { color: var(--color-text-secondary); font-weight: 600; }
+        .deadline-display { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-text-secondary); }
+        .expiring-soon { color: var(--color-warning); font-weight: 700; }
+        .expired { color: var(--color-danger); font-weight: 700; }
+        .urgent-dot { width: 8px; height: 8px; background: var(--color-danger); border-radius: 50%; box-shadow: 0 0 0 2px var(--color-danger-bg); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        .action-button-group { display: flex; gap: 0.375rem; justify-content: flex-end; opacity: 0.4; transition: var(--transition-smooth); }
+        .interactive-row:hover .action-button-group { opacity: 1; transform: translateX(-4px); }
+        .action-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--color-text-secondary); background: var(--color-surface-hover); transition: var(--transition-bounce); position: relative; border: 1px solid transparent; }
+        .action-btn:hover { background: white; color: var(--color-primary) !important; border-color: var(--color-surface-border); box-shadow: var(--shadow-sm); z-index: 10; }
+        .action-btn.btn-danger:hover { color: var(--color-danger) !important; }
+        .action-btn.btn-info:hover { color: var(--color-brand-primary) !important; }
+        
+        [data-tooltip]::before { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px); padding: 0.5rem 0.75rem; background: var(--color-brand-on-surface); color: white; font-size: 0.6875rem; font-weight: 700; border-radius: 6px; white-space: nowrap; pointer-events: none; opacity: 0; transition: var(--transition-smooth); z-index: 100; box-shadow: var(--shadow-md); }
+        [data-tooltip]:hover::before { opacity: 1; transform: translateX(-50%) translateY(-12px); }
         .text-right { text-align: right; }
-        .empty-table-state { padding: 4rem; text-align: center; color: var(--color-text-muted); }
+        .empty-table-state { 
+          padding: 6rem 2rem; 
+          text-align: center; 
+          color: var(--color-text-muted); 
+          font-weight: 600; 
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          background: var(--color-surface-hover);
+          margin: 0.5rem;
+          border-radius: var(--radius-md);
+          border: 2px dashed var(--color-surface-border);
+        }
       `}} />
     </div>
   );

@@ -81,3 +81,33 @@ VITE_RECAPTCHA_SITE_KEY=your_recaptcha_key
 ---
 
 *This project was bootstrapped with [React + Vite](https://vitejs.dev/).*
+
+## 🚀 Deployment
+
+Follow these steps to deploy HR-Lite to production.
+
+### 1. Configure Backend Secrets
+Since the Gemini API key is sensitive, use Firebase Secrets Manager instead of `.env` for production:
+```bash
+firebase functions:secrets:set GEMINI_API_KEY
+```
+*(Enter the key when prompted)*
+
+### 2. Deploy Cloud Functions
+Ensure you have the right admin email configured in your environment or via Google Cloud console.
+```bash
+firebase deploy --only functions
+```
+
+### 3. Deploy Frontend (Hosting)
+First, build the production bundle:
+```bash
+npm run build
+```
+Then deploy to Firebase Hosting:
+```bash
+firebase deploy --only hosting
+```
+
+### 4. Admin Access
+The primary admin is defined in `VITE_ADMIN_EMAIL` (.env) and the `ADMIN_EMAIL` environment variable for Cloud Functions. Default is `thanhnghiep@gmail.com`.

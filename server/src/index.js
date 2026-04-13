@@ -2,9 +2,34 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mammoth = require('mammoth');
+const fs = require('fs');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-
 dotenv.config();
+
+// Initialize Firebase Admin with Service Account if available
+const admin = require('firebase-admin');
+const serviceAccountPath = path.join(__dirname, '../service-account.json');
+
+const adminConfig = {
+  projectId: process.env.FIREBASE_PROJECT_ID || 'tn-hr-lite'
+};
+
+if (fs.existsSync(serviceAccountPath)) {
+  try {
+    const serviceAccount = require(serviceAccountPath);
+    adminConfig.credential = admin.credential.cert(serviceAccount);
+    console.log("✅ Firebase Admin: Loaded credentials from service-account.json");
+  } catch (err) {
+    console.error("❌ Firebase Admin: Error loading service-account.json:", err.message);
+  }
+} else {
+  console.warn("⚠️ Firebase Admin: No service-account.json found. Using default credentials.");
+}
+
+admin.initializeApp(adminConfig);
+
+console.log(`Firebase Admin initialized for project: ${adminConfig.projectId}`);
 
 const app = express();
 
@@ -36,6 +61,102 @@ function cleanJsonResponse(text) {
     throw new Error("AI returned an invalid data format.");
   }
 }
+
+// Admin Middleware: Ensures caller is the authenticated admin.
+const verifyAdmin = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or invalid authorization token' });
+  }
+  
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    // Use environment variable for admin email check
+    const adminEmail = process.env.ADMIN_EMAIL || 'thanhnghiep@gmail.com';
+    
+    if (decodedToken.email !== adminEmail) {
+      console.warn(`Unauthorized admin access attempt from: ${decodedToken.email}`);
+      return res.status(403).json({ error: 'Forbidden: Admin access required. Email mismatch.' });
+    }
+    
+    console.log(`Admin verified: ${decodedToken.email}`);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error("Admin verifyIdToken error:", error.message);
+    return res.status(401).json({ error: 'Unauthorized: Invalid or expired token', details: error.message });
+  }
+};
+
+// Admin Endpoint: List Users & Stats
+app.get('/api/admin/users', verifyAdmin, async (req, res) => {
+  try {
+    const db = admin.firestore();
+    const listUsersResult = await admin.auth().listUsers(1000);
+    
+    // Process records
+    const usersWithStats = await Promise.all(listUsersResult.users.map(async (userRecord) => {
+      // Aggregate Queries: count jobs & candidates by this user
+      const jobsQuery = db.collection('jobs').where('createdBy', '==', userRecord.uid);
+      const candsQuery = db.collection('candidates').where('createdBy', '==', userRecord.uid);
+
+      const [jobsSnapshot, candsSnapshot] = await Promise.all([
+        jobsQuery.count().get(),
+        candsQuery.count().get()
+      ]);
+
+      return {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName || 'Unnamed User',
+        creationTime: userRecord.metadata.creationTime,
+        lastSignInTime: userRecord.metadata.lastSignInTime,
+        jobsCount: jobsSnapshot.data().count,
+        candidatesCount: candsSnapshot.data().count
+      };
+    }));
+
+    res.json(usersWithStats);
+  } catch (error) {
+    console.error("Fetch admin users error:", error);
+    res.status(500).json({ error: 'Failed to retrieve users' });
+  }
+});
+
+// Admin Endpoint: Cascade Delete User & Data
+app.delete('/api/admin/users/:uid', verifyAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const db = admin.firestore();
+    
+    // Delete associated applications, jobs, and candidates
+    const userJobDocs = await db.collection('jobs').where('createdBy', '==', uid).get();
+    const userCandidateDocs = await db.collection('candidates').where('createdBy', '==', uid).get();
+    
+    const batch = db.batch();
+    
+    for (const candDoc of userCandidateDocs.docs) {
+       const apps = await db.collection('applications').where('candidateId', '==', candDoc.id).get();
+       apps.forEach(appDoc => batch.delete(appDoc.ref));
+       batch.delete(candDoc.ref);
+    }
+    
+    for (const jobDoc of userJobDocs.docs) {
+       const apps = await db.collection('applications').where('jobId', '==', jobDoc.id).get();
+       apps.forEach(appDoc => batch.delete(appDoc.ref));
+       batch.delete(jobDoc.ref);
+    }
+
+    await batch.commit();
+    await admin.auth().deleteUser(uid);
+
+    res.json({ success: true, message: 'User and all associated data deleted.' });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ error: 'Failed to delete user and data.', details: error.message });
+  }
+});
 
 app.post('/api/parse-cv', async (req, res) => {
   try {

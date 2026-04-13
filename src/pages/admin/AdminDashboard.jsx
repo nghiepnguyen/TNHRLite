@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
+      if (!auth.currentUser) throw new Error('Not authenticated with Firebase');
       const token = await auth.currentUser.getIdToken();
       
       const res = await fetch(`${API_BASE_URL}/admin/users`, {
@@ -27,12 +28,15 @@ export default function AdminDashboard() {
         }
       });
       
-      if (!res.ok) throw new Error('Failed to fetch users');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.details || 'Failed to fetch users');
+      }
       const data = await res.json();
       setUsers(data);
     } catch (err) {
       console.error(err);
-      setError('Could not load users. Make sure you have admin rights and the backend is running.');
+      setError(`Error: ${err.message}. Check if you have admin privileges and the server is running.`);
     } finally {
       setLoading(false);
     }
@@ -45,6 +49,7 @@ export default function AdminDashboard() {
     
     try {
       setError(null);
+      if (!auth.currentUser) throw new Error('Not authenticated with Firebase');
       const token = await auth.currentUser.getIdToken();
       const res = await fetch(`${API_BASE_URL}/admin/users/${uid}`, {
         method: 'DELETE',
@@ -72,8 +77,8 @@ export default function AdminDashboard() {
     );
   }
 
-  const totalJobs = users.reduce((acc, u) => acc + (u.jobsCount || 0), 0);
-  const totalCandidates = users.reduce((acc, u) => acc + (u.candidatesCount || 0), 0);
+  const totalJobs = Array.isArray(users) ? users.reduce((acc, u) => acc + (u.jobsCount || 0), 0) : 0;
+  const totalCandidates = Array.isArray(users) ? users.reduce((acc, u) => acc + (u.candidatesCount || 0), 0) : 0;
 
   return (
     <div style={{ padding: '2rem' }}>
@@ -119,16 +124,14 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>Loading users...</td></tr>
-              ) : users.length === 0 ? (
-                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>No users found (or fetch failed).</td></tr>
+              {!Array.isArray(users) || users.length === 0 ? (
+                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>{loading ? 'Loading users...' : 'No users found.'}</td></tr>
               ) : (
                 users.map(u => (
                   <tr key={u.uid} style={{ borderBottom: '1px solid var(--color-surface-border)' }}>
                     <td style={{ padding: '1rem', fontWeight: 500 }}>
                       {u.email}
-                      {u.email === 'thanhnghiep@gmail.com' && <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>Admin</span>}
+                      {u.uid === currentUser?.uid && <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>Bạn</span>}
                     </td>
                     <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>
                       {new Date(u.creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}

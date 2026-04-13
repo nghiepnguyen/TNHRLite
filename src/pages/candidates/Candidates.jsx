@@ -24,11 +24,11 @@ export default function Candidates() {
           <p className="text-secondary">Talent pool and parsed resumes</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <Link to="/candidates/new" className="btn btn-secondary">
+          <Link to="/dashboard/candidates/new" className="btn btn-secondary">
             <UserPlus size={18} />
             Manual Entry
           </Link>
-          <Link to="/candidates/upload" className="btn btn-primary">
+          <Link to="/dashboard/candidates/upload" className="btn btn-primary">
             <Upload size={18} />
             Upload CV
           </Link>
@@ -73,7 +73,7 @@ export default function Candidates() {
                       : 'Just now'}
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <Link to={`/candidates/${cand.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem' }}>
+                    <Link to={`/dashboard/candidates/${cand.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem' }}>
                       Profile <ChevronRight size={16} />
                     </Link>
                   </td>
@@ -84,7 +84,7 @@ export default function Candidates() {
                   <td colSpan="4" style={{ textAlign: 'center', padding: '3rem' }} className="text-muted">
                     <FileText size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                     <p>No candidates found in pool.</p>
-                    <Link to="/candidates/upload" className="text-primary" style={{ marginTop: '0.5rem', display: 'inline-block' }}>Upload a CV to parse</Link>
+                    <Link to="/dashboard/candidates/upload" className="text-primary" style={{ marginTop: '0.5rem', display: 'inline-block' }}>Upload a CV to parse</Link>
                   </td>
                 </tr>
               )}

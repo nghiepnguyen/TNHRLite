@@ -61,7 +61,7 @@ export default function CandidateUpload() {
         recruiterNotes: '' // Initial empty state
       });
 
-      navigate(`/candidates/${candidateId}`);
+      navigate(`/dashboard/candidates/${candidateId}`);
     } catch (error) {
       console.error(error);
       alert('Failed to process candidate. Check configuration rules.');
@@ -72,7 +72,7 @@ export default function CandidateUpload() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to="/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+        <Link to="/dashboard/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <ArrowLeft size={16} /> Back to Talent Pool
         </Link>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Upload Candidate CV</h1>

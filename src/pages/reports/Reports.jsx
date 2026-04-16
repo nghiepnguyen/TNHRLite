@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { getJobs, getAllApplications } from '../../services/db';
-import { BarChart3, PieChart, Activity } from 'lucide-react';
+
 
 export default function Reports() {
+  const { workspaceId } = useParams();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      const fetchedJobs = await getJobs();
-      const fetchedApps = await getAllApplications();
+      if (!workspaceId) return;
+      setLoading(true);
+      const fetchedJobs = await getJobs(workspaceId);
+      const fetchedApps = await getAllApplications(workspaceId);
       setJobs(fetchedJobs);
       setApplications(fetchedApps);
       setLoading(false);
@@ -21,7 +25,7 @@ export default function Reports() {
       }
     }
     loadData();
-  }, []);
+  }, [workspaceId]);
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading analytical data...</div>;
 
@@ -33,7 +37,7 @@ export default function Reports() {
           <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Internal data summaries and hiring volume.</p>
         </div>
         <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-           <BarChart3 size={48} className="text-muted" style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+           <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted"  style={{ margin: '0 auto 1rem', opacity: 0.5 }}>leaderboard</span>
            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>Not Enough Data</h2>
            <p className="text-secondary" style={{ marginTop: '0.5rem', maxWidth: '400px', margin: '0.5rem auto 0' }}>
              Create your first mandate and start adding candidates into the pipeline to generate analytical reports!
@@ -51,7 +55,7 @@ export default function Reports() {
           <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Internal data summaries and hiring volume.</p>
         </div>
         <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-           <PieChart size={48} className="text-muted" style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+           <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted"  style={{ margin: '0 auto 1rem', opacity: 0.5 }}>pie_chart</span>
            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>No Applications Yet</h2>
            <p className="text-secondary" style={{ marginTop: '0.5rem', maxWidth: '400px', margin: '0.5rem auto 0' }}>
              Start linking structured candidates to your job pipelines to view stage volume matrices and AI fit score distributions.
@@ -90,7 +94,7 @@ export default function Reports() {
         {/* Applications by Stage */}
         <div className="card" style={{ padding: '2rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
-            <BarChart3 size={18} className="text-primary" /> Application Volume by Stage
+            <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">leaderboard</span> Application Volume by Stage
           </h3>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5rem', height: '200px', paddingBottom: '1rem', borderBottom: '1px solid var(--color-surface-border)' }}>
             {['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'].map(stage => {
@@ -111,7 +115,7 @@ export default function Reports() {
         {/* Fit Score Distribution */}
         <div className="card" style={{ padding: '2rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
-            <PieChart size={18} className="text-primary" /> AI Match Quality Distribution
+            <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">pie_chart</span> AI Match Quality Distribution
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {[
@@ -135,7 +139,7 @@ export default function Reports() {
         {/* Recruiter Summary Table */}
         <div className="card" style={{ padding: '2rem', gridColumn: 'span 2' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <Activity size={18} className="text-primary" /> Active Jobs Workload Overview
+            <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">monitoring</span> Active Jobs Workload Overview
           </h3>
           <table style={{ width: '100%' }}>
             <thead>

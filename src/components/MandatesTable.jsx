@@ -1,8 +1,5 @@
 import React from 'react';
-import { 
-  Pencil, CalendarClock, Copy, XCircle, Eye, 
-  Building2, ChevronRight, Info, Trash2
-} from 'lucide-react';
+
 import { useToast } from '../contexts/ToastContext';
 
 /**
@@ -86,7 +83,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
                     <div className="mandate-info">
                       <span className="mandate-name">{mandate.title}</span>
                       <span className="mandate-meta">
-                        <Building2 size={12} /> {mandate.clientName || 'Internal'}
+                        <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">business</span> {mandate.clientName || 'Internal'}
                       </span>
                     </div>
                   </td>
@@ -118,12 +115,12 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
                   </td>
                   <td className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="action-button-group">
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)} data-tooltip="Chỉnh sửa mandate"><Pencil size={18} /></button>
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'extend', mandate)} data-tooltip="Gia hạn deadline"><CalendarClock size={18} /></button>
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'duplicate', mandate)} data-tooltip="Nhân bản"><Copy size={18} /></button>
-                      <button className="action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)} data-tooltip="Đóng mandate"><XCircle size={18} /></button>
-                      <button className="action-btn btn-delete text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)} data-tooltip="Xóa vĩnh viễn"><Trash2 size={18} /></button>
-                      <button className="action-btn btn-info" onClick={(e) => handleActionClick(e, 'report', mandate)} data-tooltip="Xem chi tiết"><Eye size={18} /></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)} data-tooltip="Chỉnh sửa mandate"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'extend', mandate)} data-tooltip="Gia hạn deadline"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'duplicate', mandate)} data-tooltip="Nhân bản"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">content_copy</span></button>
+                      <button className="action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)} data-tooltip="Đóng mandate"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">cancel</span></button>
+                      <button className="action-btn btn-delete text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)} data-tooltip="Xóa vĩnh viễn"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span></button>
+                      <button className="action-btn btn-info" onClick={(e) => handleActionClick(e, 'report', mandate)} data-tooltip="Xem chi tiết"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">visibility</span></button>
                     </div>
                   </td>
                 </tr>
@@ -151,7 +148,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
               <div className="card-mobile-body">
                 <h4 className="mobile-title">{mandate.title}</h4>
                 <div className="mobile-client">
-                  <Building2 size={14} /> {mandate.clientName}
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">business</span> {mandate.clientName}
                 </div>
                 
                 <div className="mobile-progress-section">
@@ -169,10 +166,10 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
               <div className="m-card-footer" onClick={e => e.stopPropagation()}>
                 <div className="m-action-group">
-                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)}><Pencil size={16} /> Edit</button>
-                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'clone', mandate)}><Copy size={16} /> Clone</button>
-                  <button className="m-action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)}><XCircle size={16} /> Close</button>
-                  <button className="m-action-btn text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)}><Trash2 size={16} /> Delete</button>
+                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">edit</span> Edit</button>
+                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'clone', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> Clone</button>
+                  <button className="m-action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">cancel</span> Close</button>
+                  <button className="m-action-btn text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Delete</button>
                 </div>
               </div>
             </div>
@@ -182,7 +179,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
       {mandates.length === 0 && (
         <div className="empty-table-state">
-           <Info size={32} opacity={0.5} />
+           <span className="material-symbols-outlined flex-shrink-0 !text-[32px]" opacity={0.5}>info</span>
            <p>Không tìm thấy mandate nào</p>
         </div>
       )}

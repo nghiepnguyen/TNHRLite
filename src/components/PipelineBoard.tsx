@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, User, Tag, Layout } from 'lucide-react';
+
 import CandidateCard from './CandidateCard';
 import { getAppState } from '../utils/pipelineUtils';
 
@@ -89,7 +89,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
       {/* Quick Filters Bar */}
       <div className="bg-white p-4 border-b border-slate-200 flex flex-wrap gap-4 items-center transition-all">
         <div className="relative flex-1 min-w-[240px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
           <input 
             type="text" 
             placeholder="Search candidates by name..."
@@ -101,7 +101,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
 
         <div className="flex gap-2 items-center overflow-x-auto no-scrollbar pb-1 sm:pb-0">
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 whitespace-nowrap">
-            <Filter size={14} className="text-slate-500" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-slate-500">filter_alt</span>
             <select 
               className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none border-none py-0.5"
               value={filterPriority}
@@ -115,7 +115,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
           </div>
 
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 whitespace-nowrap">
-            <User size={14} className="text-slate-500" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-slate-500">person</span>
             <select 
               className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none border-none py-0.5"
               value={filterOwner}
@@ -126,7 +126,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
           </div>
 
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 whitespace-nowrap">
-            <Tag size={14} className="text-slate-500" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-slate-500">label</span>
             <span className="text-xs font-semibold text-slate-400">Tags...</span>
           </div>
         </div>
@@ -199,7 +199,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
                 
                 {appsInStage.length === 0 && (
                   <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200/40 rounded-xl m-1">
-                    <Layout size={24} className="text-slate-200 mb-2" />
+                    <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-slate-200 mb-2">dashboard</span>
                     <span className="text-[10px] text-slate-300 font-medium italic">Empty</span>
                   </div>
                 )}

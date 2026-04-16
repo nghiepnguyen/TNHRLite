@@ -1,13 +1,24 @@
+import { auth } from '../firebase';
 const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : '/api';
 
-export const parseCvFromUrl = async (cvUrl) => {
+/**
+ * Helper to get Auth Token for backend calls
+ */
+const getAuthHeaders = async () => {
+  const token = await auth.currentUser?.getIdToken();
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+};
+
+export const parseCvFromUrl = async (workspaceId, cvUrl) => {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/parse-cv`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cvUrl }),
+      headers,
+      body: JSON.stringify({ workspaceId, cvUrl }),
     });
 
     if (!response.ok) {
@@ -29,14 +40,13 @@ export const parseCvFromUrl = async (cvUrl) => {
   }
 };
 
-export const compareCandidateToJob = async (candidate, job) => {
+export const compareCandidateToJob = async (workspaceId, candidate, job) => {
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/compare`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ candidate, job }),
+      headers,
+      body: JSON.stringify({ workspaceId, candidate, job }),
     });
 
     if (!response.ok) {

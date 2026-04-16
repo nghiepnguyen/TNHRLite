@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Save, X, AlertCircle, Calendar, 
-  Users, FileText, Globe,
-  DollarSign, User
-} from 'lucide-react';
+
 import { updateJob } from '../services/db';
 import { useToast } from '../contexts/ToastContext';
 
@@ -123,7 +119,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group">
             <label className="form-label">Recruitment Deadline</label>
             <div className={`input-with-icon ${errors.deadline ? 'has-error' : ''}`}>
-              <Calendar className="input-icon" size={16} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">calendar_month</span>
               <input 
                 type="date" 
                 name="deadline" 
@@ -140,7 +136,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group">
             <label className="form-label">Total Headcount (Roles)</label>
             <div className={`input-with-icon ${errors.totalRoles ? 'has-error' : ''}`}>
-              <Users className="input-icon" size={16} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">group</span>
               <input 
                 type="number" 
                 name="totalRoles" 
@@ -159,7 +155,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group">
             <label className="form-label">Working Mode</label>
             <div className="select-wrapper">
-              <span className="input-icon-left"><Globe size={16} /></span>
+              <span className="input-icon-left"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">public</span></span>
               <select 
                 name="workingMode" 
                 value={formData.workingMode} 
@@ -177,7 +173,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group">
             <label className="form-label">Salary Range</label>
             <div className="input-with-icon">
-              <DollarSign className="input-icon" size={16} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">payments</span>
               <input 
                 type="text" 
                 name="salaryRange" 
@@ -193,7 +189,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group span-2">
             <label className="form-label">HR Contact Information</label>
             <div className="input-with-icon">
-              <User className="input-icon" size={16} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">person</span>
               <input 
                 type="text" 
                 name="hrContact" 
@@ -209,7 +205,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group span-2">
             <label className="form-label">Internal Change Note</label>
             <div className="input-with-icon">
-              <FileText className="input-icon top" size={16} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon top">description</span>
               <textarea 
                 name="note" 
                 value={formData.note} 
@@ -230,7 +226,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
             {isSubmitting ? (
               <><span className="spinner-loader"></span> Saving...</>
             ) : (
-              <><Save size={18} /> Update Mandate</>
+              <><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">save</span> Update Mandate</>
             )}
           </button>
         </div>

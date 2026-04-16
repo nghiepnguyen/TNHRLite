@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, UploadCloud, FileType } from 'lucide-react';
-import { uploadCV, createCandidate } from '../../services/db';
+import { useNavigate, Link, useParams } from 'react-router-dom';
+
+import { uploadCV, createCandidate, logActivity } from '../../services/db';
 import { parseCvFromUrl } from '../../services/ai';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateUpload() {
+  const { workspaceId } = useParams();
+  const { userProfile } = useWorkspace();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState('');
@@ -26,7 +29,7 @@ export default function CandidateUpload() {
     try {
       setStatusText('Uploading CV to Storage...');
       // 1. Upload to Storage
-      const { downloadUrl, path } = await uploadCV(file, currentUser?.uid);
+      const { downloadUrl, path } = await uploadCV(file, currentUser?.uid, workspaceId);
       
       // Track CV Upload event
       if (typeof window.gtag === 'function') {
@@ -35,7 +38,7 @@ export default function CandidateUpload() {
 
       setStatusText('AI is analyzing resume patterns & experience...');
       // 2. AI Parsing Route
-      const parsedData = await parseCvFromUrl(downloadUrl);
+      const parsedData = await parseCvFromUrl(workspaceId, downloadUrl);
       
       const isFallback = parsedData.email === 'dummy@example.com';
 
@@ -53,15 +56,24 @@ export default function CandidateUpload() {
         setStatusText('Successfully extracted candidate data!');
       }
       // 3. Save Candidate to Firestore
-      const candidateId = await createCandidate({
+      const candidateId = await createCandidate(workspaceId, {
         ...parsedData,
         cvFileUrl: downloadUrl,
         cvStoragePath: path,
         createdBy: currentUser?.uid || 'anonymous',
         recruiterNotes: '' // Initial empty state
       });
+      
+      // Log activity
+      await logActivity(workspaceId, userProfile, 'CV_UPLOADED', {
+        type: 'candidate',
+        id: candidateId,
+        name: parsedData.fullName
+      }, {
+        fileName: file.name
+      });
 
-      navigate(`/dashboard/candidates/${candidateId}`);
+      navigate(`/dashboard/w/${workspaceId}/candidates/${candidateId}`);
     } catch (error) {
       console.error(error);
       alert('Failed to process candidate. Check configuration rules.');
@@ -72,8 +84,8 @@ export default function CandidateUpload() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to="/dashboard/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <ArrowLeft size={16} /> Back to Talent Pool
+        <Link to={`/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Talent Pool
         </Link>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Upload Candidate CV</h1>
         <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Upload a PDF or Word document to parse into a structured profile.</p>
@@ -98,14 +110,14 @@ export default function CandidateUpload() {
             />
             {file ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                <FileType size={48} className="text-primary" />
+                <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-primary">description</span>
                 <p style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '0.5rem' }}>{file.name}</p>
                 <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                 <button type="button" onClick={(e) => { e.preventDefault(); setFile(null); }} className="text-danger" style={{ marginTop: '1rem', fontSize: '0.875rem', zIndex: 10, position: 'relative' }}>Clear File</button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                <UploadCloud size={48} className="text-muted" />
+                <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted">cloud_upload</span>
                 <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>Click or drag file to upload</p>
                 <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Supports PDF, DOCX, TXT up to 10MB</p>
               </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Brain, AlertCircle, Ban } from 'lucide-react';
+
 
 /**
  * CandidateCard component for the recruitment pipeline.
@@ -57,7 +57,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
       {/* Blocked/Priority Indicator */}
       {isBlocked && (
         <div className="absolute top-2 right-2 text-red-500" title="Blocked or High Priority Action Required">
-          <Ban size={14} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">block</span>
         </div>
       )}
 
@@ -84,7 +84,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                   ? 'bg-amber-100 text-amber-700' 
                   : 'bg-slate-100 text-slate-600'}
             `}>
-              <Brain size={10} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[10px]">psychology</span>
               <span>{fitScore}% Match</span>
             </div>
           )}
@@ -93,7 +93,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
             <span className={overdue ? 'text-amber-600' : ''}>{days > 0 ? `${days}d` : 'Today'}</span>
             {overdue && (
-              <AlertCircle size={12} className="text-amber-500 animate-pulse" />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[12px] text-amber-500 animate-pulse">error</span>
             )}
           </div>
         </div>
@@ -103,7 +103,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           w-6 h-6 rounded-full flex items-center justify-center transition-colors
           ${selected ? 'bg-blue-100 text-blue-600' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}
         `}>
-          <User size={14} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">person</span>
         </div>
       </div>
     </div>

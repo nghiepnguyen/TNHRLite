@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ShieldAlert, Trash2, Shield, Users, Briefcase } from 'lucide-react';
+
 import { auth } from '../../firebase';
 
 const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : '/api';
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
   if (!isAdmin) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <ShieldAlert size={48} className="text-danger" style={{ margin: '0 auto 1rem' }} />
+        <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-danger"  style={{ margin: '0 auto 1rem' }}>report</span>
         <h1>Access Denied</h1>
         <p>You do not have administrative privileges.</p>
       </div>
@@ -83,24 +83,24 @@ export default function AdminDashboard() {
   return (
     <div style={{ padding: '2rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-        <Shield size={32} className="text-primary" />
+        <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-primary">shield</span>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 600 }}>Admin Portal</h1>
       </div>
 
       {/* Aggregate Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <Users size={24} className="text-primary" style={{ margin: '0 auto 0.5rem' }} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary"  style={{ margin: '0 auto 0.5rem' }}>group</span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{users.length}</h3>
           <p className="text-secondary">Total Users</p>
         </div>
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <Briefcase size={24} className="text-info" style={{ margin: '0 auto 0.5rem' }} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-info"  style={{ margin: '0 auto 0.5rem' }}>work</span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{totalJobs}</h3>
           <p className="text-secondary">Total Jobs Posted</p>
         </div>
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <Users size={24} className="text-success" style={{ margin: '0 auto 0.5rem' }} />
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-success"  style={{ margin: '0 auto 0.5rem' }}>group</span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{totalCandidates}</h3>
           <p className="text-secondary">Total Candidates Uploaded</p>
         </div>
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
                         title="Delete User"
                         style={{ padding: '0.5rem', border: 'none', backgroundColor: 'transparent' }}
                       >
-                        <Trash2 size={18} />
+                        <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
                       </button>
                     </td>
                   </tr>

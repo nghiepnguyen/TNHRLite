@@ -327,3 +327,61 @@ select.form-control {
 .reveal-delay-300 { transition-delay: 300ms; }
 .reveal-delay-400 { transition-delay: 400ms; }
 .reveal-delay-500 { transition-delay: 500ms; }
+
+/* Global Modal System */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-ambient);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-surface-border);
+  padding: 0; /* Standardized: No outer padding */
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--color-surface-border);
+  background: var(--color-surface-hover);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--color-surface-border);
+  background: var(--color-surface-hover);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

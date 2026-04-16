@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { useToast } from '../contexts/ToastContext';
 
-import { 
-  X, Briefcase, MapPin, Globe, DollarSign, Mail, 
-  Calendar, Clock, CheckCircle, ArrowRight, 
-  Download, Copy, Trash2, AlertTriangle, Layers, Settings, ArrowLeft,
-  User
-} from 'lucide-react';
+
 import EditMandateForm from './EditMandateForm';
 
 
@@ -52,16 +47,16 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         {/* Header */}
         <div className="modal-header">
           <div className="header-badge">
-             <Briefcase size={16} /> {isEditing ? 'Editing Mandate' : 'Mandate Details'}
+             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> {isEditing ? 'Editing Mandate' : 'Mandate Details'}
           </div>
           <div className="header-actions">
             {isEditing && (
               <button className="btn-back" onClick={() => setIsEditing(false)}>
-                <ArrowLeft size={16} /> Back to Details
+                <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Details
               </button>
             )}
             <button className="close-btn" onClick={onClose}>
-              <X size={24} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[24px]">close</span>
             </button>
           </div>
         </div>
@@ -84,35 +79,35 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
 
               <div className="info-stats">
                 <div className="info-item">
-                  <Layers size={18} className="text-muted" />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">layers</span>
                   <div>
                     <div className="info-label">Department</div>
                     <div className="info-value">{mandate.department || 'N/A'}</div>
                   </div>
                 </div>
                 <div className="info-item">
-                  <MapPin size={18} className="text-muted" />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">location_on</span>
                   <div>
                     <div className="info-label">Location</div>
                     <div className="info-value">{mandate.location}</div>
                   </div>
                 </div>
                 <div className="info-item">
-                  <Globe size={18} className="text-muted" />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">public</span>
                   <div>
                     <div className="info-label">Working Mode</div>
                     <div className="info-value">{mandate.workingMode || 'On-site'}</div>
                   </div>
                 </div>
                 <div className="info-item">
-                  <DollarSign size={18} className="text-muted" />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">payments</span>
                   <div>
                     <div className="info-label">Salary Range</div>
                     <div className="info-value">{mandate.salaryRange || 'N/A'}</div>
                   </div>
                 </div>
                 <div className="info-item">
-                  <User size={18} className="text-muted" />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">person</span>
                   <div>
                     <div className="info-label">HR Contact</div>
                     <div className="info-value" style={{ fontSize: '0.8125rem' }}>{mandate.hrContact || mandate.contact || 'Not specified'}</div>
@@ -154,7 +149,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
                 </div>
 
                 <div className="status-deadline">
-                   <Calendar size={14} /> Deadline: {new Date(mandate.deadline).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                   <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">calendar_month</span> Deadline: {new Date(mandate.deadline).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                 </div>
               </div>
 
@@ -231,26 +226,26 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         <div className="modal-footer">
           <div className="footer-left">
             <button className="btn btn-secondary" onClick={handleExport}>
-              <Download size={16} /> Export Report (CSV)
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> Export Report (CSV)
             </button>
           </div>
           <div className="footer-right">
             {!showConfirmClose ? (
               <>
                 <button className="btn btn-secondary" onClick={() => setIsEditing(true)}>
-                  <Settings size={16} /> Edit Settings
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">settings</span> Edit Settings
                 </button>
                 <button className="btn btn-secondary" onClick={handleClone}>
-                  <Copy size={16} /> Clone Mandate
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> Clone Mandate
                 </button>
                 <button className="btn btn-danger-outline" onClick={() => setShowConfirmClose(true)}>
-                  <Trash2 size={16} /> Close Mandate
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Close Mandate
                 </button>
               </>
 
             ) : (
               <div className="confirm-actions">
-                <span className="confirm-text"><AlertTriangle size={16} /> Are you sure?</span>
+                <span className="confirm-text"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">alerttriangle</span> Are you sure?</span>
                 <button className="btn btn-danger" onClick={handleConfirmClose}>Yes, Close</button>
                 <button className="btn btn-secondary" onClick={() => setShowConfirmClose(false)}>No, Keep Open</button>
               </div>
@@ -260,18 +255,6 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(15, 23, 42, 0.7);
-          backdrop-filter: blur(8px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          animation: fadeIn 0.3s ease-out;
-        }
-
         .modal-content {
           background: var(--color-surface-card);
           width: 90%;
@@ -282,6 +265,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
           display: flex;
           flex-direction: column;
           border: 1px solid var(--color-surface-border);
+          padding: 0 !important;
           animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -331,7 +315,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         .btn-back:hover { opacity: 0.7; transform: translateX(-4px); }
 
         .modal-body {
-          padding: 2.5rem;
+          padding: 1.5rem 2.5rem;
           overflow-y: auto;
           max-height: calc(90vh - 160px);
         }
@@ -342,17 +326,17 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         .detail-grid {
           display: grid;
           grid-template-columns: 1.5fr 1fr;
-          gap: 3rem;
-          margin-bottom: 3rem;
+          gap: 2rem;
+          margin-bottom: 2rem;
         }
 
         .detail-title {
-          font-size: 2.25rem;
+          font-size: 1.75rem;
           font-weight: 900;
           color: var(--color-text-primary);
           margin-bottom: 0.5rem;
           letter-spacing: -0.04em;
-          line-height: 1.1;
+          line-height: 1.2;
         }
 
         .detail-client {

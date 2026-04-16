@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Plus, Briefcase, MapPin, Building2, ChevronRight, 
-  AlertCircle, Users, Clock, Filter, CheckCircle
-} from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { getJobs, getAllApplications, updateJob, createJob } from '../../services/db';
 
 import MandateDetailModal from '../../components/MandateDetailModal';
@@ -16,6 +13,7 @@ import { useToast } from '../../contexts/ToastContext';
  */
 export default function Jobs() {
   const navigate = useNavigate();
+  const { workspaceId } = useParams();
   const [mandates, setMandates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,8 +34,8 @@ export default function Jobs() {
       try {
         setLoading(true);
         const [jobs, applications] = await Promise.all([
-          getJobs(),
-          getAllApplications()
+          getJobs(workspaceId),
+          getAllApplications(workspaceId)
         ]);
 
         const appCountsByJob = applications.reduce((acc, app) => {
@@ -91,7 +89,7 @@ export default function Jobs() {
       }
     }
     getMandatesData();
-  }, [refreshKey]);
+  }, [refreshKey, workspaceId]);
 
   // KPI aggregation
   const activeCount = mandates.filter(m => m.status === 'Active').length;
@@ -127,17 +125,18 @@ export default function Jobs() {
       }
 
       if (type === 'close') {
+        if (!window.confirm(`Are you sure you want to close "${mandate.title}"? This will hide it from the active pipeline view.`)) return;
         await updateJob(mandate.id, { status: 'Closed' });
         toast({ type: 'success', message: 'Mandate closed successfully.' });
       } else if (type === 'clone' || type === 'duplicate') {
         const { id, pipeline, createdAt, is_soon_expiring, ...payload } = mandate;
-        await createJob({ ...payload, title: `${mandate.title} (Copy)`, status: 'Active' });
+        await createJob(workspaceId, { ...payload, title: `${mandate.title} (Copy)`, status: 'Active' });
         toast({ type: 'success', message: 'Mandate cloned successfully.' });
       } else if (type === 'update') {
         setRefreshKey(prev => prev + 1);
         return;
       } else if (type === 'report') {
-        navigate(`/dashboard/jobs/${mandate.id}`);
+        navigate(`/dashboard/w/${workspaceId}/jobs/${mandate.id}`);
         return;
       } else if (type === 'extend') {
         const newDeadline = new Date(mandate.deadline);
@@ -177,7 +176,7 @@ export default function Jobs() {
 
   if (error) return (
     <div className="error-screen">
-      <AlertCircle size={48} />
+      <span className="material-symbols-outlined flex-shrink-0 !text-[48px]">error</span>
       <h3>Connection Error</h3>
       <p>{error}</p>
       <button onClick={() => setRefreshKey(k => k+1)} className="btn btn-primary">Retry Sync</button>
@@ -194,22 +193,22 @@ export default function Jobs() {
             <h1 className="portal-main-title">Recruiting Mandates</h1>
             <p className="portal-sub-title">Overview of current hiring requirements and pipeline status</p>
           </div>
-          <Link to="/dashboard/jobs/new" className="btn btn-primary btn-lg">
-            <Plus size={20} /> Create New Mandate
+          <Link to={`/dashboard/w/${workspaceId}/jobs/new`} className="btn btn-primary btn-lg">
+            <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">add</span> Create New Mandate
           </Link>
         </header>
 
         {/* Dashboard KPIs */}
         <section className="portal-dashboard">
           <div className="kpi-box">
-            <div className="kpi-icon-base active"><Briefcase size={24} /></div>
+            <div className="kpi-icon-base active"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">work</span></div>
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Active Mandates</span>
               <span className="kpi-value-main">{activeCount}</span>
             </div>
           </div>
           <div className="kpi-box">
-            <div className="kpi-icon-base expiring"><Clock size={24} /></div>
+            <div className="kpi-icon-base expiring"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">schedule</span></div>
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Expiring Soon</span>
               <div className="kpi-value-group">
@@ -219,7 +218,7 @@ export default function Jobs() {
             </div>
           </div>
           <div className="kpi-box">
-            <div className="kpi-icon-base roles"><Users size={24} /></div>
+            <div className="kpi-icon-base roles"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">group</span></div>
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Total Open Roles</span>
               <span className="kpi-value-main">{totalOpenRoles}</span>
@@ -244,7 +243,7 @@ export default function Jobs() {
                   className={`portal-tab ${activeTab === 'Active' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Active')}
                 >
-                  <Briefcase size={16} /> Active <span className="tab-count">{mandates.filter(m => m.status === 'Active').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> Active <span className="tab-count">{mandates.filter(m => m.status === 'Active').length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'On-Hold' ? 'active' : ''}`}
@@ -256,7 +255,7 @@ export default function Jobs() {
                   className={`portal-tab ${activeTab === 'Closed' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Closed')}
                 >
-                  <CheckCircle size={16} /> Closed <span className="tab-count">{mandates.filter(m => m.status === 'Closed').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">check_circle</span> Closed <span className="tab-count">{mandates.filter(m => m.status === 'Closed').length}</span>
                 </button>
               </div>
             </div>
@@ -264,7 +263,7 @@ export default function Jobs() {
               className={`portal-filter-btn ${isFilterExpanded ? 'active' : ''}`}
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
             >
-              <Filter size={16} /> Filters
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">filter_alt</span> Filters
             </button>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+
 
 const ToastContext = createContext(null);
 
@@ -121,10 +121,10 @@ const ToastContainer = ({ toasts, onRemove }) => {
 
 const Toast = ({ type, message, onRemove }) => {
   const icons = {
-    success: <CheckCircle className="toast-icon" size={18} />,
-    error: <AlertCircle className="toast-icon" size={18} />,
-    warning: <AlertTriangle className="toast-icon" size={18} />,
-    info: <Info className="toast-icon" size={18} />
+    success: <span className="material-symbols-outlined flex-shrink-0 !text-[18px] toast-icon">check_circle</span>,
+    error: <span className="material-symbols-outlined flex-shrink-0 !text-[18px] toast-icon">error</span>,
+    warning: <span className="material-symbols-outlined flex-shrink-0 !text-[18px] toast-icon">warning</span>,
+    info: <span className="material-symbols-outlined flex-shrink-0 !text-[18px] toast-icon">info</span>
   };
 
   return (
@@ -132,7 +132,7 @@ const Toast = ({ type, message, onRemove }) => {
       {icons[type]}
       <div className="toast-message">{message}</div>
       <button className="toast-close" onClick={onRemove}>
-        <X size={16} />
+        <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">close</span>
       </button>
     </div>
   );

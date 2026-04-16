@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, ExternalLink, Link as LinkIcon, FileText, Trash2, Edit, Layers, GraduationCap, Award, Zap } from 'lucide-react';
-import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate, getApplicationsByCandidate } from '../../services/db';
+
+import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate, getApplicationsByCandidate, logActivity } from '../../services/db';
 import { compareCandidateToJob } from '../../services/ai';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateDetail() {
-  const { id } = useParams();
+  const { workspaceId, id } = useParams();
+  const { userProfile } = useWorkspace();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(null);
   const [jobs, setJobs] = useState([]); // Store Active jobs for selection
@@ -19,10 +21,11 @@ export default function CandidateDetail() {
 
   useEffect(() => {
     async function fetchData() {
+      if (!workspaceId) return;
       const [dbCandidate, activeJobs, dbApps] = await Promise.all([
-        getCandidate(id),
-        getJobs(),
-        getApplicationsByCandidate(id)
+        getCandidate(id, workspaceId),
+        getJobs(workspaceId),
+        getApplicationsByCandidate(workspaceId, id)
       ]);
 
       if (dbCandidate) {
@@ -42,6 +45,16 @@ export default function CandidateDetail() {
     setSavingNotes(true);
     try {
       await updateCandidate(id, { recruiterNotes: notes });
+      
+      if (workspaceId && userProfile) {
+        await logActivity(workspaceId, userProfile, 'NOTE_ADDED', {
+          type: 'candidate',
+          id: id,
+          name: candidate?.fullName
+        });
+      }
+
+      // Toast or alert is fine, user current uses alert
       alert('Notes saved!');
     } catch (e) {
       console.error(e);
@@ -57,9 +70,9 @@ export default function CandidateDetail() {
       const targetJob = jobs.find(j => j.id === selectedJob);
       
       // Hit Proxy Server for GenAI Comparison
-      const aiResults = await compareCandidateToJob(candidate, targetJob);
+      const aiResults = await compareCandidateToJob(workspaceId, candidate, targetJob);
 
-      await createApplication({
+      await createApplication(workspaceId, {
         candidateId: id,
         jobId: selectedJob,
         fitScore: aiResults.fitScore || 0,
@@ -67,6 +80,17 @@ export default function CandidateDetail() {
         gaps: aiResults.gaps || [],
         aiSummary: aiResults.aiSummary || '',
       });
+      
+      if (workspaceId && userProfile) {
+        await logActivity(workspaceId, userProfile, 'APPLICATION_CREATED', {
+          type: 'candidate',
+          id: id,
+          name: candidate?.fullName
+        }, {
+          jobId: selectedJob,
+          jobTitle: targetJob?.title
+        });
+      }
       
       // Track candidate matching event
       if (typeof window.gtag === 'function') {
@@ -80,7 +104,7 @@ export default function CandidateDetail() {
       setSelectedJob('');
       
       // Refresh linked applications list
-      const updatedApps = await getApplicationsByCandidate(id);
+      const updatedApps = await getApplicationsByCandidate(workspaceId, id);
       setLinkedApplications(updatedApps);
     } catch (error) {
       console.error(error);
@@ -94,7 +118,7 @@ export default function CandidateDetail() {
     if (window.confirm('Are you sure you want to permanently delete this candidate? Pipeline history forms will be wiped.')) {
       try {
         await deleteCandidate(id);
-        navigate('/dashboard/candidates');
+        navigate(`/dashboard/w/${workspaceId}/candidates`);
       } catch (error) {
         console.error(error);
         alert('Could not delete the candidate.');
@@ -112,14 +136,14 @@ export default function CandidateDetail() {
         <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', backgroundColor: 'var(--color-primary-bg)', borderRadius: '50%', opacity: 0.1, zIndex: 0 }}></div>
         
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Link to="/dashboard/candidates" className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
-            <ArrowLeft size={16} /> Back to Talent Pool
+          <Link to={`/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Talent Pool
           </Link>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', border: '1px solid var(--color-primary-border)' }}>
-                <User size={40} />
+                <span className="material-symbols-outlined flex-shrink-0 !text-[40px]">person</span>
               </div>
               <div>
                 <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>{candidate.fullName}</h1>
@@ -132,28 +156,28 @@ export default function CandidateDetail() {
             </div>
             
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <Link to={`/dashboard/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
-                 <Edit size={18} /> Edit
+              <Link to={`/dashboard/w/${workspaceId}/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
+                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span> Edit
               </Link>
               <button onClick={handleDelete} className="btn" style={{ height: '42px', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
-                <Trash2 size={18} />
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
               </button>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
             <div className="badge badge-primary" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <Briefcase size={18} /> {candidate.yearsExperience} Years Exp.
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">work</span> {candidate.yearsExperience} Years Exp.
             </div>
             <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <MapPin size={18} /> {candidate.location || 'Remote/TBD'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">location_on</span> {candidate.location || 'Remote/TBD'}
             </div>
             <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <GraduationCap size={18} /> {candidate.education?.split(',')[0] || 'Degree N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> {candidate.education?.split(',')[0] || 'Degree N/A'}
             </div>
             {candidate.cvFileUrl && (
               <a href={candidate.cvFileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginLeft: 'auto', height: '44px' }}>
-                <ExternalLink size={18} /> Full CV
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">open_in_new</span> Full CV
               </a>
             )}
           </div>
@@ -166,19 +190,19 @@ export default function CandidateDetail() {
           
           <div className="card" style={{ padding: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', backgroundColor: 'var(--color-surface-hover)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Mail size={16} className="text-primary" /> {candidate.email || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">mail</span> {candidate.email || 'N/A'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Phone size={16} className="text-primary" /> {candidate.phone || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">phone</span> {candidate.phone || 'N/A'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              <MapPin size={16} /> {candidate.location || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">location_on</span> {candidate.location || 'N/A'}
             </div>
           </div>
 
           <div className="card" style={{ padding: '2rem', borderLeft: '4px solid var(--color-primary)' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Zap size={20} style={{ color: 'var(--color-warning)' }} /> AI Execution Summary
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]" style={{ color: 'var(--color-warning)' }}>bolt</span> AI Execution Summary
             </h2>
             <div style={{ fontSize: '1rem', color: 'var(--color-text-primary)', lineHeight: 1.6, fontWeight: 500, fontStyle: 'italic' }}>
               "{candidate.parsedResume || 'No summary available.'}"
@@ -188,20 +212,22 @@ export default function CandidateDetail() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
-                <GraduationCap size={18} /> Education
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> Education
               </h3>
               <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.education || 'Not specified'}</p>
             </div>
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
-                <Award size={18} /> Certifications
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">workspace_premium</span> Certifications
               </h3>
               <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.certifications || 'No certifications detected'}</p>
             </div>
           </div>
 
           <div className="card" style={{ padding: '2rem' }}>
-             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem' }}>Technical Skills & Expertise</h3>
+             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">psychology</span> Technical Skills & Expertise
+             </h3>
              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                 {candidate.skills && candidate.skills.length > 0 ? candidate.skills.map((s, i) => (
                   <span key={i} className="badge badge-primary" style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', fontSize: '0.875rem', fontWeight: 500 }}>{s}</span>
@@ -212,7 +238,7 @@ export default function CandidateDetail() {
           {/* Linked Pipelines Section */}
           <div className="card" style={{ padding: '2rem' }}>
              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Layers size={18} className="text-primary" /> Linked Pipelines
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">layers</span> Linked Pipelines
              </h3>
              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {linkedApplications.length === 0 ? (
@@ -259,8 +285,8 @@ export default function CandidateDetail() {
                           <div className={app.fitScore > 75 ? 'text-success' : 'text-warning'} style={{ fontWeight: 700, fontSize: '0.875rem' }}>{app.fitScore}% Match</div>
                           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>{app.stage}</div>
                         </div>
-                        <Link to="/dashboard/pipeline" className="btn btn-secondary" style={{ padding: '0.375rem' }}>
-                          <ExternalLink size={14} />
+                        <Link to={`/dashboard/w/${workspaceId}/pipeline`} className="btn btn-secondary" style={{ padding: '0.375rem' }}>
+                          <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">open_in_new</span>
                         </Link>
                       </div>
                     </div>
@@ -275,7 +301,7 @@ export default function CandidateDetail() {
           
           <div className="card" style={{ padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <LinkIcon size={18} className="text-secondary" /> Add to Pipeline
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">add_link</span> Add to Pipeline
             </h3>
              <select className="form-control" style={{ marginBottom: '1rem' }} value={selectedJob} onChange={(e) => setSelectedJob(e.target.value)}>
                 <option value="">Select a Job...</option>
@@ -288,7 +314,7 @@ export default function CandidateDetail() {
 
           <div className="card" style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileText size={18} className="text-secondary" /> Recruiter Notes
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">description</span> Recruiter Notes
             </h3>
             <textarea 
               className="form-control" 

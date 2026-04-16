@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Edit } from 'lucide-react';
-import { getJob, createJob, updateJob } from '../../services/db';
+
+import { getJob, createJob, updateJob, logActivity } from '../../services/db';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function JobForm() {
-  const { id } = useParams();
+  const { workspaceId, id } = useParams();
+  const { userProfile } = useWorkspace();
   const isEditing = !!id;
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -33,7 +35,7 @@ export default function JobForm() {
   useEffect(() => {
     if (isEditing) {
       async function fetchJobData() {
-        const job = await getJob(id);
+        const job = await getJob(id, workspaceId);
         if (job) {
           setFormData({
             title: job.title || '',
@@ -56,11 +58,23 @@ export default function JobForm() {
       }
       fetchJobData();
     }
-  }, [id, isEditing]);
+  }, [id, workspaceId, isEditing]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this job? All candidate links in the pipeline will be removed.')) {
+      try {
+        await deleteJob(id, workspaceId);
+        navigate(`/dashboard/w/${workspaceId}/jobs`);
+      } catch (error) {
+        console.error(error);
+        alert('Failed to delete job');
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,9 +92,19 @@ export default function JobForm() {
     try {
       if (isEditing) {
         await updateJob(id, payload);
-        navigate(`/dashboard/jobs/${id}`);
+        navigate(`/dashboard/w/${workspaceId}/jobs/${id}`);
       } else {
-        const newId = await createJob(payload);
+        const newId = await createJob(workspaceId, payload);
+        
+        // Log activity
+        await logActivity(workspaceId, userProfile, 'JOB_CREATED', {
+          type: 'job',
+          id: newId,
+          name: payload.title
+        }, {
+          client: payload.clientName
+        });
+
         // Track job creation event
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'create_job', {
@@ -88,7 +112,7 @@ export default function JobForm() {
             'event_label': 'New Job Created'
           });
         }
-        navigate(`/dashboard/jobs/${newId}`);
+        navigate(`/dashboard/w/${workspaceId}/jobs/${newId}`);
       }
     } catch (error) {
       console.error(error);
@@ -102,11 +126,11 @@ export default function JobForm() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to={isEditing ? `/dashboard/jobs/${id}` : "/dashboard/jobs"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <ArrowLeft size={16} /> Back
+        <Link to={isEditing ? `/dashboard/w/${workspaceId}/jobs/${id}` : `/dashboard/w/${workspaceId}/jobs`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {isEditing ? <Edit size={24} className="text-muted"/> : null}
+          {isEditing ? <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-muted">edit</span> : null}
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? 'Edit Job' : 'Create New Job'}</h1>
         </div>
       </div>
@@ -199,7 +223,7 @@ export default function JobForm() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/dashboard/jobs/${id}` : "/dashboard/jobs"} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/w/${workspaceId}/jobs/${id}` : `/dashboard/w/${workspaceId}/jobs`} className="btn btn-secondary">Cancel</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Job')}
             </button>

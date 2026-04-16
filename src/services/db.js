@@ -11,12 +11,12 @@ const formatDoc = (doc) => ({
 });
 
 // --- JOBS ---
-export const getJobs = async () => {
+export const getJobs = async (workspaceId) => {
   try {
-    if (!auth.currentUser) return [];
+    if (!auth.currentUser || !workspaceId) return [];
     const q = query(
       collection(db, 'jobs'), 
-      where('createdBy', '==', auth.currentUser.uid)
+      where('workspaceId', '==', workspaceId)
     );
     const snapshot = await getDocs(q);
     const docs = snapshot.docs.map(formatDoc);
@@ -27,20 +27,30 @@ export const getJobs = async () => {
   }
 };
 
-export const getJob = async (jobId) => {
+export const getJob = async (jobId, workspaceId) => {
   try {
-    const docSnap = await getDoc(doc(db, 'jobs', jobId));
-    if (docSnap.exists()) return formatDoc(docSnap);
-    return null;
+    const docRef = doc(db, 'jobs', jobId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    
+    const data = docSnap.data();
+    // Security check: Ensure job belongs to requested workspace
+    if (workspaceId && data.workspaceId !== workspaceId) {
+      console.error("Access denied: Job does not belong to this workspace");
+      return null;
+    }
+    return formatDoc(docSnap);
   } catch (error) {
     console.error("Error fetching job:", error);
     return null;
   }
 };
 
-export const createJob = async (jobData) => {
+export const createJob = async (workspaceId, jobData) => {
+  if (!workspaceId) throw new Error("Workspace ID is required to create a job");
   const docRef = await addDoc(collection(db, 'jobs'), {
     ...jobData,
+    workspaceId,
     createdBy: auth.currentUser?.uid || jobData.createdBy,
     status: jobData.status || 'Active',
     createdAt: serverTimestamp(),
@@ -52,18 +62,17 @@ export const updateJob = async (id, data) => {
   await updateDoc(doc(db, 'jobs', id), data);
 };
 
-export const deleteJob = async (id) => {
+export const deleteJob = async (id, workspaceId) => {
   try {
-    if (!auth.currentUser) return;
-    // 1. Fetch user applications and filter in-memory (to avoid composite index requirement)
+    if (!auth.currentUser || !workspaceId) return;
+    // 1. Fetch related applications in this workspace
     const q = query(
       collection(db, 'applications'), 
-      where('createdBy', '==', auth.currentUser.uid)
+      where('jobId', '==', id),
+      where('workspaceId', '==', workspaceId)
     );
     const snap = await getDocs(q);
-    const deletePromises = snap.docs
-      .filter(doc => doc.data().jobId === id)
-      .map(d => deleteDoc(doc(db, 'applications', d.id)));
+    const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'applications', d.id)));
       
     await Promise.all(deletePromises);
     
@@ -77,12 +86,12 @@ export const deleteJob = async (id) => {
 
 
 // --- CANDIDATES ---
-export const getCandidates = async () => {
+export const getCandidates = async (workspaceId) => {
   try {
-    if (!auth.currentUser) return [];
+    if (!auth.currentUser || !workspaceId) return [];
     const q = query(
       collection(db, 'candidates'), 
-      where('createdBy', '==', auth.currentUser.uid)
+      where('workspaceId', '==', workspaceId)
     );
     const snapshot = await getDocs(q);
     const docs = snapshot.docs.map(formatDoc);
@@ -93,20 +102,29 @@ export const getCandidates = async () => {
   }
 };
 
-export const getCandidate = async (candidateId) => {
+export const getCandidate = async (candidateId, workspaceId) => {
   try {
-    const docSnap = await getDoc(doc(db, 'candidates', candidateId));
-    if (docSnap.exists()) return formatDoc(docSnap);
-    return null;
+    const docRef = doc(db, 'candidates', candidateId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+
+    const data = docSnap.data();
+    if (workspaceId && data.workspaceId !== workspaceId) {
+      console.error("Access denied: Candidate does not belong to this workspace");
+      return null;
+    }
+    return formatDoc(docSnap);
   } catch (error) {
     console.error("Error fetching candidate:", error);
     return null;
   }
 };
 
-export const createCandidate = async (candidateData) => {
+export const createCandidate = async (workspaceId, candidateData) => {
+  if (!workspaceId) throw new Error("Workspace ID is required to create a candidate");
   const docRef = await addDoc(collection(db, 'candidates'), {
     ...candidateData,
+    workspaceId,
     createdBy: auth.currentUser?.uid || candidateData.createdBy,
     createdAt: serverTimestamp(),
   });
@@ -123,15 +141,14 @@ export const deleteCandidate = async (id) => {
     const candDoc = await getDoc(doc(db, 'candidates', id));
     const candData = candDoc.exists() ? candDoc.data() : null;
 
-    // 2. Delete associated Applications (filter in-memory)
+    // 2. Delete associated Applications in this workspace
     const q = query(
       collection(db, 'applications'), 
-      where('createdBy', '==', auth.currentUser.uid)
+      where('candidateId', '==', id),
+      where('workspaceId', '==', candData?.workspaceId || '')
     );
     const snap = await getDocs(q);
-    const deletePromises = snap.docs
-      .filter(doc => doc.data().candidateId === id)
-      .map(d => deleteDoc(doc(db, 'applications', d.id)));
+    const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'applications', d.id)));
       
     await Promise.all(deletePromises);
     
@@ -156,13 +173,13 @@ export const deleteCandidate = async (id) => {
 
 
 // --- APPLICATIONS (Linking Pipeline) ---
-export const getApplicationsByJob = async (jobId) => {
+export const getApplicationsByJob = async (workspaceId, jobId) => {
   try {
-    if (!auth.currentUser) return [];
+    if (!auth.currentUser || !workspaceId) return [];
     const q = query(
       collection(db, 'applications'), 
-      where('jobId', '==', jobId),
-      where('createdBy', '==', auth.currentUser.uid)
+      where('workspaceId', '==', workspaceId),
+      where('jobId', '==', jobId)
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(formatDoc);
@@ -172,13 +189,13 @@ export const getApplicationsByJob = async (jobId) => {
   }
 };
 
-export const getApplicationsByCandidate = async (candidateId) => {
+export const getApplicationsByCandidate = async (workspaceId, candidateId) => {
   try {
-    if (!auth.currentUser) return [];
+    if (!auth.currentUser || !workspaceId) return [];
     const q = query(
       collection(db, 'applications'), 
-      where('candidateId', '==', candidateId),
-      where('createdBy', '==', auth.currentUser.uid)
+      where('workspaceId', '==', workspaceId),
+      where('candidateId', '==', candidateId)
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(formatDoc);
@@ -188,34 +205,27 @@ export const getApplicationsByCandidate = async (candidateId) => {
   }
 };
 
-export const getAllApplications = async () => {
+export const getAllApplications = async (workspaceId) => {
   try {
-    if (!auth.currentUser) return [];
-    // Application might not have createdBy but jobId/candidateId do. 
-    // Wait, earlier we were saving createdBy on applications. If not, this query might fail.
-    // It's safer to query applications by mapping candidate/job if createdBy is missing, but assuming createdBy is present on all entities:
+    if (!auth.currentUser || !workspaceId) return [];
     const q = query(
       collection(db, 'applications'), 
-      where('createdBy', '==', auth.currentUser.uid)
+      where('workspaceId', '==', workspaceId)
     );
     const snapshot = await getDocs(q);
     const docs = snapshot.docs.map(formatDoc);
     return docs.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
   } catch (error) {
-    // If no composite index for orderBy createdAt yet, fallback safely
-    try {
-      const snapshot = await getDocs(collection(db, 'applications'));
-      return snapshot.docs.map(formatDoc);
-    } catch(e) {
-      console.error(e);
-      return [];
-    }
+    console.error("Error fetching all applications:", error);
+    return [];
   }
 };
 
-export const createApplication = async (data) => {
+export const createApplication = async (workspaceId, data) => {
+  if (!workspaceId) throw new Error("Workspace ID is required to create an application");
   const docRef = await addDoc(collection(db, 'applications'), {
     ...data,
+    workspaceId,
     createdBy: auth.currentUser?.uid || data.createdBy,
     stage: 'New', 
     createdAt: serverTimestamp(),
@@ -248,14 +258,51 @@ export const updateApplication = async (id, data) => {
 
 
 // --- STORAGE UTILS ---
-export const uploadCV = async (file, userId) => {
+export const uploadCV = async (file, userId, workspaceId) => {
   if (!file) throw new Error("No file provided");
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  const path = `cvs/${userId || 'anonymous'}/${timestamp}_${safeName}`;
+  // Scoped path: cvs/ws_<workspaceId>/<userId>/<filename>
+  const wsPrefix = workspaceId ? `ws_${workspaceId}/` : '';
+  const path = `cvs/${wsPrefix}${userId || 'anonymous'}/${timestamp}_${safeName}`;
   const storageRef = ref(storage, path);
   
   await uploadBytes(storageRef, file);
   const downloadUrl = await getDownloadURL(storageRef);
   return { path, downloadUrl };
+};
+
+// --- ACTIVITIES ---
+/**
+ * Log a workspace activity with enriched metadata
+ * @param {string} workspaceId 
+ * @param {Object} actor - { uid, email, displayName, photoURL }
+ * @param {string} action - 'JOB_CREATED', 'STAGE_UPDATED', etc.
+ * @param {Object} entity - { type, id, name }
+ * @param {Object} details - extra context
+ */
+export const logActivity = async (workspaceId, actor, action, entity, details = {}) => {
+  if (!workspaceId) return;
+  
+  try {
+    await addDoc(collection(db, 'activities'), {
+      workspaceId,
+      actor: {
+        uid: actor?.uid || actor?.id || 'system',
+        email: actor?.email || 'system',
+        name: actor?.displayName || actor?.name || actor?.email || 'Someone',
+        photoURL: actor?.photoURL || null
+      },
+      action,
+      entity: {
+        type: entity?.type || 'system',
+        id: entity?.id || null,
+        name: entity?.name || 'Unknown'
+      },
+      details,
+      timestamp: serverTimestamp(),
+    });
+  } catch (e) {
+    console.error("Failed to log activity:", e);
+  }
 };

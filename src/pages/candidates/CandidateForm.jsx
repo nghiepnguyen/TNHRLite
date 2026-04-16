@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, User, Save } from 'lucide-react';
-import { getCandidate, updateCandidate, createCandidate } from '../../services/db';
+
+import { getCandidate, updateCandidate, createCandidate, logActivity } from '../../services/db';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateForm() {
-  const { id } = useParams();
+  const { workspaceId, id } = useParams();
+  const { userProfile } = useWorkspace();
   const isEditing = !!id;
   const navigate = useNavigate();
   
@@ -28,7 +30,7 @@ export default function CandidateForm() {
   useEffect(() => {
     if (isEditing) {
       async function fetchCandidateData() {
-        const candidate = await getCandidate(id);
+        const candidate = await getCandidate(id, workspaceId);
         if (candidate) {
           setFormData({
             fullName: candidate.fullName || '',
@@ -48,7 +50,7 @@ export default function CandidateForm() {
       }
       fetchCandidateData();
     }
-  }, [id, isEditing]);
+  }, [id, workspaceId, isEditing]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,9 +70,19 @@ export default function CandidateForm() {
     try {
       if (isEditing) {
         await updateCandidate(id, payload);
-        navigate(`/dashboard/candidates/${id}`);
+        navigate(`/dashboard/w/${workspaceId}/candidates/${id}`);
       } else {
-        const newId = await createCandidate(payload);
+        const newId = await createCandidate(workspaceId, payload);
+        
+        // Log activity
+        await logActivity(workspaceId, userProfile, 'CANDIDATE_CREATED', {
+          type: 'candidate',
+          id: newId,
+          name: payload.fullName
+        }, {
+          email: payload.email
+        });
+
         // Track manual candidate creation event
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'create_candidate', {
@@ -78,7 +90,7 @@ export default function CandidateForm() {
             'event_label': 'Manual Candidate Created'
           });
         }
-        navigate(`/dashboard/candidates/${newId}`);
+        navigate(`/dashboard/w/${workspaceId}/candidates/${newId}`);
       }
     } catch (error) {
       console.error(error);
@@ -93,8 +105,8 @@ export default function CandidateForm() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <Link to={isEditing ? `/dashboard/candidates/${id}` : "/dashboard/candidates"} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <ArrowLeft size={16} /> Back
+        <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? 'Edit Candidate' : 'Manual Candidate Entry'}</h1>
@@ -163,9 +175,9 @@ export default function CandidateForm() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/dashboard/candidates/${id}` : "/dashboard/candidates"} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="btn btn-secondary">Cancel</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              <Save size={16} /> {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Candidate')}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">save</span> {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Candidate')}
             </button>
           </div>
         </form>

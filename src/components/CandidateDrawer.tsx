@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, FileText, Calendar, DollarSign, X, Check, AlertCircle, Layout } from 'lucide-react';
+
 import { updateApplication } from '../services/db';
 
 /**
@@ -113,12 +113,12 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
         <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-              <User size={28} />
+              <span className="material-symbols-outlined flex-shrink-0 !text-[28px]">person</span>
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-800 tracking-tight">{candidate.fullName}</h2>
               <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                <Layout size={14} /> {candidate.currentTitle || 'No Title'}
+                <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">dashboard</span> {candidate.currentTitle || 'No Title'}
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
             onClick={onClose}
             className="p-2.5 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-all"
           >
-            <X size={24} />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[24px]">close</span>
           </button>
         </div>
 
@@ -143,10 +143,10 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                   ${isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}
                 `}
               >
-                {tab === 'Overview' && <Layout size={16} />}
-                {tab === 'Notes' && <FileText size={16} />}
-                {tab === 'Interview' && <Calendar size={16} />}
-                {tab === 'Offer' && <DollarSign size={16} />}
+                {tab === 'Overview' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">dashboard</span>}
+                {tab === 'Notes' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">description</span>}
+                {tab === 'Interview' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">calendar_month</span>}
+                {tab === 'Offer' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">attach_money</span>}
                 {tab}
                 {isActive && (
                   <div className="absolute bottom-0 left-4 right-4 h-1 bg-blue-600 rounded-t-full shadow-[0_-2px_6px_rgba(37,99,235,0.3)]" />
@@ -161,7 +161,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
           
           {error && (
             <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm font-semibold animate-shake">
-              <AlertCircle size={20} /> {error}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">error</span> {error}
             </div>
           )}
 
@@ -281,7 +281,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
               <div className="space-y-2">
                 <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Annual Basic Value ($)</label>
                 <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">attach_money</span>
                   <input 
                     type="number" 
                     placeholder="e.g. 150000"
@@ -317,7 +317,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <><Check size={20} className="group-hover:rotate-12 transition-transform" /> Save Progress</>
+              <><span className="material-symbols-outlined flex-shrink-0 !text-[20px] group-hover:rotate-12 transition-transform">check</span> Save Progress</>
             )}
           </button>
           <button 

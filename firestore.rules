@@ -2,32 +2,109 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is authenticated
+    // --- HELPER FUNCTIONS ---
+    
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Helper to check if the user is the owner of the document
-    function isOwner(resourceData) {
-      return isAuthenticated() && resourceData.createdBy == request.auth.uid;
+    // Check if the user is a member of a specific workspace
+    function isMember(workspaceId) {
+      return isAuthenticated() && workspaceId != null &&
+        exists(/databases/$(database)/documents/workspaceMembers/$(request.auth.uid + '_' + workspaceId));
     }
 
-    // JOBS Collection
+    // Check if user has at least specific role level
+    function hasRole(workspaceId, roles) {
+      return isMember(workspaceId) && 
+             get(/databases/$(database)/documents/workspaceMembers/$(request.auth.uid + '_' + workspaceId)).data.role in roles;
+    }
+
+    // --- COLLECTIONS ---
+
+    // USERS (Profiles)
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // WORKSPACES
+    match /workspaces/{workspaceId} {
+      allow read: if isMember(workspaceId);
+      allow create: if isAuthenticated();
+      allow update, delete: if hasRole(workspaceId, ['owner', 'admin']);
+    }
+
+    // WORKSPACE MEMBERS
+    match /workspaceMembers/{memberId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        isMember(resource.data.workspaceId)
+      );
+      
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid || 
+        hasRole(request.resource.data.workspaceId, ['owner', 'admin'])
+      );
+
+      allow update, delete: if isAuthenticated() && (
+        // Case 1: Admins/Owners can manage members, but NO ONE can delete/demote an owner
+        (hasRole(resource.data.workspaceId, ['owner', 'admin']) && resource.data.role != 'owner') ||
+        // Case 2: A user can remove themselves (Leave Workspace), but NOT if they are the owner
+        (resource.data.userId == request.auth.uid && resource.data.role != 'owner')
+      );
+    }
+
+    // INVITES
+    // Warning: Do not mutate resource.data (like lower()) so query evaluator works!
+    match /invites/{inviteId} {
+      allow read: if isAuthenticated() && (
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("workspaceId" in resource.data && isMember(resource.data.workspaceId))
+      );
+      
+      allow create: if isAuthenticated() && "workspaceId" in request.resource.data && hasRole(request.resource.data.workspaceId, ['owner', 'admin']);
+      allow update: if isAuthenticated() && (
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("workspaceId" in resource.data && isMember(resource.data.workspaceId))
+      );
+      allow delete: if isAuthenticated() && (
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("workspaceId" in resource.data && hasRole(resource.data.workspaceId, ['owner', 'admin']))
+      );
+    }
+
+    // DATA SCOPED BY WORKSPACE (Jobs, Candidates, Applications, Activities)
+    function canAccessLegacyData() {
+      // Safely check if workspaceId is missing indicating legacy data, and user is creator
+      return !("workspaceId" in resource.data) && resource.data.createdBy == request.auth.uid;
+    }
+
+    function canAccessWorkspaceData() {
+      // Safely check if workspaceId exists and user is a member
+      return "workspaceId" in resource.data && isMember(resource.data.workspaceId);
+    }
+
     match /jobs/{jobId} {
-      allow read, update, delete: if isOwner(resource.data);
-      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow read: if isAuthenticated() && (canAccessWorkspaceData() || canAccessLegacyData() || resource.data.createdBy == request.auth.uid);
+      allow create: if isAuthenticated() && "workspaceId" in request.resource.data && isMember(request.resource.data.workspaceId);
+      allow update, delete: if isAuthenticated() && "workspaceId" in resource.data && isMember(resource.data.workspaceId);
     }
 
-    // CANDIDATES Collection
     match /candidates/{candidateId} {
-      allow read, update, delete: if isOwner(resource.data);
-      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow read: if isAuthenticated() && (canAccessWorkspaceData() || canAccessLegacyData() || resource.data.createdBy == request.auth.uid);
+      allow create: if isAuthenticated() && "workspaceId" in request.resource.data && isMember(request.resource.data.workspaceId);
+      allow update, delete: if isAuthenticated() && "workspaceId" in resource.data && isMember(resource.data.workspaceId);
     }
 
-    // APPLICATIONS Collection
     match /applications/{applicationId} {
-      allow read, update, delete: if isOwner(resource.data);
-      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow read: if isAuthenticated() && (canAccessWorkspaceData() || canAccessLegacyData() || resource.data.createdBy == request.auth.uid);
+      allow create: if isAuthenticated() && "workspaceId" in request.resource.data && isMember(request.resource.data.workspaceId);
+      allow update, delete: if isAuthenticated() && "workspaceId" in resource.data && isMember(resource.data.workspaceId);
+    }
+    
+    match /activities/{activityId} {
+      allow read: if isAuthenticated() && "workspaceId" in resource.data && isMember(resource.data.workspaceId);
+      allow create: if isAuthenticated() && "workspaceId" in request.resource.data && isMember(request.resource.data.workspaceId);
     }
   }
 }

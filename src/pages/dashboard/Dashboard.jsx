@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getJobs, getCandidates, getAllApplications } from '../../services/db';
-import { Briefcase, Users, FileText, Activity, Layers, AlertCircle, ChevronRight, CheckCircle } from 'lucide-react';
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+
 
 export default function Dashboard() {
+  const { workspaceId } = useParams();
+  const { pendingInvites } = useWorkspace();
   const [jobs, setJobs] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
+      if (!workspaceId) return;
+      setLoading(true);
       const [fetchedJobs, fetchedCands, fetchedApps] = await Promise.all([
-        getJobs(),
-        getCandidates(),
-        getAllApplications()
+        getJobs(workspaceId),
+        getCandidates(workspaceId),
+        getAllApplications(workspaceId)
       ]);
       setJobs(fetchedJobs);
       setCandidates(fetchedCands);
@@ -22,7 +30,25 @@ export default function Dashboard() {
       setLoading(false);
     }
     loadData();
-  }, []);
+
+    // Activities real-time listener
+    if (workspaceId) {
+      const q = query(
+        collection(db, 'activities'),
+        where('workspaceId', '==', workspaceId)
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        // Sort and limit in memory to avoid requiring a composite index in Firestore during dev
+        const sortedActivities = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0))
+          .slice(0, 5);
+        
+        setActivities(sortedActivities);
+      });
+      return () => unsubscribe();
+    }
+  }, [workspaceId]);
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading dashboard metrics...</div>;
 
@@ -49,13 +75,99 @@ export default function Dashboard() {
   const recentActivity = [...candidates].slice(0, 3);
 
   // Jobs Needing Attention (Active jobs with 0 New/Review applications)
+
+  const SafeImage = ({ src, name, size = '32px' }) => {
+    const [error, setError] = useState(false);
+    if (src && !error) {
+      return (
+        <img 
+          src={src} 
+          alt="" 
+          style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }} 
+          onError={() => setError(true)}
+        />
+      );
+    }
+    return (
+      <div style={{ 
+        width: size, 
+        height: size, 
+        borderRadius: '50%', 
+        backgroundColor: 'var(--color-primary-bg)', 
+        color: 'var(--color-primary)', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        fontSize: '0.75rem', 
+        fontWeight: 700 
+      }}>
+        {name?.charAt(0).toUpperCase() || 'U'}
+      </div>
+    );
+  };
+
   const jobsAttn = activeJobs.filter(job => {
      const appsForJob = applications.filter(a => a.jobId === job.id);
      return appsForJob.length === 0;
   });
 
+  const formatRelativeTime = (timestamp) => {
+    if (!timestamp || typeof timestamp.toDate !== 'function') return 'Just now';
+    const date = timestamp.toDate();
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return date.toLocaleDateString();
+  };
+
+  const getActivityMessage = (act) => {
+    const name = <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span>;
+    switch (act.action) {
+      case 'JOB_CREATED': return <>posted a new job: {name}</>;
+      case 'CANDIDATE_CREATED': return <>added candidate: {name}</>;
+      case 'CV_UPLOADED': return <>uploaded CV for: {name}</>;
+      case 'STAGE_CHANGED': return <>moved {name} to <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.newStage}</span></>;
+      case 'APPLICATION_CREATED': return <>linked {name} to a job pipeline</>;
+      case 'NOTE_ADDED': return <>updated notes for: {name}</>;
+      case 'INVITATION_ACCEPTED': return <>accepted the workspace invitation to join as <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.role}</span></>;
+      case 'INVITATION_DECLINED': return <><span style={{ color: 'var(--color-danger)' }}>declined</span> the workspace invitation</>;
+      case 'MEMBER_REMOVED': return <>removed <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span> from the workspace</>;
+      case 'MEMBER_LEFT': return <><span style={{ color: 'var(--color-danger)' }}>left</span> the workspace</>;
+      default: return <>action: {act.action}</>;
+    }
+  };
+
   return (
     <div>
+      {/* Pending Invites Banner */}
+      {pendingInvites && pendingInvites.length > 0 && (
+        <div className="card" style={{ 
+          marginBottom: '2rem', 
+          backgroundColor: 'var(--color-primary-bg)', 
+          border: '1px solid var(--color-primary)',
+          padding: '1.25rem 1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderRadius: 'var(--radius-lg)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.5rem', borderRadius: '50%' }}>
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">notifications</span>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.25rem' }}>
+                You have {pendingInvites.length} pending workspace invitation{pendingInvites.length > 1 ? 's' : ''}!
+              </h3>
+              <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Open the workspace menu in the top left corner to view and accept them.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>Recruitment Overview</h1>
         <p className="text-secondary" style={{ marginTop: '0.5rem', fontSize: '1rem' }}>Welcome back. Here is the pulse of your talent pipeline.</p>
@@ -65,7 +177,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
         <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', transition: 'var(--transition-smooth)', cursor: 'default' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-md)' }}>
-            <Briefcase size={24} className="text-primary" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary">work</span>
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{activeJobs.length}</h2>
@@ -75,7 +187,7 @@ export default function Dashboard() {
         
         <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', transition: 'var(--transition-smooth)', cursor: 'default' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-success-bg)', borderRadius: 'var(--radius-md)' }}>
-            <FileText size={24} className="text-success" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-success">description</span>
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{candidates.length}</h2>
@@ -85,7 +197,7 @@ export default function Dashboard() {
         
         <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', transition: 'var(--transition-smooth)', cursor: 'default' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-warning-bg)', borderRadius: 'var(--radius-md)' }}>
-            <Layers size={24} className="text-warning" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-warning">layers</span>
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stageCounts['New'] || 0}</h2>
@@ -95,7 +207,7 @@ export default function Dashboard() {
 
         <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', transition: 'var(--transition-smooth)', cursor: 'default' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)' }}>
-            <Users size={24} className="text-primary" />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary">group</span>
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stageCounts['Interview'] || 0}</h2>
@@ -110,7 +222,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <CheckCircle size={18} className="text-success" /> Top AI Matched Candidates
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-success">check_circle</span> Top AI Matched Candidates
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {topMatches.length === 0 ? (
@@ -126,7 +238,7 @@ export default function Dashboard() {
                       <span className="text-success" style={{ fontWeight: 800, fontSize: '1.125rem' }}>{m.fitScore}%</span>
                       <span className="badge badge-neutral" style={{ marginTop: '0.25rem', fontSize: '0.6875rem' }}>{m.stage}</span>
                     </div>
-                    <Link to={`/dashboard/pipeline`} className="btn btn-secondary" style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}><ChevronRight size={18} /></Link>
+                    <Link to={`/dashboard/w/${workspaceId}/pipeline`} className="btn btn-secondary" style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">chevron_right</span></Link>
                   </div>
                 </div>
               ))}
@@ -135,7 +247,7 @@ export default function Dashboard() {
 
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <Activity size={18} className="text-primary" /> Active Funnel Preview
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">monitoring</span> Active Funnel Preview
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {['New', 'Reviewed', 'Interview', 'Offer', 'Hired'].map(stage => {
@@ -156,43 +268,80 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Sidebar: Attention & Recent Activity */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <div className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning)', borderRadius: 'var(--radius-lg)' }}>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem', color: 'var(--color-warning)' }}>
-              <AlertCircle size={18} /> Needs Attention
-            </h3>
-            {jobsAttn.length === 0 ? (
-               <p className="text-muted" style={{ fontSize: '0.8125rem' }}>All active jobs have pipeline engagement.</p>
-            ) : jobsAttn.map(job => (
-              <div key={job.id} style={{ padding: '1rem', backgroundColor: 'white', borderRadius: 'var(--radius-md)', marginBottom: '0.75rem', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-smooth)' }}>
-                <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>{job.title}</div>
-                <div className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>0 applications</div>
-                <Link to={`/dashboard/jobs/${job.id}`} className="text-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', marginTop: '0.75rem', fontWeight: 700 }}>
-                  View Mandate <ChevronRight size={12} />
-                </Link>
-              </div>
-            ))}
-          </div>
+          {/* Sidebar: Attention & Workspace Activity */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Needs Attention Card */}
+            <div className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning)', borderRadius: 'var(--radius-lg)' }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem', color: 'var(--color-warning)' }}>
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">error</span> Needs Attention
+              </h3>
+              {jobsAttn.length === 0 ? (
+                 <p className="text-muted" style={{ fontSize: '0.8125rem' }}>All active jobs have pipeline engagement.</p>
+              ) : jobsAttn.map(job => (
+                <div key={job.id} style={{ padding: '1rem', backgroundColor: 'white', borderRadius: 'var(--radius-md)', marginBottom: '0.75rem', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>{job.title}</div>
+                  <div className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>0 applications</div>
+                  <Link to={`/dashboard/w/${workspaceId}/jobs/${job.id}`} className="text-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', marginTop: '0.75rem', fontWeight: 700 }}>
+                    View Mandate <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">chevron_right</span>
+                  </Link>
+                </div>
+              ))}
+            </div>
 
-          <div className="card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-primary)', marginBottom: '1.25rem' }}>Recent CV Uploads</h3>
-            {recentActivity.length === 0 ? (
-              <p className="text-muted" style={{ fontSize: '0.8125rem' }}>No recent activity.</p>
-            ) : recentActivity.map((cand, idx) => (
-               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem', paddingBottom: idx < recentActivity.length - 1 ? '1rem' : 0, borderBottom: idx < recentActivity.length - 1 ? '1px solid var(--color-surface-border)' : 'none' }}>
-                 <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <FileText size={16} className="text-muted" />
-                 </div>
-                 <div>
-                   <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>{cand.fullName}</div>
-                   <div className="text-secondary" style={{ fontSize: '0.75rem' }}>AI Parsing Completed</div>
-                 </div>
-               </div>
-            ))}
-            <Link to="/dashboard/candidates" className="btn btn-secondary" style={{ width: '100%', fontSize: '0.8125rem', fontWeight: 700, marginTop: '0.5rem' }}>View All Talents</Link>
+            {/* REAL-TIME ACTIVITY FEED */}
+            <div className="card" style={{ padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">schedule</span> Workspace Activity
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {activities.length === 0 ? (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    padding: '3rem 2rem', 
+                    textAlign: 'center',
+                    color: 'var(--color-text-muted)',
+                    backgroundColor: 'var(--color-surface-hover)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px dashed var(--color-surface-border)'
+                  }}>
+                    <span className="material-symbols-outlined flex-shrink-0 !text-[40px]" style={{ opacity: 0.2, marginBottom: '1rem' }}>monitoring</span>
+                    <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>No recent activity.</p>
+                    <p style={{ fontSize: '0.75rem', marginTop: '0.25rem', opacity: 0.7 }}>Recent workspace updates will appear here.</p>
+                  </div>
+                ) : (
+                  activities.slice(0, 3).map((act, idx) => (
+                    <div key={idx} style={{ 
+                      display: 'flex', 
+                      gap: '1rem', 
+                      marginBottom: '1.25rem', 
+                      paddingBottom: idx < activities.length - 1 ? '1.25rem' : 0, 
+                      borderBottom: idx < activities.length - 1 ? '1px solid var(--color-surface-border)' : 'none' 
+                    }}>
+                      <div style={{ flexShrink: 0 }}>
+                        <SafeImage src={act.actor?.photoURL} name={act.actor?.name} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                          <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.actor?.name || 'Someone'}</span> {getActivityMessage(act)}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">schedule</span> {formatRelativeTime(act.timestamp)}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              <Link to={`/dashboard/w/${workspaceId}/settings?tab=activity`} className="btn btn-secondary" style={{ width: '100%', fontSize: '0.8125rem', fontWeight: 700, marginTop: '0.5rem', justifyContent: 'center' }}>
+                View Full Activity
+              </Link>
+            </div>
           </div>
-        </div>
 
       </div>
     </div>

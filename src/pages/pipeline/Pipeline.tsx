@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getJobs, getApplicationsByJob, getCandidates, updateApplicationStage } from '../../services/db';
-import { Layers, Download } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { getJobs, getApplicationsByJob, getCandidates, updateApplicationStage, logActivity } from '../../services/db';
+
 import PipelineBoard from '../../components/PipelineBoard';
 import CandidateDrawer from '../../components/CandidateDrawer';
 import { exportCandidatesToCSV } from '../../utils/exportUtils';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function Pipeline() {
+  const { workspaceId } = useParams();
+  const { userProfile } = useWorkspace();
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState('');
   const [applications, setApplications] = useState([]);
@@ -24,10 +28,10 @@ export default function Pipeline() {
       try {
         setLoading(true);
         setError('');
-        const activeJobs = await getJobs();
+        const activeJobs = await getJobs(workspaceId);
         setJobs(activeJobs.filter(j => j.status === 'Active'));
 
-        const candidates = await getCandidates();
+        const candidates = await getCandidates(workspaceId);
         const cMap = {};
         candidates.forEach(c => cMap[c.id] = c);
         setCandidatesMap(cMap);
@@ -39,7 +43,7 @@ export default function Pipeline() {
       }
     }
     init();
-  }, []);
+  }, [workspaceId]);
 
   useEffect(() => {
     async function fetchApps() {
@@ -50,7 +54,7 @@ export default function Pipeline() {
       try {
         setLoading(true);
         setError('');
-        const apps = await getApplicationsByJob(selectedJob);
+        const apps = await getApplicationsByJob(workspaceId, selectedJob);
         setApplications(apps);
       } catch (err) {
         console.error('Fetch applications error:', err);
@@ -77,11 +81,43 @@ export default function Pipeline() {
   }, [applications, candidatesMap, searchTerm, filterPriority, filterOwner]);
 
   const handleStageChange = async (appId, newStage) => {
+    const appIndex = applications.findIndex(a => a.id === appId);
+    if (appIndex === -1) return;
+    
+    const oldStage = applications[appIndex].stage;
+    const candidate = candidatesMap[applications[appIndex].candidateId];
+
+    // 1. Optimistic Update
     setApplications(prev => prev.map(app => app.id === appId ? { ...app, stage: newStage } : app));
     if (selectedApp?.id === appId) {
       setSelectedApp(prev => ({ ...prev, stage: newStage }));
     }
-    await updateApplicationStage(appId, newStage);
+
+    try {
+      // 2. Database Update
+      await updateApplicationStage(appId, newStage);
+      
+      // 3. Log Activity for Collaboration
+      if (workspaceId && userProfile) {
+        await logActivity(workspaceId, userProfile, 'STAGE_CHANGED', {
+          type: 'candidate',
+          id: applications[appIndex].candidateId,
+          name: candidate?.fullName || 'Unknown'
+        }, {
+          oldStage,
+          newStage,
+          jobId: selectedJob
+        });
+      }
+    } catch (err) {
+      console.error('Failed to update stage:', err);
+      // 4. Rollback on failure
+      setApplications(prev => prev.map(app => app.id === appId ? { ...app, stage: oldStage } : app));
+      if (selectedApp?.id === appId) {
+        setSelectedApp(prev => ({ ...prev, stage: oldStage }));
+      }
+      alert('Failed to update stage. Reverting...');
+    }
   };
 
   const handleExport = () => {
@@ -117,7 +153,7 @@ export default function Pipeline() {
             disabled={!selectedJob || filteredApplications.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Download size={16} /> Export CSV
+            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> Export CSV
           </button>
         </div>
       </div>
@@ -130,7 +166,7 @@ export default function Pipeline() {
 
       {!selectedJob && (
          <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <Layers size={32} className="text-muted" style={{ margin: '0 auto 1rem' }} />
+            <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-muted"  style={{ margin: '0 auto 1rem' }}>layers</span>
             <p className="text-secondary">Select an active job from the dropdown above to view its pipeline.</p>
          </div>
       )}
@@ -159,8 +195,8 @@ export default function Pipeline() {
         onClose={() => setSelectedApp(null)}
         onSave={async () => {
           setSelectedApp(null);
-          if (selectedJob) {
-            const apps = await getApplicationsByJob(selectedJob);
+          if (selectedJob && workspaceId) {
+            const apps = await getApplicationsByJob(workspaceId, selectedJob);
             setApplications(apps);
           }
         }}

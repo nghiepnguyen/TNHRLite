@@ -25,3 +25,12 @@
 ## 6. Phân tích (Báo cáo & Xuất CSV)
 - Cho phép xuất danh sách tuyển dụng ra file Excel (CSV) nhanh chóng.
 - Hệ thống log hành vi thay đổi sang bảng `Activity` để cung cấp dòng thời gian toàn diện (Feed) cho các Admin khác theo dõi.
+
+## 7. Hệ thống Thông báo & Phản hồi (Notifications)
+- Mọi tương tác quan trọng (Lời mời mới, Chấp nhận/Từ chối tham gia, Thay đổi nhân sự) đều được đẩy về **Notification Center**.
+- Hệ thống áp dụng cơ chế thông báo hai chiều, đảm bảo cả người thực hiện và người nhận đều nhận được phản hồi xác thực về hành động của mình.
+- Tự động dọn dẹp trạng thái "Chưa đọc" khi các hành động tương tác (như Review Invitation) đã hoàn thành.
+
+---
+
+*Tham khảo các phần tiếp theo để hiểu rõ hơn về kỹ thuật và luồng nghiệp vụ của hệ thống.*

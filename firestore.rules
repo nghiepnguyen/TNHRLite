@@ -106,5 +106,11 @@ service cloud.firestore {
       allow read: if isAuthenticated() && "workspaceId" in resource.data && isMember(resource.data.workspaceId);
       allow create: if isAuthenticated() && "workspaceId" in request.resource.data && isMember(request.resource.data.workspaceId);
     }
+
+    // USER NOTIFICATIONS (Persistent across login/offline)
+    match /userNotifications/{notifId} {
+      allow read, update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated(); 
+    }
   }
 }

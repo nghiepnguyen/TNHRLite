@@ -12,6 +12,7 @@ import {
   declineInvite,
   subscribeToUserWorkspaces
 } from '../services/workspace.service';
+import { createNotification, markInviteNotificationAsRead } from '../services/notification.service';
 import { logActivity } from '../services/db';
 import { useToast } from './ToastContext';
 
@@ -187,6 +188,32 @@ export function WorkspaceProvider({ children }) {
       console.warn("Could not log accept activity", e);
     }
     await refreshData();
+    
+    // Auto-mark the "New Invite" notification as read
+    await markInviteNotificationAsRead(currentUser.uid, invite.workspaceId);
+
+    // Create history notification for the current user (invitee)
+    await createNotification(currentUser.uid, {
+      title: 'Invitation Accepted',
+      message: `You have joined "${invite.workspaceName || 'a new workspace'}".`,
+      type: 'success',
+      workspaceId: invite.workspaceId,
+      workspaceName: invite.workspaceName,
+      metadata: { action: 'INVITE_ACCEPTED' }
+    });
+
+    // Notify the Inviter
+    if (invite.invitedBy) {
+      await createNotification(invite.invitedBy, {
+        title: 'Invitation Accepted',
+        message: `${currentUser.email} has accepted your invitation to join "${invite.workspaceName}".`,
+        type: 'success',
+        workspaceId: invite.workspaceId,
+        workspaceName: invite.workspaceName,
+        metadata: { action: 'INVITE_ACCEPTED_BY_USER', userEmail: currentUser.email }
+      });
+    }
+
     navigate(`/dashboard/w/${invite.workspaceId}`);
   };
 
@@ -204,6 +231,31 @@ export function WorkspaceProvider({ children }) {
       console.warn("Could not log decline activity", e);
     }
     await refreshData();
+
+    // Auto-mark the "New Invite" notification as read
+    await markInviteNotificationAsRead(currentUser.uid, invite.workspaceId);
+
+    // Create history notification for current user
+    await createNotification(currentUser.uid, {
+      title: 'Invitation Declined',
+      message: `You declined the invitation to join "${invite.workspaceName || 'the workspace'}".`,
+      type: 'info',
+      workspaceId: invite.workspaceId,
+      workspaceName: invite.workspaceName,
+      metadata: { action: 'INVITE_DECLINED' }
+    });
+
+    // Notify the Inviter
+    if (invite.invitedBy) {
+      await createNotification(invite.invitedBy, {
+        title: 'Invitation Declined',
+        message: `${currentUser.email} has declined your invitation to join "${invite.workspaceName}".`,
+        type: 'warning',
+        workspaceId: invite.workspaceId,
+        workspaceName: invite.workspaceName,
+        metadata: { action: 'INVITE_DECLINED_BY_USER', userEmail: currentUser.email }
+      });
+    }
   };
 
   const value = {

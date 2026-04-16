@@ -4,6 +4,7 @@ import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
+import NotificationBell from '../components/NotificationBell';
 import './DashboardLayout.css';
 
 export default function DashboardLayout() {
@@ -128,6 +129,7 @@ export default function DashboardLayout() {
             </div>
 
 
+            <NotificationBell />
             
             <div className="user-profile-wrapper" ref={profileRef} style={{ position: 'relative' }}>
               <div className="avatar clickable" onClick={() => setShowProfileMenu(!showProfileMenu)}>

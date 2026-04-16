@@ -3,6 +3,7 @@ import {
   query, where, serverTimestamp, writeBatch, onSnapshot 
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { createNotification } from './notification.service';
 
 /**
  * --- USER PROFILE ---
@@ -198,18 +199,91 @@ export const getWorkspaceMembers = async (workspaceId) => {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
-export const removeWorkspaceMember = async (workspaceId, userId) => {
+export const removeWorkspaceMember = async (workspaceId, userId, performerId = null, isLeaving = false) => {
   const memberId = `${userId}_${workspaceId}`;
   const batch = writeBatch(db);
   
-  // 1. Delete member record
+  // 1. Get info BEFORE deleting membership (while user still has access rules)
+  let wsData = null;
+  let wsName = 'a Workspace';
+  let ownerId = null;
+  let userEmail = 'a member';
+
+  try {
+    const [wsSnap, userSnap] = await Promise.all([
+      getDoc(doc(db, 'workspaces', workspaceId)),
+      getDoc(doc(db, 'users', userId))
+    ]);
+
+    if (wsSnap.exists()) {
+      wsData = wsSnap.data();
+      wsName = wsData.name;
+      ownerId = wsData.ownerId;
+    }
+    
+    if (userSnap.exists()) {
+      userEmail = userSnap.data().email;
+    }
+  } catch (err) {
+    console.warn("Failed to fetch info before removal:", err);
+  }
+
+  // 2. Delete member record
   batch.delete(doc(db, 'workspaceMembers', memberId));
-  
-  // 2. Clear user's default workspace if it matches (optional but recommended)
-  // We can't easily update another user's profile from the client due to rules, 
-  // but the next time they login, WorkspaceContext will handle the lack of membership.
-  
   await batch.commit();
+
+  // 3. Comprehensive Notifications
+  try {
+    if (isLeaving || performerId === userId) {
+      // CASE: User left voluntarily
+      // A. Notify the user who left (History)
+      await createNotification(userId, {
+        title: 'Workspace Left',
+        message: `You have successfully left "${wsName}".`,
+        type: 'info',
+        workspaceId,
+        workspaceName: wsName,
+        metadata: { action: 'MEMBER_LEFT' }
+      });
+
+      // B. Notify the Workspace Owner
+      if (ownerId && ownerId !== userId) {
+        await createNotification(ownerId, {
+          title: 'Member Departed',
+          message: `${userEmail} has left your workspace "${wsName}".`,
+          type: 'warning',
+          workspaceId,
+          workspaceName: wsName,
+          metadata: { action: 'MEMBER_LEFT_OWNER_NOTIFY', userEmail }
+        });
+      }
+    } else {
+      // CASE: User was removed by an administrator
+      // A. Notify the removed user
+      await createNotification(userId, {
+        title: 'Membership Revoked',
+        message: `Your access to "${wsName}" has been removed by an administrator.`,
+        type: 'warning',
+        workspaceId,
+        workspaceName: wsName,
+        metadata: { action: 'MEMBER_REMOVED' }
+      });
+
+      // B. Notify the Performer (Administrator)
+      if (performerId) {
+        await createNotification(performerId, {
+          title: 'Member Removed',
+          message: `You have successfully removed ${userEmail} from "${wsName}".`,
+          type: 'success',
+          workspaceId,
+          workspaceName: wsName,
+          metadata: { action: 'MEMBER_REMOVED_PERFORMER_NOTIFY', userEmail }
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to create removal/leave notifications:", err);
+  }
 };
 
 /**
@@ -231,6 +305,26 @@ export const inviteMember = async (workspaceId, workspaceName, email, role, invi
     createdAt: serverTimestamp(),
     expiresAt: expiresAt,
   });
+
+  // Create persistent notification for the invited user
+  // We search for the user by email first (if they already have an account)
+  try {
+    const q = query(collection(db, 'users'), where('email', '==', email.toLowerCase()));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const targetUserId = snapshot.docs[0].id;
+      await createNotification(targetUserId, {
+        title: 'New Workspace Invitation',
+        message: `You have been invited to join "${workspaceName}" as a ${role}.`,
+        type: 'info',
+        workspaceId,
+        workspaceName,
+        metadata: { action: 'INVITE_RECEIVED', invitedBy: invitedByEmail }
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to create invite notification:", err);
+  }
 };
 
 export const getPendingInvites = async (email) => {

@@ -26,12 +26,10 @@ const getWorkspaceColor = (id) => {
 };
 
 export default function WorkspaceSwitcher({ variant = 'default' }) {
-  const { workspaces, activeWorkspace, switchWorkspace, createWorkspace, pendingInvites, acceptInvite, declineInvite, getPendingInvites } = useWorkspace();
+  const { workspaces, activeWorkspace, switchWorkspace, createWorkspace } = useWorkspace();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedInvite, setSelectedInvite] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isProcessingInvite, setIsProcessingInvite] = useState(false);
   const toast = useToast();
   
   // Form State
@@ -108,21 +106,6 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
           <span className="workspace-role">{activeWorkspace?.myRole || 'Member'}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {pendingInvites.length > 0 && (
-            <span style={{ 
-              backgroundColor: 'var(--color-danger)', 
-              color: 'white', 
-              fontSize: '0.75rem', 
-              fontWeight: 'bold', 
-              padding: '0.1rem 0.4rem', 
-              borderRadius: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {pendingInvites.length}
-            </span>
-          )}
           <span className={`material-symbols-outlined flex-shrink-0 !text-[16px] ${ `chevron ${isOpen ? 'rotated' : '' }`} `}>expand_more</span>
         </div>
       </button>
@@ -148,30 +131,6 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
               </button>
             ))}
           </div>
-
-          {pendingInvites.length > 0 && (
-            <div className="dropdown-section invitations">
-              <h4 className="section-title">Pending Invitations</h4>
-              {pendingInvites.map((invite) => (
-                <div key={invite.id} className="invitation-item">
-                  <div className="invitation-info">
-                    <span className="invitation-name">{invite.workspaceName}</span>
-                    <span className="invitation-role">Role: {invite.role}</span>
-                  </div>
-                  <button 
-                    className="accept-btn"
-                    style={{ backgroundColor: 'var(--color-primary)', color: 'white', border: 'none' }}
-                    onClick={() => {
-                      setSelectedInvite(invite);
-                      setIsOpen(false);
-                    }}
-                  >
-                    Review
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
 
           <div className="dropdown-divider"></div>
           
@@ -212,10 +171,10 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
 
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label>Description</label>
-                  <textarea 
+                  <input 
+                    type="text"
                     placeholder="Briefly describe the purpose of this workspace..."
                     value={formData.description}
-                    style={{ minHeight: '80px', paddingTop: '0.75rem' }}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                   />
                 </div>
@@ -276,127 +235,6 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
           </div>
         </div>
       )}
-      {/* Invitation Review Modal */}
-      {selectedInvite && (
-        <div className="modal-overlay">
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px' }}>
-            <div className="modal-body" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
-              <div style={{ 
-                backgroundColor: 'var(--color-primary-bg)', 
-                borderRadius: '50%', 
-                marginBottom: '1.25rem', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                width: '64px', 
-                height: '64px' 
-              }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-primary">mail</span>
-              </div>
-              
-              <h3 style={{ fontSize: '1.375rem', fontWeight: 800, marginBottom: '0.75rem' }}>Workspace Invitation</h3>
-              
-              <p className="text-secondary" style={{ marginBottom: '2rem', lineHeight: 1.6, fontSize: '0.9375rem' }}>
-                <strong>{selectedInvite.invitedByEmail || 'A colleague'}</strong> has invited you to join their workspace.
-              </p>
-
-              <div style={{ 
-                backgroundColor: 'var(--color-surface-hover)', 
-                borderRadius: 'var(--radius-md)', 
-                padding: '1.5rem', 
-                textAlign: 'left', 
-                border: '1px solid var(--color-surface-border)', 
-                marginBottom: '2rem' 
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">domain</span>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', fontWeight: 700 }}>Workspace</div>
-                    <div style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '0.9375rem', marginTop: '0.125rem' }}>{selectedInvite.workspaceName}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-success">check_circle</span>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', fontWeight: 700 }}>Your Role</div>
-                    <div style={{ fontWeight: 600, color: 'var(--color-text)', textTransform: 'capitalize', fontSize: '0.9375rem', marginTop: '0.125rem' }}>{selectedInvite.role}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '1rem' }}>
-              <button 
-                type="button" 
-                className="btn-secondary" 
-                style={{ flex: 1, padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                onClick={async () => {
-                  setIsProcessingInvite(true);
-                  try {
-                    await declineInvite(selectedInvite);
-                    toast({ type: 'success', message: 'Invitation declined' });
-                    setSelectedInvite(null);
-                  } catch (err) {
-                    toast({ type: 'error', message: 'Failed to decline invite' });
-                    setIsProcessingInvite(false);
-                  }
-                }} 
-                disabled={isProcessingInvite}
-              >
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">cancel</span> Decline
-              </button>
-              
-              <button 
-                type="button" 
-                className="btn-primary" 
-                style={{ flex: 1, padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                onClick={async () => {
-                  setIsProcessingInvite(true);
-                  try {
-                    await acceptInvite(selectedInvite);
-                    
-                    if (typeof window.gtag === 'function') {
-                      window.gtag('event', 'invite_accepted', { 'role': selectedInvite.role });
-                    }
-
-                    toast({ type: 'success', message: 'Welcome to the workspace!' });
-                    setSelectedInvite(null);
-                    window.location.reload(); 
-                  } catch (err) {
-                    toast({ type: 'error', message: 'Failed to accept invite' });
-                    setIsProcessingInvite(false);
-                  }
-                }} 
-                disabled={isProcessingInvite}
-              >
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">check_circle</span> Accept
-              </button>
-            </div>
-            
-            {isProcessingInvite && <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>Processing...</div>}
-            
-               {!isProcessingInvite && (
-                 <button 
-                   onClick={() => setSelectedInvite(null)} 
-                   style={{ 
-                     background: 'none', 
-                     border: 'none', 
-                     width: '100%', 
-                     padding: '0.5rem', 
-                     marginTop: '1rem',
-                     color: 'var(--color-text-muted)', 
-                     fontSize: '0.8125rem', 
-                     cursor: 'pointer',
-                     fontWeight: 500
-                   }}
-                 >
-                   Close & decide later
-                 </button>
-               )}
-             </div>
-           </div>
-         </div>
-       )}
     </div>
   );
 }

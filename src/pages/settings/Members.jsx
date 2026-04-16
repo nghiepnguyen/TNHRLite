@@ -102,7 +102,7 @@ export default function Members() {
     
     try {
       console.log(`Starting removal for user: ${member.userId} in workspace: ${workspaceId}`);
-      await removeWorkspaceMember(workspaceId, member.userId);
+      await removeWorkspaceMember(workspaceId, member.userId, userProfile?.id);
       
       // Log removal activity
       await logActivity(
@@ -220,12 +220,12 @@ export default function Members() {
           </div>
         </section>
 
-        {/* Pending Invitations Section */}
+        {/* Sent Invitations Section */}
         <section>
           <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-surface-border)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">mail</span>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Invitations</h3>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Sent Invitations</h3>
             </div>
             
             <div style={{ overflowX: 'auto' }}>

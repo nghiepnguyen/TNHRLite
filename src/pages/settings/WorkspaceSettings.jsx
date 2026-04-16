@@ -255,14 +255,14 @@ export default function WorkspaceSettings() {
       const { removeWorkspaceMember } = await import('../../services/workspace.service');
       const { logActivity } = await import('../../services/db');
       
-      await removeWorkspaceMember(workspaceId, userProfile.uid);
+      await removeWorkspaceMember(workspaceId, userProfile.id, userProfile.id, true);
       
       // Log leave activity for the owner/admins to see
       await logActivity(
         workspaceId, 
         userProfile, 
         'MEMBER_LEFT', 
-        { name: userProfile.email, id: userProfile.uid, type: 'member' },
+        { name: userProfile.email, id: userProfile.id, type: 'member' },
         { email: userProfile.email, role: activeWorkspace?.myRole }
       );
 
@@ -290,7 +290,7 @@ export default function WorkspaceSettings() {
       const { removeWorkspaceMember } = await import('../../services/workspace.service');
       const { logActivity } = await import('../../services/db');
       
-      await removeWorkspaceMember(workspaceId, member.userId);
+      await removeWorkspaceMember(workspaceId, member.userId, userProfile.id);
       
       // Log activity
       await logActivity(
@@ -442,11 +442,11 @@ export default function WorkspaceSettings() {
             </div>
           </div>
 
-          {/* Pending Invites List */}
+          {/* Sent Invites List */}
           {invites.length > 0 && (
             <div className="card" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">schedule</span> Pending Invitations
+                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">schedule</span> Sent Invitations (Outgoing)
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

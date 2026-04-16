@@ -142,32 +142,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* Pending Invites Banner */}
-      {pendingInvites && pendingInvites.length > 0 && (
-        <div className="card" style={{ 
-          marginBottom: '2rem', 
-          backgroundColor: 'var(--color-primary-bg)', 
-          border: '1px solid var(--color-primary)',
-          padding: '1.25rem 1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderRadius: 'var(--radius-lg)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.5rem', borderRadius: '50%' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">notifications</span>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.25rem' }}>
-                You have {pendingInvites.length} pending workspace invitation{pendingInvites.length > 1 ? 's' : ''}!
-              </h3>
-              <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Open the workspace menu in the top left corner to view and accept them.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>Recruitment Overview</h1>
         <p className="text-secondary" style={{ marginTop: '0.5rem', fontSize: '1rem' }}>Welcome back. Here is the pulse of your talent pipeline.</p>

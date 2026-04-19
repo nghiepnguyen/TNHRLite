@@ -81,15 +81,8 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'is-open' : ''}`}>
-        <div className="sidebar-header">
-          <Link to={navBase} className="logo" style={{ textDecoration: 'none' }}>
-            <span className="material-symbols-outlined flex-shrink-0 !text-[24px] logo-icon">work</span>
-            HR Lite
-          </Link>
-        </div>
-
-        {/* Workspace Switcher inside Sidebar for mobile access */}
-        <div className="sidebar-workspace">
+        {/* Unified Workspace/Brand Header */}
+        <div className="sidebar-identity">
           <WorkspaceSwitcher />
         </div>
 
@@ -124,7 +117,6 @@ export default function DashboardLayout() {
         <header className="header">
           {/* Left group */}
           <div className="header-left">
-            {/* Mobile Menu Toggle */}
             <button 
               className="mobile-menu-toggle"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -134,20 +126,14 @@ export default function DashboardLayout() {
                 {isSidebarOpen ? 'close' : 'menu'}
               </span>
             </button>
-
-            {/* Mobile brand name (shown beside hamburger on mobile) */}
-            <Link to={navBase} className="header-brand-mobile" style={{ textDecoration: 'none' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">work</span>
-              HR Lite
+            
+            <Link to={navBase} className="logo header-logo" style={{ textDecoration: 'none' }}>
+              <span className="material-symbols-outlined flex-shrink-0 !text-[24px] logo-icon">work</span>
+              <span className="logo-text">HR Lite</span>
             </Link>
 
-            <div className="header-search">
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] search-icon text-muted">search</span>
-              <input type="text" placeholder="Search candidates, jobs..." className="search-input" />
-            </div>
-
-            <div className="header-workspace-switcher">
-              <WorkspaceSwitcher variant="header" />
+            <div className="header-page-title">
+              {/* This space can be used for breadcrumbs or page titles in the future */}
             </div>
           </div>
 

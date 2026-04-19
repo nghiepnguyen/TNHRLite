@@ -44,15 +44,15 @@ export default function JobDetail() {
         <Link to={`/dashboard/w/${workspaceId}/jobs`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Jobs
         </Link>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               <h1 style={{ fontSize: '1.75rem', fontWeight: 600 }}>{job.title}</h1>
               <span className={`badge ${job.status === 'Closed' ? 'badge-neutral' : 'badge-success'}`}>
                 {job.status || 'Active'}
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem', marginTop: '0.75rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem', marginTop: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">business</span> {job.clientName || 'Internal / Direct'}
               </div>
@@ -67,7 +67,7 @@ export default function JobDetail() {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexShrink: 0 }}>
             <button onClick={handleDelete} className="btn" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Delete
             </button>
@@ -78,7 +78,7 @@ export default function JobDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '2rem' }} className="job-detail-grid">
         <div className="card" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem' }}>Job Description</h2>
           <div style={{ whiteSpace: 'pre-line', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>

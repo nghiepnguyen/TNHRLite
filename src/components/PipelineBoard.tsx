@@ -130,6 +130,12 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
             <span className="text-xs font-semibold text-slate-400">Tags...</span>
           </div>
         </div>
+        
+        {/* Mobile Scroll Hint */}
+        <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-blue-50/50 rounded-lg border border-blue-100/50">
+          <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-blue-400">swipe_left</span>
+          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">Vuốt ngang để xem các bước</span>
+        </div>
       </div>
 
       {/* Kanban Board Layout */}
@@ -139,7 +145,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
           return (
             <div 
               key={stage} 
-              className="flex flex-col min-w-[320px] w-[320px] bg-slate-100/40 rounded-xl border border-slate-200/50"
+              className="flex flex-col min-w-[280px] sm:min-w-[320px] w-[280px] sm:w-[320px] bg-slate-100/40 rounded-xl border border-slate-200/50"
               onDragOver={(e) => handleDragOver(e, stage)}
               onDrop={(e) => handleDrop(e, stage)}
             >

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getJobs, getCandidates, getAllApplications } from '../../services/db';
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import Skeleton from '../../components/Skeleton';
 
 
 export default function Dashboard() {
@@ -50,7 +51,7 @@ export default function Dashboard() {
     }
   }, [workspaceId]);
 
-  if (loading) return <div style={{ padding: '2rem' }}>Loading dashboard metrics...</div>;
+  if (loading) return <DashboardSkeleton />;
 
   const activeJobs = jobs.filter(j => j.status === 'Active');
   
@@ -148,7 +149,7 @@ export default function Dashboard() {
       </div>
 
       {/* Top Metrics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div className="dashboard-kpi-grid" style={{ marginBottom: '2.5rem' }}>
         <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', transition: 'var(--transition-smooth)', cursor: 'default' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-md)' }}>
             <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary">work</span>
@@ -190,7 +191,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+      <div className="dashboard-body-grid">
         
         {/* Main Feed: Top Matches & Funnel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -299,7 +300,7 @@ export default function Dashboard() {
                         <SafeImage src={act.actor?.photoURL} name={act.actor?.name} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                           <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.actor?.name || 'Someone'}</span> {getActivityMessage(act)}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -321,3 +322,73 @@ export default function Dashboard() {
     </div>
   );
 }
+
+const DashboardSkeleton = () => (
+  <div>
+    <div style={{ marginBottom: '2.5rem' }}>
+      <Skeleton variant="title" width="40%" height="2.5rem" />
+      <Skeleton variant="text" width="60%" style={{ marginTop: '0.5rem' }} />
+    </div>
+
+    <div className="dashboard-kpi-grid" style={{ marginBottom: '2.5rem' }}>
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <Skeleton variant="rect" width="56px" height="56px" style={{ borderRadius: 'var(--radius-md)' }} />
+          <div style={{ flex: 1 }}>
+            <Skeleton variant="title" width="60px" height="2rem" />
+            <Skeleton variant="text" width="80px" />
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="dashboard-body-grid">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="card" style={{ padding: '2rem' }}>
+          <Skeleton variant="title" width="200px" style={{ marginBottom: '1.5rem' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--color-surface-border)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ flex: 1 }}>
+                  <Skeleton variant="text" width="150px" />
+                  <Skeleton variant="text" width="100px" style={{ marginTop: '0.25rem' }} />
+                </div>
+                <Skeleton variant="rect" width="40px" height="40px" style={{ borderRadius: 'var(--radius-sm)' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="card" style={{ padding: '2rem' }}>
+          <Skeleton variant="title" width="180px" style={{ marginBottom: '1.5rem' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <Skeleton variant="text" width="80px" />
+                <Skeleton variant="rect" style={{ flex: 1, height: '8px', borderRadius: 'var(--radius-full)' }} />
+                <Skeleton variant="text" width="30px" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="card" style={{ padding: '1.5rem', height: '180px' }}>
+          <Skeleton variant="text" width="120px" style={{ marginBottom: '1.25rem' }} />
+          <Skeleton variant="rect" height="80px" style={{ borderRadius: 'var(--radius-md)' }} />
+        </div>
+        <div className="card" style={{ padding: '1.5rem' }}>
+          <Skeleton variant="text" width="150px" style={{ marginBottom: '1.5rem' }} />
+          {[1, 2, 3].map(i => (
+            <div key={i} style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
+              <Skeleton variant="avatar" />
+              <div style={{ flex: 1 }}>
+                <Skeleton variant="text" width="80%" />
+                <Skeleton variant="text" width="40%" style={{ marginTop: '0.375rem' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);

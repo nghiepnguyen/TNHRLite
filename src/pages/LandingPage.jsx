@@ -99,10 +99,10 @@ const LandingPage = () => {
               >
                 HR Lite dành cho Nhà tuyển dụng độc lập
               </span>
-              <h1 className="font-headline font-extrabold text-4xl sm:text-5xl lg:text-6xl text-on-surface leading-[1.1] tracking-tight">
+              <h1 className="font-headline font-extrabold text-3xl sm:text-5xl lg:text-6xl text-on-surface leading-[1.1] tracking-tight">
                 Thoát khỏi Excel và dữ liệu rời rạc trong tuyển dụng
               </h1>
-              <p className="text-on-surface-variant text-base md:text-lg max-w-md mx-auto md:mx-0 font-light leading-relaxed reveal reveal-up reveal-delay-300">
+              <p className="text-on-surface-variant text-sm sm:text-base md:text-lg max-w-md mx-auto md:mx-0 font-light leading-relaxed reveal reveal-up reveal-delay-300">
                 Thay thế các bảng tính rườm rà bằng một dashboard tinh gọn, được thiết kế riêng cho recruiter độc lập và đội ngũ nhỏ.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start reveal reveal-up reveal-delay-400">
@@ -245,7 +245,7 @@ const LandingPage = () => {
           <div className="relative flex flex-col md:flex-row justify-between items-center gap-12 md:gap-8 px-4 md:px-12">
             {/* Connection Lines */}
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-surface-container-highest -z-10 hidden md:block"></div>
-            <div className="absolute left-1/2 top-0 w-0.5 h-full bg-surface-container-highest -z-10 md:hidden"></div>
+            <div className="absolute left-1/2 top-0 w-0.5 h-full bg-surface-container-highest -z-0 md:hidden opacity-30"></div>
 
             <div className="flex flex-col items-center group bg-white p-2 md:p-0 rounded-full md:bg-transparent flex-shrink-0 reveal reveal-up">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center border-4 border-surface group-hover:border-primary transition-all duration-300 flex-shrink-0">
@@ -289,26 +289,26 @@ const LandingPage = () => {
           {/* 1. Job List */}
           <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-20 items-center">
             <div className="order-2 md:order-1">
-              <div className="rounded-lg p-8 border border-white/50 shadow-sm" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
-                <div className="bg-white rounded-lg p-6 space-y-4 shadow-md">
+              <div className="rounded-lg p-4 sm:p-8 border border-white/50 shadow-sm" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
+                <div className="bg-white rounded-lg p-5 sm:p-6 space-y-4 shadow-md">
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-headline font-bold">Danh mục Tuyển dụng</h4>
-                    <button className="text-primary text-sm font-bold">+ Thêm mới</button>
+                    <h4 className="font-headline font-bold text-sm sm:text-base">Danh mục Tuyển dụng</h4>
+                    <button className="text-primary text-[10px] sm:text-sm font-bold">+ Thêm mới</button>
                   </div>
                   <div className="space-y-3">
                     <div className="p-3 bg-surface-container-low rounded flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold">UI/UX Designer</span>
-                        <span className="text-[10px] text-on-surface-variant">Hạn: 30/11 • Người tạo: Alex D.</span>
+                        <span className="text-xs sm:text-sm font-bold">UI/UX Designer</span>
+                        <span className="text-[10px] text-on-surface-variant">Hạn: 30/11 • Alex D.</span>
                       </div>
-                      <span className="text-[10px] px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold uppercase">đang tuyển</span>
+                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold uppercase">đang tuyển</span>
                     </div>
                     <div className="p-3 border border-surface-container-high rounded flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold">Backend Dev (Go)</span>
-                        <span className="text-[10px] text-on-surface-variant">Hạn: 15/12 • Người tạo: Ngân UK.</span>
+                        <span className="text-xs sm:text-sm font-bold">Backend Dev (Go)</span>
+                        <span className="text-[10px] text-on-surface-variant">Hạn: 15/12 • Ngân UK.</span>
                       </div>
-                      <span className="text-[10px] px-2 py-1 bg-indigo-100 text-primary rounded-full font-bold uppercase">hoàn thành</span>
+                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-indigo-100 text-primary rounded-full font-bold uppercase whitespace-nowrap">hoàn thành</span>
                     </div>
                   </div>
                 </div>
@@ -316,8 +316,8 @@ const LandingPage = () => {
             </div>
             <div className="order-1 md:order-2 space-y-6 reveal reveal-right">
               <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">Cấu trúc</span>
-              <h2 className="font-headline font-extrabold text-4xl">Trung tâm điều hành tuyển dụng</h2>
-              <p className="text-on-surface-variant leading-relaxed reveal reveal-up reveal-delay-200">Tổ chức các vị trí theo khách hàng, mức độ ưu tiên hoặc trạng thái. Giao diện hiện đại giúp bạn nắm bắt nhanh thông tin và thao tác ngay khi cần.</p>
+              <h2 className="font-headline font-extrabold text-3xl sm:text-4xl">Trung tâm điều hành tuyển dụng</h2>
+              <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed reveal reveal-up reveal-delay-200">Tổ chức các vị trí theo khách hàng, mức độ ưu tiên hoặc trạng thái. Giao diện hiện đại giúp bạn nắm bắt nhanh thông tin và thao tác ngay khi cần.</p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
                 <li className="flex items-center gap-3 text-on-surface">
                   <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>

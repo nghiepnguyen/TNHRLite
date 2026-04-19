@@ -7,6 +7,7 @@ import {
   getWorkspaceInvites, 
   inviteMember, 
   updateInviteStatus, 
+  deleteInvite,
   removeWorkspaceMember 
 } from '../../services/workspace.service';
 import { useToast } from '../../contexts/ToastContext';
@@ -53,14 +54,32 @@ export default function Members() {
     e.preventDefault();
     if (!inviteEmail) return;
     
-    setIsSubmitting(true);
+    const normalizedEmail = inviteEmail.trim().toLowerCase();
+    
+    // 1. Check if already a member
+    const isMember = members.some(m => m.email?.toLowerCase() === normalizedEmail);
+    if (isMember) {
+      toast({ type: 'error', message: `${inviteEmail} is already a member of this workspace.` });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // 2. Check if already has a pending invite
+    const isAlreadyInvited = invites.some(i => i.email?.toLowerCase() === normalizedEmail && i.status === 'pending');
+    if (isAlreadyInvited) {
+      toast({ type: 'error', message: `An invitation has already been sent to ${inviteEmail}.` });
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await inviteMember(
         workspaceId, 
         activeWorkspace?.name || 'Workspace', 
         inviteEmail, 
         inviteRole, 
-        userProfile?.id
+        userProfile?.id,
+        userProfile?.email
       );
       toast({ type: 'success', message: `Invitation sent to ${inviteEmail}` });
       setInviteEmail('');
@@ -82,6 +101,17 @@ export default function Members() {
       loadData();
     } catch (err) {
       toast({ type: 'error', message: 'Failed to revoke invitation.' });
+    }
+  };
+
+  const handleDeleteInvite = async (inviteId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this invitation log?')) return;
+    try {
+      await deleteInvite(inviteId);
+      toast({ type: 'success', message: 'Invitation record deleted.' });
+      loadData();
+    } catch (err) {
+      toast({ type: 'error', message: 'Failed to delete invitation record.' });
     }
   };
 
@@ -148,7 +178,7 @@ export default function Members() {
   return (
     <div className="members-page-container">
       {/* Header */}
-      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>Team Members</h1>
           <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Manage who has access to this workspace and their permissions.</p>
@@ -256,15 +286,26 @@ export default function Members() {
                           {invite.createdAt?.toDate ? invite.createdAt.toDate().toLocaleDateString() : 'N/A'}
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          {canManage && invite.status === 'pending' && (
-                            <button 
-                              className="btn btn-secondary btn-sm"
-                              style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
-                              onClick={() => handleRevoke(invite.id)}
-                            >
-                              Revoke
-                            </button>
-                          )}
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            {canManage && invite.status === 'pending' && (
+                              <button 
+                                className="btn btn-secondary btn-sm"
+                                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
+                                onClick={() => handleRevoke(invite.id)}
+                              >
+                                Revoke
+                              </button>
+                            )}
+                            {canManage && (
+                              <button 
+                                className="btn-icon text-danger" 
+                                title="Delete Log"
+                                onClick={() => handleDeleteInvite(invite.id)}
+                              >
+                                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))

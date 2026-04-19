@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useToast } from '../contexts/ToastContext';
+import Skeleton from './Skeleton';
 
 /**
  * MandatesTable Component - Phase 2 & 4 Improvement
@@ -53,9 +54,54 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
   if (loading) {
     return (
-      <div className="table-loader">
-        <div className="spinner"></div>
-        <p>Loading mandates...</p>
+      <div className="mandates-display-wrapper">
+        <div className="table-responsive desktop-only">
+          <table className="mandates-table-advanced">
+            <thead>
+              <tr>
+                <th>Mandate & Client</th>
+                <th>Status</th>
+                <th>Open Roles</th>
+                <th>Deadline</th>
+                <th className="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map(i => (
+                <tr key={i}>
+                  <td>
+                    <Skeleton variant="text" width="180px" />
+                    <Skeleton variant="text" width="120px" style={{ marginTop: '0.375rem' }} />
+                  </td>
+                  <td><Skeleton variant="text" width="80px" height="24px" style={{ borderRadius: '99px' }} /></td>
+                  <td>
+                    <Skeleton variant="text" width="40px" />
+                    <Skeleton variant="rect" width="100px" height="6px" style={{ marginTop: '0.375rem', borderRadius: '10px' }} />
+                  </td>
+                  <td><Skeleton variant="text" width="100px" /></td>
+                  <td className="text-right"><Skeleton variant="rect" width="120px" height="34px" style={{ marginLeft: 'auto', borderRadius: '8px' }} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mobile-only mobile-cards-list">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="mandate-mobile-card">
+              <div className="card-mobile-header">
+                <Skeleton variant="text" width="60px" height="20px" style={{ borderRadius: '99px' }} />
+                <Skeleton variant="text" width="80px" />
+              </div>
+              <Skeleton variant="title" width="70%" />
+              <Skeleton variant="text" width="40%" style={{ marginBottom: '1.25rem' }} />
+              <Skeleton variant="rect" height="6px" style={{ marginBottom: '1.5rem', borderRadius: '10px' }} />
+              <div className="m-action-group">
+                <Skeleton variant="rect" height="40px" style={{ borderRadius: '10px' }} />
+                <Skeleton variant="rect" height="40px" style={{ borderRadius: '10px' }} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

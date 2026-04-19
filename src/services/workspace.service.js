@@ -359,7 +359,7 @@ export const updateInviteStatus = async (inviteId, status) => {
   });
 };
 
-export const revokeInvite = async (inviteId) => {
+export const deleteInvite = async (inviteId) => {
   await deleteDoc(doc(db, 'invites', inviteId));
 };
 

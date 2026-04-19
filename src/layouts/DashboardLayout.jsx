@@ -13,6 +13,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const [aiStatus, setAiStatus] = useState('checking');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
   const profileRef = React.useRef(null);
 
@@ -69,9 +70,17 @@ export default function DashboardLayout() {
   ];
 
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Mobile Sidebar Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-backdrop" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'is-open' : ''}`}>
         <div className="sidebar-header">
           <Link to={navBase} className="logo" style={{ textDecoration: 'none' }}>
             <span className="material-symbols-outlined flex-shrink-0 !text-[24px] logo-icon">work</span>
@@ -79,9 +88,11 @@ export default function DashboardLayout() {
           </Link>
         </div>
 
-        <div style={{ padding: '0 0.5rem 0.5rem 0.5rem', borderBottom: '1px solid var(--color-surface-border)' }}>
-          {/* Workspace Switcher moved to Header */}
+        {/* Workspace Switcher inside Sidebar for mobile access */}
+        <div className="sidebar-workspace">
+          <WorkspaceSwitcher />
         </div>
+
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <NavLink 
@@ -89,6 +100,7 @@ export default function DashboardLayout() {
               to={item.path} 
               end
               className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}
+              onClick={() => setIsSidebarOpen(false)}
             >
               <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">{item.icon}</span>
               <span>{item.name}</span>
@@ -110,24 +122,44 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <div className="main-wrapper">
         <header className="header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1 }}>
+          {/* Left group */}
+          <div className="header-left">
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="mobile-menu-toggle"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label="Toggle Menu"
+            >
+              <span className="material-symbols-outlined">
+                {isSidebarOpen ? 'close' : 'menu'}
+              </span>
+            </button>
+
+            {/* Mobile brand name (shown beside hamburger on mobile) */}
+            <Link to={navBase} className="header-brand-mobile" style={{ textDecoration: 'none' }}>
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">work</span>
+              HR Lite
+            </Link>
+
             <div className="header-search">
               <span className="material-symbols-outlined flex-shrink-0 !text-[18px] search-icon text-muted">search</span>
               <input type="text" placeholder="Search candidates, jobs..." className="search-input" />
             </div>
 
-            <div style={{ width: '280px' }}>
+            <div className="header-workspace-switcher">
               <WorkspaceSwitcher variant="header" />
             </div>
           </div>
-            {/* AI Status Indicator */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 0.75rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', fontSize: '0.75rem' }}>
+
+          {/* Right group */}
+          <div className="header-right">
+            {/* AI Status Indicator - hidden on mobile */}
+            <div className="ai-status-indicator">
               <span className={`material-symbols-outlined flex-shrink-0 !text-[14px] ${ aiStatus === 'online' ? 'text-success' : 'text-danger' }`}>memory</span>
-              <span style={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.025em' }}>
-                AI Proxy: <span className={aiStatus === 'online' ? 'text-success' : 'text-danger'}>{aiStatus}</span>
+              <span>
+                AI: <span className={aiStatus === 'online' ? 'text-success' : 'text-danger'}>{aiStatus}</span>
               </span>
             </div>
-
 
             <NotificationBell />
             
@@ -159,6 +191,7 @@ export default function DashboardLayout() {
                 </div>
               )}
             </div>
+          </div>
         </header>
 
         <main className="main-content">

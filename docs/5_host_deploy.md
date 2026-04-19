@@ -6,9 +6,26 @@ Toàn bộ quá trình triển khai dự án đều nằm trong hạ tầng củ
 
 - Ứng dụng React/Vite sau khi build sẽ tạo ra thư mục `dist`.
 - File tĩnh này được upload tự động lên Firebase Hosting, CDN toàn cầu của Google giúp thời gian load nhanh đáng kể.
-- URL Tên miền tuỳ chỉnh hoặc mặc định (ví dụ: `https://tn-hr-lite.web.app`).
+- URL Tên miền tuỳ chỉnh: `https://hr.thanhnghiep.top` (Production) hoặc mặc định `https://tn-hr-lite.web.app`.
 
-## 2. Quy trình Deploy (Deploy Flow)
+## 2. Cấu hình Điều hướng (Hosting Rewrites)
+
+Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 2 là cấu hình rewrites trong `firebase.json`:
+```json
+"rewrites": [
+  {
+    "source": "/api/**",
+    "function": "api"
+  },
+  {
+    "source": "**",
+    "destination": "/index.html"
+  }
+]
+```
+*Lưu ý: Firebase Hosting Gen 2 không tự động loại bỏ tiền tố `/api` khi chuyển tiếp request. Do đó, mã nguồn Express bên trong Function phải giữ nguyên `/api` trong định nghĩa route.*
+
+## 3. Quy trình Deploy (Deploy Flow)
 
 Để deploy dự án lên môi trường Production, làm theo các bước sau trong Terminal ở thư mục gốc của dự án:
 

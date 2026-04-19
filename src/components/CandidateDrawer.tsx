@@ -107,7 +107,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
       />
       
       {/* Slide-in Panel */}
-      <div className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-out">
+      <div className="relative w-full sm:max-w-xl bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-out">
         
         {/* Header Section */}
         <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
@@ -131,7 +131,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex px-2 bg-white border-b border-slate-100">
+        <div className="flex px-2 bg-white border-b border-slate-100 overflow-x-auto no-scrollbar">
           {(['Overview', 'Notes', 'Interview', 'Offer'] as TabType[]).map(tab => {
             const isActive = activeTab === tab;
             return (
@@ -139,7 +139,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`
-                  flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative
+                  flex-1 min-w-[100px] flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all relative
                   ${isActive ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}
                 `}
               >
@@ -157,7 +157,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
         </div>
 
         {/* Main Form Area */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white no-scrollbar">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6 sm:space-y-8 bg-white no-scrollbar">
           
           {error && (
             <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm font-semibold animate-shake">
@@ -308,11 +308,11 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 bg-slate-50 border-t border-slate-200 flex gap-4">
+        <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button 
             onClick={handleSave}
             disabled={loading}
-            className="flex-1 h-14 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 hover:scale-[1.02] shadow-xl shadow-blue-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 group"
+            className="flex-[2] h-12 sm:h-14 bg-blue-600 text-white font-black rounded-xl sm:rounded-2xl hover:bg-blue-700 hover:scale-[1.02] shadow-xl shadow-blue-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2 group order-1 sm:order-2"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -322,7 +322,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
           </button>
           <button 
             onClick={onClose}
-            className="px-8 h-14 border border-slate-200 text-slate-500 font-black rounded-2xl hover:bg-white hover:text-slate-700 hover:border-slate-300 transition-all"
+            className="flex-1 h-12 sm:h-14 border border-slate-200 text-slate-500 font-black rounded-xl sm:rounded-2xl hover:bg-white hover:text-slate-700 hover:border-slate-300 transition-all order-2 sm:order-1"
           >
             Dismiss
           </button>

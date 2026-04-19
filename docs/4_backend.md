@@ -24,5 +24,11 @@ Cấu trúc Data được gom nhóm theo Workspace hoặc User nhằm bảo mậ
   4. Lấy cấu trúc JSON trả về (họ tên, email, kỹ năng, kinh nghiệm).
   5. Trả dữ liệu JSON sạch về cho Frontend tạo Candidate.
 
-## 3. Bảo mật (Firebase Data Rules)
+## 3. Quy ước định tuyến API (Routing)
+
+Do sử dụng Cloud Functions Gen 2 kết hợp với Firebase Hosting, hệ thống áp dụng quy ước:
+- **Tiền tố `/api`**: Bắt buộc phải có trong tất cả các định nghĩa route của Express (ví dụ: `app.get('/api/admin/users', ...)`).
+- **Hosting Rewrite**: File `firebase.json` cấu hình chuyển hướng `/api/**` sang cloud function mà không loại bỏ tiền tố. Điều này đảm bảo tính tương thích khi chạy cả ở môi trường local và production (`hr.thanhnghiep.top`).
+
+## 4. Bảo mật (Firebase Data Rules)
 File `firestore.rules` quản lý nghiêm ngặt việc truy cập Data. Một Viewer không thể thực hiện thao tác xóa, và chỉ có Owner mới được xóa không gian làm việc (Workspace). Quyền quản trị thành viên cũng được chia tầng rõ ràng thông qua hàm helper `hasRole` và `isMember`.

@@ -29,6 +29,7 @@
 ## 7. Hệ thống Thông báo & Phản hồi (Notifications)
 - Mọi tương tác quan trọng (Lời mời mới, Chấp nhận/Từ chối tham gia, Thay đổi nhân sự) đều được đẩy về **Notification Center**.
 - Hệ thống áp dụng cơ chế thông báo hai chiều, đảm bảo cả người thực hiện và người nhận đều nhận được phản hồi xác thực về hành động của mình.
+- **Quản lý thành viên nâng cao**: Ngăn chặn gửi nhiều lời mời tới cùng một email (duplicate check). Đồng thời cho phép Admin xóa vĩnh viễn các bản ghi mời cũ để làm sạch Audit Log.
 - Tự động dọn dẹp trạng thái "Chưa đọc" khi các hành động tương tác (như Review Invitation) đã hoàn thành.
 
 ---

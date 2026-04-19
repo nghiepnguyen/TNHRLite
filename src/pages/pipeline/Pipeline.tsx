@@ -126,20 +126,20 @@ export default function Pipeline() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)', minHeight: 0 }}>
       {/* Header & Main Controls */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Pipeline</h1>
           <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Organize candidates by progressing their application stage.</p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <label className="text-secondary" style={{ fontWeight: 500, fontSize: '0.875rem' }}>Job Mandate:</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <label className="text-secondary" style={{ fontWeight: 500, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>Job Mandate:</label>
             <select 
               className="form-control" 
-              style={{ width: '220px' }}
+              style={{ minWidth: '160px', maxWidth: '220px' }}
               value={selectedJob} 
               onChange={e => { setSelectedJob(e.target.value); setSelectedApp(null); }}
             >

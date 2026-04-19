@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { getWorkspaceMembers, inviteMember, updateWorkspace, deleteWorkspace, getWorkspaceInvites, revokeInvite } from '../../services/workspace.service';
+import { getWorkspaceMembers, inviteMember, updateWorkspace, deleteWorkspace, getWorkspaceInvites, deleteInvite } from '../../services/workspace.service';
 import { useToast } from '../../contexts/ToastContext';
 
 export default function WorkspaceSettings() {
@@ -177,7 +177,7 @@ export default function WorkspaceSettings() {
   const handleRevokeInvite = async (inviteId) => {
     if (!window.confirm('Are you sure you want to revoke this invitation? The user will no longer be able to join using this link.')) return;
     try {
-      await revokeInvite(inviteId);
+      await deleteInvite(inviteId);
 
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'revoke_invite');
@@ -339,41 +339,25 @@ export default function WorkspaceSettings() {
       </div>
 
       {/* TABS NAVIGATION */}
-      <div style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid var(--color-surface-border)', marginBottom: '2rem' }}>
+      <div className="ws-tabs-nav">
         <button 
           onClick={() => setTab('general')}
-          style={{ 
-            padding: '1rem 0', 
-            fontSize: '0.9375rem', 
-            fontWeight: 700, 
-            color: activeTab === 'general' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-            borderBottom: activeTab === 'general' ? '2px solid var(--color-primary)' : '2px solid transparent',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
+          className={`ws-tab-btn ${activeTab === 'general' ? 'ws-tab-active' : ''}`}
         >
-          <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">settings</span> General & Members
+          <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">settings</span>
+          <span>General &amp; Members</span>
         </button>
         <button 
           onClick={() => setTab('activity')}
-          style={{ 
-            padding: '1rem 0', 
-            fontSize: '0.9375rem', 
-            fontWeight: 700, 
-            color: activeTab === 'activity' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-            borderBottom: activeTab === 'activity' ? '2px solid var(--color-primary)' : '2px solid transparent',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
+          className={`ws-tab-btn ${activeTab === 'activity' ? 'ws-tab-active' : ''}`}
         >
-          <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span> Activity History
+          <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span>
+          <span>Activity History</span>
         </button>
       </div>
 
       {activeTab === 'general' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem' }}>
+        <div className="ws-general-grid">
         
         {/* Left Column: Settings & Members */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -415,13 +399,13 @@ export default function WorkspaceSettings() {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {members.map((member) => (
-                <div key={member.id} className="interactive-row-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--color-surface-border)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontWeight: 700 }}>
+                <div key={member.id} className="ws-member-row">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', minWidth: 0 }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontWeight: 700, flexShrink: 0 }}>
                       {member.email.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{member.email}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', textTransform: 'capitalize', marginTop: '0.125rem' }}>
                         {getRoleIcon(member.role)} {member.role}
                       </div>
@@ -648,10 +632,7 @@ export default function WorkspaceSettings() {
               </div>
             ) : (
               activities.map((act, idx) => (
-                <div key={idx} style={{ 
-                  display: 'flex', 
-                  gap: '1.5rem', 
-                  padding: '1.5rem 0',
+                <div key={idx} className="ws-activity-row" style={{ 
                   borderBottom: idx < activities.length - 1 ? '1px solid var(--color-surface-border)' : 'none' 
                 }}>
                   <div style={{ flexShrink: 0 }}>

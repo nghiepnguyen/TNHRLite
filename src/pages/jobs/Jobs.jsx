@@ -6,6 +6,7 @@ import { getJobs, getAllApplications, updateJob, createJob } from '../../service
 import MandateDetailModal from '../../components/MandateDetailModal';
 import MandatesTable from '../../components/MandatesTable';
 import { useToast } from '../../contexts/ToastContext';
+import Skeleton from '../../components/Skeleton';
 
 /**
  * Optimized Mandates Dashboard
@@ -204,7 +205,7 @@ export default function Jobs() {
             <div className="kpi-icon-base active"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">work</span></div>
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Active Mandates</span>
-              <span className="kpi-value-main">{activeCount}</span>
+              {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main">{activeCount}</span>}
             </div>
           </div>
           <div className="kpi-box">
@@ -212,7 +213,7 @@ export default function Jobs() {
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Expiring Soon</span>
               <div className="kpi-value-group">
-                <span className="kpi-value-main highlight">{expiringSoonCount}</span>
+                {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main highlight">{expiringSoonCount}</span>}
                 <span className="kpi-mini-badge">{"< 14 days"}</span>
               </div>
             </div>
@@ -221,7 +222,7 @@ export default function Jobs() {
             <div className="kpi-icon-base roles"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">group</span></div>
             <div className="kpi-text-base">
               <span className="kpi-tag-label">Total Open Roles</span>
-              <span className="kpi-value-main">{totalOpenRoles}</span>
+              {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main">{totalOpenRoles}</span>}
             </div>
           </div>
         </section>
@@ -237,25 +238,25 @@ export default function Jobs() {
                   className={`portal-tab ${activeTab === 'All' ? 'active' : ''}`}
                   onClick={() => setActiveTab('All')}
                 >
-                  All <span className="tab-count">{mandates.length}</span>
+                  All <span className="tab-count">{loading ? '...' : mandates.length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'Active' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Active')}
                 >
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> Active <span className="tab-count">{mandates.filter(m => m.status === 'Active').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> Active <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Active').length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'On-Hold' ? 'active' : ''}`}
                   onClick={() => setActiveTab('On-Hold')}
                 >
-                  On Hold <span className="tab-count">{mandates.filter(m => m.status === 'On-Hold' || m.status === 'On Hold' || m.status === 'Draft').length}</span>
+                  On Hold <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'On-Hold' || m.status === 'On Hold' || m.status === 'Draft').length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'Closed' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Closed')}
                 >
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">check_circle</span> Closed <span className="tab-count">{mandates.filter(m => m.status === 'Closed').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">check_circle</span> Closed <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Closed').length}</span>
                 </button>
               </div>
             </div>
@@ -613,13 +614,26 @@ export default function Jobs() {
         }
 
         @media (max-width: 1024px) {
-          .portal-dashboard { grid-template-columns: 1fr; }
+          .portal-dashboard { grid-template-columns: repeat(2, 1fr); }
           .portal-accordion-inner { grid-template-columns: 1fr; }
         }
 
-        @media (max-width: 640px) {
-          .portal-header { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+        @media (max-width: 768px) {
+          .portal-header { flex-direction: column; align-items: stretch; gap: 1rem; }
+          .portal-header .btn-lg { width: 100%; justify-content: center; }
+          .portal-dashboard { grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .portal-table-header { flex-direction: column; gap: 0.75rem; align-items: stretch; }
+          .portal-tabs-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .portal-tabs { min-width: max-content; }
+          .portal-filter-btn { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+          .portal-dashboard { grid-template-columns: 1fr; }
+          .portal-header { flex-direction: column; align-items: stretch; gap: 1rem; }
           .portal-table-footer { flex-direction: column; gap: 1.25rem; text-align: center; }
+          .kpi-box { padding: 1rem; }
+          .kpi-value-main { font-size: 1.75rem; }
         }
       `}} />
     </div>

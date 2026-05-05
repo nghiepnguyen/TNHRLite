@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ToastProvider } from './contexts/ToastContext';
 
@@ -30,12 +30,26 @@ import CookiePolicy from './pages/legal/CookiePolicy';
 import ContactSupport from './pages/support/ContactSupport';
 
 const ProtectedRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  if (!currentUser) return <Navigate to="/login" replace />;
+  const { currentUser, loading } = useAuth();
+  
+  if (loading) {
+    console.log('ProtectedRoute: Auth is initial loading...');
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-surface-base)' }}>
+        <div className="spinner" style={{ width: '40px', height: '40px', border: '3px solid var(--color-surface-border)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+  
+  if (!currentUser) {
+    console.log('ProtectedRoute: No user detected, redirecting to /login');
+    return <Navigate to="/login" replace />;
+  }
+  
+  console.log('ProtectedRoute: User detected:', currentUser.email);
   return children;
 };
-
-import { useAuth } from './contexts/AuthContext';
 
 function App() {
   return (

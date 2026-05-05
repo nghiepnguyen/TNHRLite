@@ -151,7 +151,7 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
             
             <div className="modal-body">
               <form onSubmit={handleCreate}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label>Workspace Name*</label>
                   <input 
@@ -222,7 +222,7 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
                 </div>
               </div>
 
-                <div className="modal-actions" style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <div className="flex flex-col sm:flex-row justify-end gap-4 mt-10">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)} disabled={isSubmitting}>
                     Cancel
                   </button>

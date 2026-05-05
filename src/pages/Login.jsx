@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,8 +9,16 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, register, loginWithGoogle } = useAuth();
+  const { login, register, loginWithGoogle, currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (currentUser && !authLoading) {
+      console.log('Login: currentUser detected and auth settled, navigating to /dashboard');
+      navigate('/dashboard');
+    }
+  }, [currentUser, authLoading, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -21,6 +29,9 @@ export default function Login() {
     try {
       setError('');
       setLoading(true);
+      const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+      console.log('Login: API Key loaded (first 5 chars):', apiKey?.substring(0, 5));
+      console.log('Login: Attempting login for', email);
       if (isSignUp) {
         if (password !== rePassword) {
           setError('Passwords do not match.');
@@ -28,19 +39,23 @@ export default function Login() {
           return;
         }
         await register(email, password);
-        // Track signup event
+        console.log('Login: register() promise resolved successfully');
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'signup_completed', { 'method': 'email' });
         }
       } else {
         await login(email, password);
+        console.log('Login: login() promise resolved successfully');
         // Track login event
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'login_success', { 'method': 'email' });
         }
+        setLoading(false);
+        // Explicitly navigate as a fallback, though useEffect handles it too
+        navigate('/dashboard');
       }
-      navigate('/dashboard');
     } catch (err) {
+      console.error('Login error:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
          setError('Invalid email or password. You may need to Sign Up first.');
       } else if (err.code === 'auth/email-already-in-use') {
@@ -61,8 +76,10 @@ export default function Login() {
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'login_success', { 'method': 'google' });
       }
+      setLoading(false);
       navigate('/dashboard');
     } catch (err) {
+      console.error('Google login error:', err);
       setError(err.message || 'Failed to sign in with Google.');
       setLoading(false);
     }

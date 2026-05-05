@@ -6,7 +6,9 @@ import {
   signOut, 
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from 'firebase/auth';
 
 const AuthContext = createContext();
@@ -30,6 +32,7 @@ export function AuthProvider({ children }) {
 
   function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
+    // Sử dụng Popup thay vì Redirect để ổn định hơn trên localhost
     return signInWithPopup(auth, provider);
   }
 
@@ -38,7 +41,13 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    // Xử lý kết quả trả về sau khi Redirect (nếu có lỗi)
+    getRedirectResult(auth).catch((error) => {
+      console.error("Redirect login error:", error);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, user => {
+      console.log('AuthContext: onAuthStateChanged fired', user?.email || 'No user');
       setCurrentUser(user);
       const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'thanhnghiep@gmail.com';
       setIsAdmin(user?.email === adminEmail);
@@ -51,6 +60,7 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     isAdmin,
+    loading,
     login,
     register,
     loginWithGoogle,
@@ -59,7 +69,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

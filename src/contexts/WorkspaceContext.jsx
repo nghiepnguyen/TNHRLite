@@ -50,12 +50,16 @@ export function WorkspaceProvider({ children }) {
 
     try {
       setLoading(true);
+      console.log('WorkspaceContext: Fetching profile for', currentUser.email);
       // 1. Ensure profile exists
       const profile = await ensureUserProfile(currentUser);
+      console.log('WorkspaceContext: Profile loaded', profile?.id);
       setUserProfile(profile);
 
       // 2. Fetch workspaces
+      console.log('WorkspaceContext: Fetching workspaces for', currentUser.uid);
       const wsList = await getUserWorkspaces(currentUser.uid);
+      console.log('WorkspaceContext: Found', wsList.length, 'workspaces');
       setWorkspaces(wsList);
       prevWorkspaceIdsRef.current = new Set(wsList.map(w => w.id));
 

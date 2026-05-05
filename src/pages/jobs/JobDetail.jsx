@@ -67,7 +67,7 @@ export default function JobDetail() {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem', flexShrink: 0 }}>
+          <div className="flex gap-3 flex-wrap sm:flex-nowrap">
             <button onClick={handleDelete} className="btn" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Delete
             </button>
@@ -78,7 +78,7 @@ export default function JobDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '2rem' }} className="job-detail-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
         <div className="card" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem' }}>Job Description</h2>
           <div style={{ whiteSpace: 'pre-line', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>

@@ -25,17 +25,25 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Initialize App Check
-export const appCheck = typeof window !== 'undefined' ? initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-  isTokenAutoRefreshEnabled: true
-}) : null;
+// Initialize App Check - Disable on localhost if causing issues
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+export const appCheck = (typeof window !== 'undefined' && !isLocalhost) 
+  ? initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+      isTokenAutoRefreshEnabled: true
+    }) 
+  : null;
 
 // Allow Debug Mode on localhost
-if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+if (isLocalhost) {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// Initialize Analytics - Disable on localhost to avoid Installations API 403 errors
+export const analytics = (typeof window !== 'undefined' && !isLocalhost) 
+  ? getAnalytics(app) 
+  : null;
 
 export default app;

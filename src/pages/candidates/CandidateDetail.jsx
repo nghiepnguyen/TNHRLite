@@ -140,9 +140,9 @@ export default function CandidateDetail() {
             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Talent Pool
           </Link>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', border: '1px solid var(--color-primary-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }} className="candidate-header-top">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--color-primary-bg)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', border: '1px solid var(--color-primary-border)', flexShrink: 0 }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[40px]">person</span>
               </div>
               <div>
@@ -184,7 +184,7 @@ export default function CandidateDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
         {/* Left Column: Parsed Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
@@ -209,7 +209,7 @@ export default function CandidateDetail() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> Education

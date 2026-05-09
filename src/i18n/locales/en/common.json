@@ -44,7 +44,12 @@
       "Interview": "Interview",
       "Offer": "Offer"
     },
-    "empty": "Empty"
+    "empty": "Empty",
+    "seo": {
+      "title": "HR Lite | Lean Recruitment Management",
+      "description": "HR Lite - A lean recruitment management solution for independent recruiters and small HR teams. Manage candidates, jobs, and smart reconciliation with AI.",
+      "keywords": "recruitment, HR Lite, candidate management, ATS, lean recruitment, AI CV filtering, recruitment portal, recruitment dashboard"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate, getApplicationsByCandidate, logActivity } from '../../services/db';
 import { compareCandidateToJob } from '../../services/ai';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import SEO from '../../components/common/SEO';
 
 export default function CandidateDetail() {
   const { t, i18n } = useTranslation();
@@ -137,6 +138,7 @@ export default function CandidateDetail() {
 
   return (
     <div>
+      <SEO title={`${candidate.fullName} | HR Lite`} />
       <div style={{ marginBottom: '2.5rem', padding: '2rem', backgroundColor: 'var(--color-surface-base)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-surface-border)', position: 'relative', overflow: 'hidden' }}>
         {/* Subtle Background Decoration */}
         <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', backgroundColor: 'var(--color-primary-bg)', borderRadius: '50%', opacity: 0.1, zIndex: 0 }}></div>

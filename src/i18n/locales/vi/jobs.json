@@ -53,7 +53,7 @@
     "tabs": {
       "all": "Tất cả",
       "active": "Hoạt động",
-      "onHold": "Tạm dừng",
+      "onhold": "Tạm dừng",
       "closed": "Đã đóng"
     },
     "filters": {
@@ -72,14 +72,27 @@
       "title": "Chi tiết yêu cầu tuyển dụng",
       "editingTitle": "Đang chỉnh sửa",
       "backToDetails": "Quay lại chi tiết",
+      "back": "Quay lại danh sách",
       "exportReport": "Xuất báo cáo (CSV)",
       "editSettings": "Thiết lập",
       "cloneMandate": "Nhân bản",
       "closeMandate": "Đóng yêu cầu",
       "confirmClose": "Bạn có chắc chắn?",
       "editJob": "Chỉnh sửa công việc",
+      "delete": "Xóa tin",
+      "deleting": "Đang xóa...",
       "confirmYes": "Có, Đóng ngay",
       "confirmNo": "Không, Giữ lại",
+      "reqSkills": "Kỹ năng bắt buộc",
+      "optSkills": "Kỹ năng ưu tiên",
+      "jdTitle": "Mô tả công việc",
+      "created": "Ngày tạo",
+      "none": "Không có",
+      "internalDirect": "Tuyển dụng trực tiếp",
+      "locNotSpecified": "Chưa xác định địa điểm",
+      "fullTime": "Toàn thời gian",
+      "noDesc": "Chưa có mô tả",
+      "loading": "Đang tải chi tiết...",
       "sections": {
         "jobDescription": "Mô tả công việc",
         "keyRequirements": "Yêu cầu trọng tâm",
@@ -111,6 +124,11 @@
         "offer": "Đề nghị",
         "hired": "Đã tuyển"
       },
+      "none": "Không có",
+      "internalDirect": "Tuyển dụng trực tiếp",
+      "locNotSpecified": "Chưa xác định địa điểm",
+      "fullTime": "Toàn thời gian",
+      "noDesc": "Chưa có mô tả",
       "loading": "Đang tải chi tiết..."
     },
     "editForm": {

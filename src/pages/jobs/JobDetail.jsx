@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
 import { getJob, deleteJob } from '../../services/db';
+import SEO from '../../components/common/SEO';
 
 export default function JobDetail() {
   const { t, i18n } = useTranslation();
@@ -47,6 +48,7 @@ export default function JobDetail() {
 
   return (
     <div>
+      <SEO title={`${job.title} | HR Lite`} />
       <div style={{ marginBottom: '2rem' }}>
         <Link to={`/dashboard/w/${workspaceId}/jobs`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
           <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('jobsPage.detail.back')}

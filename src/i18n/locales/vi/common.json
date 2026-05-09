@@ -44,7 +44,12 @@
       "Interview": "Phỏng vấn",
       "Offer": "Đề nghị"
     },
-    "empty": "Trống"
+    "empty": "Trống",
+    "seo": {
+      "title": "HR Lite | Quản lý Tuyển dụng Tinh gọn",
+      "description": "HR Lite - Giải pháp quản lý tuyển dụng tinh gọn cho các Recruiter độc lập và đội ngũ nhân sự nhỏ. Quản lý ứng viên, công việc và đối soát thông minh bằng AI.",
+      "keywords": "tuyển dụng, HR Lite, quản lý ứng viên, ATS, tuyển dụng tinh gọn, lọc CV AI, portal tuyển dụng, dashboard tuyển dụng"
+    }
   },
   "nav": {
     "dashboard": "Bảng điều khiển",

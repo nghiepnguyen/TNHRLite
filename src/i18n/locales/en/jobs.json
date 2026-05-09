@@ -53,7 +53,7 @@
     "tabs": {
       "all": "All",
       "active": "Active",
-      "onHold": "On Hold",
+      "onhold": "On Hold",
       "closed": "Closed"
     },
     "filters": {
@@ -72,14 +72,27 @@
       "title": "Mandate Details",
       "editingTitle": "Editing Mandate",
       "backToDetails": "Back to Details",
+      "back": "Back to list",
       "exportReport": "Export Report (CSV)",
       "editSettings": "Edit Settings",
       "cloneMandate": "Clone Mandate",
       "closeMandate": "Close Mandate",
       "confirmClose": "Are you sure?",
       "editJob": "Edit Job",
+      "delete": "Delete",
+      "deleting": "Deleting...",
       "confirmYes": "Yes, Close",
       "confirmNo": "No, Keep Open",
+      "reqSkills": "Required Skills",
+      "optSkills": "Optional Skills",
+      "jdTitle": "Job Description",
+      "created": "Created",
+      "none": "None",
+      "internalDirect": "Internal Direct",
+      "locNotSpecified": "Location not specified",
+      "fullTime": "Full-time",
+      "noDesc": "No description",
+      "loading": "Loading job details...",
       "sections": {
         "jobDescription": "Job Description",
         "keyRequirements": "Key Requirements",
@@ -111,6 +124,11 @@
         "offer": "Offer",
         "hired": "Hired"
       },
+      "none": "None",
+      "internalDirect": "Internal Direct",
+      "locNotSpecified": "Location not specified",
+      "fullTime": "Full-time",
+      "noDesc": "No description",
       "loading": "Loading job details..."
     },
     "editForm": {

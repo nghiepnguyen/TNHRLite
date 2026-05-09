@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { HelmetProvider } from 'react-helmet-async';
+import SEO from './components/common/SEO';
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
@@ -62,9 +64,11 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <ToastProvider>
-        <AuthProvider>
-          <Suspense fallback={<PageLoading />}>
+      <HelmetProvider>
+        <SEO />
+        <ToastProvider>
+          <AuthProvider>
+            <Suspense fallback={<PageLoading />}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
@@ -117,6 +121,7 @@ function App() {
           </Suspense>
         </AuthProvider>
       </ToastProvider>
+      </HelmetProvider>
     </Router>
   );
 }

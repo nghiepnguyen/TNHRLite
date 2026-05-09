@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
 
 
@@ -13,24 +14,25 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [isEditing, setIsEditing] = useState(initialMode === 'edit');
   const toast = useToast();
+  const { t } = useTranslation();
 
 
 
   if (!mandate) return null;
 
   const handleExport = () => {
-    toast?.({ type: 'info', message: `Exporting report for ${mandate.title}...` });
+    toast?.({ type: 'info', message: t('jobsPage.messages.extendSuccess', { date: mandate.title }) }); // Placeholder if needed
     onAction?.('export', mandate);
   };
 
   const handleClone = () => {
-    toast?.({ type: 'success', message: `Mandate "${mandate.title}" cloned successfully.` });
+    toast?.({ type: 'success', message: t('jobsPage.messages.cloneSuccess') });
     onAction?.('clone', mandate);
     onClose();
   };
 
   const handleConfirmClose = () => {
-    toast?.({ type: 'success', message: `Mandate "${mandate.title}" has been closed.` });
+    toast?.({ type: 'success', message: t('jobsPage.messages.closeSuccess') });
     onAction?.('close', mandate);
     onClose();
   };
@@ -47,12 +49,12 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         {/* Header */}
         <div className="modal-header">
           <div className="header-badge">
-             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> {isEditing ? 'Editing Mandate' : 'Mandate Details'}
+             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> {isEditing ? t('jobsPage.detail.editingTitle') : t('jobsPage.detail.title')}
           </div>
           <div className="header-actions">
             {isEditing && (
               <button className="btn-back" onClick={() => setIsEditing(false)}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Details
+                <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('jobsPage.detail.backToDetails')}
               </button>
             )}
             <button className="close-btn" onClick={onClose}>
@@ -81,45 +83,45 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
                 <div className="info-item">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">layers</span>
                   <div>
-                    <div className="info-label">Department</div>
-                    <div className="info-value">{mandate.department || 'N/A'}</div>
+                    <div className="info-label">{t('jobsPage.detail.labels.department')}</div>
+                    <div className="info-value">{mandate.department || t('jobsPage.detail.placeholders.notSpecified')}</div>
                   </div>
                 </div>
                 <div className="info-item">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">location_on</span>
                   <div>
-                    <div className="info-label">Location</div>
+                    <div className="info-label">{t('jobsPage.detail.labels.location')}</div>
                     <div className="info-value">{mandate.location}</div>
                   </div>
                 </div>
                 <div className="info-item">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">public</span>
                   <div>
-                    <div className="info-label">Working Mode</div>
-                    <div className="info-value">{mandate.workingMode || 'On-site'}</div>
+                    <div className="info-label">{t('jobsPage.detail.labels.workingMode')}</div>
+                    <div className="info-value">{mandate.workingMode || t('common.workingModes.onsite')}</div>
                   </div>
                 </div>
                 <div className="info-item">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">payments</span>
                   <div>
-                    <div className="info-label">Salary Range</div>
-                    <div className="info-value">{mandate.salaryRange || 'N/A'}</div>
+                    <div className="info-label">{t('jobsPage.detail.labels.salaryRange')}</div>
+                    <div className="info-value">{mandate.salaryRange || t('jobsPage.detail.placeholders.notSpecified')}</div>
                   </div>
                 </div>
                 <div className="info-item">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-muted">person</span>
                   <div>
-                    <div className="info-label">HR Contact</div>
-                    <div className="info-value" style={{ fontSize: '0.8125rem' }}>{mandate.hrContact || mandate.contact || 'Not specified'}</div>
+                    <div className="info-label">{t('jobsPage.detail.labels.hrContact')}</div>
+                    <div className="info-value" style={{ fontSize: '0.8125rem' }}>{mandate.hrContact || mandate.contact || t('jobsPage.detail.placeholders.notSpecified')}</div>
                   </div>
                 </div>
               </div>
 
               {/* Job Description Section */}
               <div className="description-section">
-                <h4 className="section-subtitle">Job Description</h4>
+                <h4 className="section-subtitle">{t('jobsPage.detail.sections.jobDescription')}</h4>
                 <div className="description-text">
-                  {mandate.jdText || mandate.description || 'No description provided for this mandate.'}
+                  {mandate.jdText || mandate.description || t('jobsPage.detail.placeholders.noDescription')}
                 </div>
               </div>
 
@@ -127,7 +129,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
               {((mandate.requiredSkills && mandate.requiredSkills.length > 0) || 
                 (mandate.optionalSkills && mandate.optionalSkills.length > 0)) && (
                 <div className="skills-section">
-                  <h4 className="section-subtitle">Key Requirements</h4>
+                  <h4 className="section-subtitle">{t('jobsPage.detail.sections.keyRequirements')}</h4>
                   <div className="skills-cloud">
                     {mandate.requiredSkills?.map((skill, i) => (
                       <span key={`req-${i}`} className="skill-badge required">{skill}</span>
@@ -145,36 +147,36 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
               <div className="status-card">
                 <div className="status-header">
                    <span className={`status-dot ${mandate.status.toLowerCase().replace(/[_\s]/g, '-')}`}></span>
-                   {mandate.status}
+                   {t(`jobsPage.tabs.${mandate.status.toLowerCase().replace(/[_\s-]/g, '') === 'onhold' ? 'onHold' : mandate.status.toLowerCase()}`)}
                 </div>
 
                 <div className="status-deadline">
-                   <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">calendar_month</span> Deadline: {new Date(mandate.deadline).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                   <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">calendar_month</span> {t('jobsPage.detail.labels.deadline')}: {new Date(mandate.deadline).toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                 </div>
               </div>
 
               <div className="timeline-section">
-                <h4 className="section-subtitle">Mandate Timeline</h4>
+                <h4 className="section-subtitle">{t('jobsPage.detail.sections.timeline')}</h4>
                 <div className="vertical-timeline">
                   <div className="timeline-item">
                     <div className="timeline-marker success"></div>
                     <div className="timeline-info">
-                      <div className="timeline-title">Mandate Created</div>
-                       <div className="timeline-date">{new Date(mandate.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+                      <div className="timeline-title">{t('jobsPage.messages.JOB_CREATED')}</div>
+                       <div className="timeline-date">{new Date(mandate.createdAt).toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
                     </div>
                   </div>
                   <div className="timeline-item">
                     <div className="timeline-marker info"></div>
                     <div className="timeline-info">
-                      <div className="timeline-title">Hiring Team Assigned</div>
-                      <div className="timeline-date">3 days ago</div>
+                      <div className="timeline-title">{t('jobsPage.detail.timeline.hiringTeamAssigned')}</div>
+                      <div className="timeline-date">{t('jobsPage.detail.timeline.daysAgo', { count: 3 })}</div>
                     </div>
                   </div>
                   <div className="timeline-item">
                     <div className="timeline-marker active"></div>
                     <div className="timeline-info">
-                      <div className="timeline-title">Sourcing & Screening</div>
-                      <div className="timeline-date">Active now</div>
+                      <div className="timeline-title">{t('jobsPage.detail.labels.sourcing')}</div>
+                      <div className="timeline-date">{t('jobsPage.detail.timeline.activeNow')}</div>
                     </div>
                   </div>
                 </div>
@@ -184,32 +186,32 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
 
           {/* Bottom Section: Pipeline KPIs */}
           <div className="pipeline-section">
-            <h4 className="section-subtitle">Recruitment Pipeline</h4>
+            <h4 className="section-subtitle">{t('jobsPage.detail.sections.pipeline')}</h4>
             <div className="pipeline-kpi-grid">
               <div className="pipeline-stat">
                 <div className="stat-header">
-                  <span className="stat-label">Screened</span>
+                  <span className="stat-label">{t('jobsPage.detail.pipeline.screened')}</span>
                   <span className="stat-value">{mandate.pipeline?.screened || 0}</span>
                 </div>
                 <div className="stat-progress"><div className="stat-bar" style={{ width: '80%', background: '#94a3b8' }}></div></div>
               </div>
               <div className="pipeline-stat">
                 <div className="stat-header">
-                  <span className="stat-label">Interview</span>
+                  <span className="stat-label">{t('jobsPage.detail.pipeline.interview')}</span>
                   <span className="stat-value">{mandate.pipeline?.interview || 0}</span>
                 </div>
                 <div className="stat-progress"><div className="stat-bar" style={{ width: '40%', background: '#3b82f6' }}></div></div>
               </div>
               <div className="pipeline-stat">
                 <div className="stat-header">
-                  <span className="stat-label">Offer</span>
+                  <span className="stat-label">{t('jobsPage.detail.pipeline.offer')}</span>
                   <span className="stat-value">{mandate.pipeline?.offer || 0}</span>
                 </div>
                 <div className="stat-progress"><div className="stat-bar" style={{ width: '20%', background: '#f59e0b' }}></div></div>
               </div>
               <div className="pipeline-stat">
                 <div className="stat-header">
-                  <span className="stat-label">Hired</span>
+                  <span className="stat-label">{t('jobsPage.detail.pipeline.hired')}</span>
                   <span className="stat-value">{mandate.pipeline?.hired || 0}</span>
                 </div>
                 <div className="stat-progress"><div className="stat-bar" style={{ width: '10%', background: '#10b981' }}></div></div>
@@ -226,28 +228,28 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
         <div className="modal-footer">
           <div className="footer-left">
             <button className="btn btn-secondary" onClick={handleExport}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> Export Report (CSV)
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> {t('jobsPage.detail.exportReport')}
             </button>
           </div>
           <div className="footer-right">
             {!showConfirmClose ? (
               <>
                 <button className="btn btn-secondary" onClick={() => setIsEditing(true)}>
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">settings</span> Edit Settings
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">settings</span> {t('jobsPage.detail.editSettings')}
                 </button>
                 <button className="btn btn-secondary" onClick={handleClone}>
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> Clone Mandate
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> {t('jobsPage.detail.cloneMandate')}
                 </button>
                 <button className="btn btn-danger-outline" onClick={() => setShowConfirmClose(true)}>
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Close Mandate
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> {t('jobsPage.detail.closeMandate')}
                 </button>
               </>
 
             ) : (
               <div className="confirm-actions">
-                <span className="confirm-text"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">alerttriangle</span> Are you sure?</span>
-                <button className="btn btn-danger" onClick={handleConfirmClose}>Yes, Close</button>
-                <button className="btn btn-secondary" onClick={() => setShowConfirmClose(false)}>No, Keep Open</button>
+                <span className="confirm-text"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">alerttriangle</span> {t('jobsPage.detail.confirmClose')}</span>
+                <button className="btn btn-danger" onClick={handleConfirmClose}>{t('jobsPage.detail.confirmYes')}</button>
+                <button className="btn btn-secondary" onClick={() => setShowConfirmClose(false)}>{t('jobsPage.detail.confirmNo')}</button>
               </div>
             )}
           </div>

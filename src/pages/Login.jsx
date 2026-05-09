@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,6 +11,7 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
   const { login, register, loginWithGoogle, currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -34,7 +37,7 @@ export default function Login() {
       console.log('Login: Attempting login for', email);
       if (isSignUp) {
         if (password !== rePassword) {
-          setError('Passwords do not match.');
+          setError(t('login.errors.passMismatch'));
           setLoading(false);
           return;
         }
@@ -57,11 +60,11 @@ export default function Login() {
     } catch (err) {
       console.error('Login error:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-         setError('Invalid email or password. You may need to Sign Up first.');
+         setError(t('login.errors.invalidCreds'));
       } else if (err.code === 'auth/email-already-in-use') {
-         setError('Email is already registered. Switch to Log In.');
+         setError(t('login.errors.emailInUse'));
       } else {
-         setError(err.message || 'An error occurred. Check if Firebase structure is valid.');
+         setError(err.message || t('login.errors.generic'));
       }
       setLoading(false);
     }
@@ -80,7 +83,7 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Google login error:', err);
-      setError(err.message || 'Failed to sign in with Google.');
+      setError(err.message || t('login.errors.googleFail'));
       setLoading(false);
     }
   }
@@ -90,49 +93,49 @@ export default function Login() {
       <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>HR Lite</h1>
-          <p className="text-secondary" style={{ marginTop: '0.5rem' }}>{isSignUp ? 'Create a new account' : 'Log in to your recruiter dashboard'}</p>
+          <p className="text-secondary" style={{ marginTop: '0.5rem' }}>{isSignUp ? t('login.signUp') : t('login.subtitle')}</p>
         </div>
         
         {error && <div className="badge badge-danger" style={{ display: 'block', padding: '0.75rem', marginBottom: '1rem', whiteSpace: 'normal', borderRadius: 'var(--radius-md)' }}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label">{t('login.email')}</label>
             <input 
               type="email" 
               className="form-control" 
               required 
-              placeholder="e.g. recruiter@company.com"
+              placeholder={t('login.placeholders.email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">{t('login.password')}</label>
             <input 
               type="password" 
               className="form-control" 
               required 
-              placeholder="Enter your password"
+              placeholder={t('login.placeholders.password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           {isSignUp && (
             <div className="form-group">
-              <label className="form-label">Confirm Password</label>
+              <label className="form-label">{t('login.rePassword')}</label>
               <input 
                 type="password" 
                 className="form-control" 
                 required 
-                placeholder="Re-enter your password"
+                placeholder={t('login.placeholders.rePassword')}
                 value={rePassword}
                 onChange={(e) => setRePassword(e.target.value)}
               />
             </div>
           )}
           <button disabled={loading} className="btn btn-primary" type="submit" style={{ width: '100%', marginTop: '1rem', padding: '0.75rem' }}>
-            {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Log In')}
+            {loading ? t('common.processing') : (isSignUp ? t('login.signUp') : t('login.signIn'))}
           </button>
         </form>
 
@@ -157,7 +160,7 @@ export default function Login() {
               <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
             </g>
           </svg>
-          Continue with Google
+          {t('login.googleSignIn')}
         </button>
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem' }}>
@@ -167,8 +170,12 @@ export default function Login() {
             className="text-primary" 
             style={{ padding: '0.5rem' }}
           >
-            {isSignUp ? 'Already have an account? Log In' : "Don't have an account? Sign Up"}
+            {isSignUp ? t('login.hasAccount') : t('login.noAccount')}
           </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <LanguageSwitcher />
         </div>
         
         <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>

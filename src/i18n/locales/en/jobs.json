@@ -1,0 +1,214 @@
+{
+  "jobsPage": {
+    "form": {
+      "title": "Job Title",
+      "client": "Client Name",
+      "dept": "Department",
+      "location": "Location",
+      "headcount": "Headcount (Total Roles)",
+      "deadline": "Submission Deadline",
+      "type": "Employment Type",
+      "status": "Status",
+      "mode": "Working Mode",
+      "salary": "Salary Range",
+      "contact": "HR Contact Information",
+      "jd": "Job Description",
+      "required": "Required Skills",
+      "optional": "Optional Skills",
+      "saveChanges": "Save Changes",
+      "createJob": "Create Job",
+      "deleteConfirm": "Are you sure you want to delete this job? All candidate links in the pipeline will be removed.",
+      "placeholder": {
+        "title": "e.g. Senior Frontend Engineer",
+        "client": "Company or Internal",
+        "dept": "e.g. Engineering, Sales",
+        "location": "e.g. Remote, San Francisco",
+        "salary": "e.g. $5,000 - $8,000",
+        "contact": "Name, Email or Phone of the primary recruiter",
+        "jd": "Paste job requirements, responsibilities...",
+        "required": "React, Node.js, Typescript (comma separated)",
+        "optional": "GraphQL, AWS (comma separated)"
+      },
+      "types": {
+        "fulltime": "Full-time",
+        "parttime": "Part-time",
+        "contract": "Contract",
+        "freelance": "Freelance"
+      },
+      "modes": {
+        "onsite": "On-site",
+        "remote": "Remote",
+        "hybrid": "Hybrid"
+      }
+    },
+    "title": "Recruiting Mandates",
+    "subtitle": "Overview of current hiring requirements and pipeline status",
+    "createBtn": "Create New Mandate",
+    "kpis": {
+      "active": "Active Mandates",
+      "expiring": "Expiring Soon",
+      "openRoles": "Total Open Roles",
+      "expiringNote": "< 14 days"
+    },
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "onHold": "On Hold",
+      "closed": "Closed"
+    },
+    "filters": {
+      "title": "Filters",
+      "client": "Client Organization",
+      "clientPlaceholder": "Search all clients...",
+      "dept": "Operating Department",
+      "deptPlaceholder": "Search all departments..."
+    },
+    "footer": {
+      "showing": "Showing",
+      "of": "of",
+      "records": "records"
+    },
+    "detail": {
+      "title": "Mandate Details",
+      "editingTitle": "Editing Mandate",
+      "backToDetails": "Back to Details",
+      "exportReport": "Export Report (CSV)",
+      "editSettings": "Edit Settings",
+      "cloneMandate": "Clone Mandate",
+      "closeMandate": "Close Mandate",
+      "confirmClose": "Are you sure?",
+      "editJob": "Edit Job",
+      "confirmYes": "Yes, Close",
+      "confirmNo": "No, Keep Open",
+      "sections": {
+        "jobDescription": "Job Description",
+        "keyRequirements": "Key Requirements",
+        "timeline": "Mandate Timeline",
+        "pipeline": "Recruitment Pipeline"
+      },
+      "labels": {
+        "department": "Department",
+        "location": "Location",
+        "workingMode": "Working Mode",
+        "salaryRange": "Salary Range",
+        "hrContact": "HR Contact",
+        "deadline": "Deadline",
+        "created": "Created",
+        "sourcing": "Sourcing & Screening"
+      },
+      "placeholders": {
+        "noDescription": "No description provided for this mandate.",
+        "notSpecified": "Not specified"
+      },
+      "timeline": {
+        "hiringTeamAssigned": "Hiring Team Assigned",
+        "daysAgo": "{{count}} days ago",
+        "activeNow": "Active now"
+      },
+      "pipeline": {
+        "screened": "Screened",
+        "interview": "Interview",
+        "offer": "Offer",
+        "hired": "Hired"
+      },
+      "loading": "Loading job details..."
+    },
+    "editForm": {
+      "title": "Edit Mandate Settings",
+      "subtitle": "Update recruitment parameters for this role",
+      "labels": {
+        "status": "Mandate Status",
+        "deadline": "Recruitment Deadline",
+        "headcount": "Total Headcount (Roles)",
+        "workingMode": "Working Mode",
+        "salary": "Salary Range",
+        "hrContact": "HR Contact Information",
+        "note": "Internal Change Note"
+      },
+      "placeholders": {
+        "salary": "e.g. $5,000 - $8,000",
+        "hrContact": "Name, Email or Phone of the primary HR contact",
+        "note": "Briefly describe the reason for this change (e.g., headcount expansion, budget delay)..."
+      },
+      "errors": {
+        "headcountTooLow": "Total roles cannot be less than filled roles ({{count}}).",
+        "deadlineFuture": "Deadline must be today or in the future for active mandates.",
+        "saveFailed": "Failed to update database."
+      },
+      "success": "Mandate updated successfully.",
+      "progress": "Current progress: {{filled}} filled / {{total}} total"
+    },
+    "table": {
+      "mandateClient": "Mandate & Client",
+      "status": "Status",
+      "openRoles": "Open Roles",
+      "deadline": "Deadline",
+      "actions": "Actions",
+      "tooltips": {
+        "edit": "Edit mandate",
+        "extend": "Extend deadline",
+        "duplicate": "Duplicate",
+        "close": "Close mandate",
+        "delete": "Permanently delete",
+        "view": "View details"
+      },
+      "noMandates": "No mandates found"
+    },
+    "messages": {
+      "deleteConfirm": "WARNING: Are you sure you want to delete this mandate? This will also remove all associated application data. This action cannot be undone.",
+      "closeConfirm": "Are you sure you want to close \"{{title}}\"? This will hide it from the active pipeline view.",
+      "deleteSuccess": "Mandate and history permanently deleted.",
+      "closeSuccess": "Mandate closed successfully.",
+      "cloneSuccess": "Mandate cloned successfully.",
+      "extendSuccess": "Deadline extended to {{date}}",
+      "execError": "Execution failed: {{type}}",
+      "loadError": "Failed to load recruiting data. Please check connection.",
+      "connError": "Connection Error",
+      "retry": "Retry Sync",
+      "JOB_CREATED": "Mandate Created"
+    }
+  },
+  "drawer": {
+    "noTitle": "No Title",
+    "tabs": {
+      "overview": "Overview",
+      "notes": "Notes",
+      "interview": "Interview",
+      "offer": "Offer"
+    },
+    "searchOwner": "Search or enter owner...",
+    "nextStepPlaceholder": "e.g. Follow up in 2 days...",
+    "tagsPlaceholder": "e.g. referral, technical...",
+    "notesPlaceholder": "Write interview summaries or internal comments here...",
+    "offerPlaceholder": "e.g. 150000",
+    "labels": {
+      "stage": "Current Stage",
+      "owner": "Candidate Owner",
+      "priority": "Priority Level",
+      "nextStep": "Planned Next Step",
+      "tags": "Labels / Tags",
+      "notes": "Evaluation & Team Feedback",
+      "interviewDate": "Schedule Date & Time",
+      "meetingLink": "Online Meeting Link",
+      "interviewStatus": "Interview Status",
+      "offerValue": "Annual Basic Value ($)",
+      "commitment": "Role Commitment"
+    },
+    "statuses": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "fullTime": "Full-time",
+      "contract": "Project-based / Contract",
+      "internship": "Internship / Grad Role"
+    },
+    "actions": {
+      "save": "Save Progress",
+      "dismiss": "Dismiss"
+    },
+    "errors": {
+      "ownerRequired": "A candidate owner is required.",
+      "saveFailed": "An error occurred while saving. Please try again."
+    }
+  }
+}

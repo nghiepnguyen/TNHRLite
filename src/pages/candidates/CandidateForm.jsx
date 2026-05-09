@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { getCandidate, updateCandidate, createCandidate, logActivity } from '../../services/db';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateForm() {
+  const { t } = useTranslation();
   const { workspaceId, id } = useParams();
   const { userProfile } = useWorkspace();
   const isEditing = !!id;
@@ -70,9 +72,11 @@ export default function CandidateForm() {
     try {
       if (isEditing) {
         await updateCandidate(id, payload);
+        alert(t('candidateForm.updateSuccess'));
         navigate(`/dashboard/w/${workspaceId}/candidates/${id}`);
       } else {
         const newId = await createCandidate(workspaceId, payload);
+        alert(t('candidateForm.createSuccess'));
         
         // Log activity
         await logActivity(workspaceId, userProfile, 'CANDIDATE_CREATED', {
@@ -94,22 +98,22 @@ export default function CandidateForm() {
       }
     } catch (error) {
       console.error(error);
-      alert(`Failed to ${isEditing ? 'update' : 'create'} candidate`);
+      alert(t('candidateForm.saveFail'));
     } finally {
       setLoading(false);
     }
   };
 
-  if (fetching) return <div style={{ padding: '2rem' }}>Loading candidate data...</div>;
+  if (fetching) return <div style={{ padding: '2rem' }}>{t('common.loading')}</div>;
 
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('common.back')}
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? 'Edit Candidate' : 'Manual Candidate Entry'}</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? t('candidateForm.editTitle') : t('candidateForm.createTitle')}</h1>
         </div>
       </div>
 
@@ -118,66 +122,66 @@ export default function CandidateForm() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Full Name *</label>
+              <label className="form-label">{t('candidateForm.fullName')}</label>
               <input type="text" name="fullName" className="form-control" value={formData.fullName} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email</label>
+              <label className="form-label">{t('candidateForm.email')}</label>
               <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Phone</label>
+              <label className="form-label">{t('candidateForm.phone')}</label>
               <input type="text" name="phone" className="form-control" value={formData.phone} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Current Title</label>
+              <label className="form-label">{t('candidateForm.title')}</label>
               <input type="text" name="currentTitle" className="form-control" value={formData.currentTitle} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Current Company</label>
+              <label className="form-label">{t('candidateForm.company')}</label>
               <input type="text" name="currentCompany" className="form-control" value={formData.currentCompany} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Years Experience</label>
+              <label className="form-label">{t('candidateForm.exp')}</label>
               <input type="number" name="yearsExperience" className="form-control" value={formData.yearsExperience} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Location</label>
+              <label className="form-label">{t('candidateForm.location')}</label>
               <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} />
             </div>
 
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Skills (comma separated)</label>
+              <label className="form-label">{t('candidateForm.skills')}</label>
               <input type="text" name="skills" className="form-control" value={formData.skills} onChange={handleChange} placeholder="e.g. React, Node.js, Python" />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Education</label>
+              <label className="form-label">{t('candidateForm.education')}</label>
               <input type="text" name="education" className="form-control" value={formData.education} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Certifications</label>
+              <label className="form-label">{t('candidateForm.certs')}</label>
               <input type="text" name="certifications" className="form-control" value={formData.certifications} onChange={handleChange} />
             </div>
 
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Parsed Resume / Bio Summary</label>
+              <label className="form-label">{t('candidateForm.resume')}</label>
               <textarea name="parsedResume" className="form-control" rows="6" value={formData.parsedResume} onChange={handleChange} placeholder="Full analysis summary..." />
             </div>
 
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="btn btn-secondary">{t('common.cancel')}</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">save</span> {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Candidate')}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">save</span> {loading ? t('candidateForm.saving') : (isEditing ? t('common.save') : t('common.save'))}
             </button>
           </div>
         </form>

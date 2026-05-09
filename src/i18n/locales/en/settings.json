@@ -1,0 +1,141 @@
+{
+  "settings": {
+    "title": "Workspace Settings",
+    "subtitle": "Manage your team and workspace permissions.",
+    "back": "Back to Dashboard",
+    "tabs": {
+      "general": "General & Members",
+      "activity": "Activity History"
+    },
+    "general": {
+      "title": "General Basics",
+      "nameLabel": "Workspace Name",
+      "namePlaceholder": "e.g. Acme Corp Recruiting",
+      "saveBtn": "Save Changes",
+      "saving": "Saving...",
+      "adminOnly": "Only admins can change the workspace name."
+    },
+    "members": {
+      "title": "Workspace Members",
+      "removeTooltip": "Remove member",
+      "invitesTitle": "Sent Invitations (Outgoing)",
+      "pending": "Pending",
+      "revokeBtn": "Revoke",
+      "revoking": "Revoking...",
+      "removeConfirm": "Are you sure you want to remove {{email}} from the workspace?",
+      "revokeConfirm": "Are you sure you want to revoke this invitation? The user will no longer be able to join using this link."
+    },
+    "invite": {
+      "title": "Invite Team Member",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "colleague@example.com",
+      "roleLabel": "Role",
+      "sendBtn": "Send Invitation",
+      "sending": "Sending...",
+      "restrictedTitle": "Role Restricted",
+      "restrictedDesc": "Only Workspace Owners and Admins can invite new members. Your current role is {{role}}.",
+      "success": "Invitation sent to {{email}}",
+      "fail": "Failed to send invitation."
+    },
+    "roles": {
+      "guide": "Permission Guide",
+      "owner": {
+        "title": "Owner",
+        "desc": "Full access, payment control, and workspace deletion."
+      },
+      "admin": {
+        "title": "Admin",
+        "desc": "Can manage members, jobs, and all data.",
+        "option": "Admin (Full Control)"
+      },
+      "editor": {
+        "title": "Editor",
+        "desc": "Can create/edit jobs and candidates. Cannot manage members.",
+        "option": "Editor (Read/Write)"
+      },
+      "viewer": {
+        "title": "Viewer",
+        "desc": "Read only access. Cannot modify data.",
+        "option": "Viewer (Read Only)"
+      }
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "deleteDesc": "Deleting this workspace will remove all members from it. This action cannot be undone.",
+      "lastWorkspaceNote": "Note: Since this is your last workspace, deleting it will reset your account and create a fresh, empty workspace.",
+      "typeToConfirm": "Type {{name}} to confirm",
+      "typePlaceholder": "Type workspace name here",
+      "deleteBtn": "Delete Workspace",
+      "deleting": "Deleting...",
+      "leaveBtn": "Leave Workspace",
+      "leaving": "Leaving...",
+      "leaveDesc": "Leaving this workspace will immediately revoke your access to its data and candidates. To return, you will need to request a new invitation from an administrator.",
+      "leaveConfirm": "Are you sure you want to leave this workspace? You will lose access immediately, and you will need to be re-invited to join again.",
+      "ownerLeaveError": "The owner cannot leave the workspace. You must delete the workspace or transfer ownership first.",
+      "nameMismatch": "Workspace name does not match!",
+      "deleteConfirm": "Are you absolutely sure? All jobs and candidates tied to this workspace will become orphaned or deleted!",
+      "deleteConfirmOnly": "⚠️ DANGER: This is your ONLY workspace! Deleting it will wipe all your visible data. A fresh, empty \"My Workspace\" will be created for you upon reload. Are you absolutely sure?"
+    },
+    "activity": {
+      "title": "Extended Activity Logs",
+      "subtitle": "A complete audit trail of recent changes in your workspace.",
+      "empty": "No activity logs found for this workspace.",
+      "emptyHint": "As you add jobs, candidates, or team members, logs will appear here.",
+      "justNow": "Just now",
+      "ago": "{{count}}{{unit}} ago",
+      "actionId": "Action ID",
+      "messages": {
+        "JOB_CREATED": "posted a new job: {{name}}",
+        "CANDIDATE_CREATED": "added candidate: {{name}}",
+        "CV_UPLOADED": "uploaded CV for: {{name}}",
+        "STAGE_CHANGED": "moved {{name}} to {{stage}}",
+        "APPLICATION_CREATED": "linked {{name}} to a job pipeline",
+        "NOTE_ADDED": "updated notes for: {{name}}",
+        "INVITATION_ACCEPTED": "accepted the workspace invitation to join as {{role}}",
+        "INVITATION_DECLINED": "declined the workspace invitation",
+        "MEMBER_REMOVED": "removed {{name}} from the workspace",
+        "MEMBER_LEFT": "left the workspace"
+      }
+    },
+    "user": {
+      "title": "Account Settings",
+      "subtitle": "Manage your personal profile and email notification preferences.",
+      "loading": "Loading your settings...",
+      "profile": {
+        "title": "Profile Information",
+        "nameLabel": "Display Name",
+        "namePlaceholder": "Your name",
+        "emailLabel": "Email Address",
+        "emailHint": "Email address cannot be changed."
+      },
+      "notifications": {
+        "title": "Email Notifications",
+        "desc": "Stay updated on your hiring pipeline. Turn these off to reduce inbox noise.",
+        "welcome": {
+          "title": "Welcome & Tips",
+          "desc": "Introductory emails and tips for getting started."
+        },
+        "invite": {
+          "title": "Workspace Invitations",
+          "desc": "When you are invited to join a new workspace."
+        },
+        "newJob": {
+          "title": "New Job Openings",
+          "desc": "When a team member posts a new job in your workspace."
+        },
+        "newCandidate": {
+          "title": "New Candidates",
+          "desc": "When a new candidate is added to your active jobs."
+        },
+        "pipeline": {
+          "title": "Pipeline Changes",
+          "desc": "When a candidate's stage is updated in the pipeline."
+        }
+      },
+      "saveBtn": "Save All Changes",
+      "saving": "Saving Changes...",
+      "success": "Settings saved successfully.",
+      "fail": "Failed to save settings."
+    }
+  }
+}

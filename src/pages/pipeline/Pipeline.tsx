@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getJobs, getApplicationsByJob, getCandidates, updateApplicationStage, logActivity } from '../../services/db';
 
 import PipelineBoard from '../../components/PipelineBoard';
@@ -10,6 +11,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 export default function Pipeline() {
   const { workspaceId } = useParams();
   const { userProfile } = useWorkspace();
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState('');
   const [applications, setApplications] = useState([]);
@@ -37,7 +39,7 @@ export default function Pipeline() {
         setCandidatesMap(cMap);
       } catch (err) {
         console.error('Initialization error:', err);
-        setError('Failed to load initial data. Please check your connection or permissions.');
+        setError(t('pipelinePage.errors.init'));
       } finally {
         setLoading(false);
       }
@@ -58,7 +60,7 @@ export default function Pipeline() {
         setApplications(apps);
       } catch (err) {
         console.error('Fetch applications error:', err);
-        setError('Failed to load applications for this job.');
+        setError(t('pipelinePage.errors.fetch'));
       } finally {
         setLoading(false);
       }
@@ -116,7 +118,7 @@ export default function Pipeline() {
       if (selectedApp?.id === appId) {
         setSelectedApp(prev => ({ ...prev, stage: oldStage }));
       }
-      alert('Failed to update stage. Reverting...');
+      alert(t('pipelinePage.errors.update'));
     }
   };
 
@@ -130,20 +132,20 @@ export default function Pipeline() {
       {/* Header & Main Controls */}
       <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Pipeline</h1>
-          <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Organize candidates by progressing their application stage.</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{t('pipelinePage.title')}</h1>
+          <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{t('pipelinePage.subtitle')}</p>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <label className="text-secondary" style={{ fontWeight: 500, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>Job Mandate:</label>
+            <label className="text-secondary" style={{ fontWeight: 500, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{t('pipelinePage.jobMandate')}</label>
             <select 
               className="form-control" 
               style={{ minWidth: '160px', maxWidth: '220px' }}
               value={selectedJob} 
               onChange={e => { setSelectedJob(e.target.value); setSelectedApp(null); }}
             >
-              <option value="">-- Choose job --</option>
+              <option value="">{t('pipelinePage.chooseJob')}</option>
               {jobs.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
             </select>
           </div>
@@ -153,7 +155,7 @@ export default function Pipeline() {
             disabled={!selectedJob || filteredApplications.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> Export CSV
+            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">download</span> {t('pipelinePage.exportCsv')}
           </button>
         </div>
       </div>
@@ -167,7 +169,7 @@ export default function Pipeline() {
       {!selectedJob && (
          <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
             <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-muted"  style={{ margin: '0 auto 1rem' }}>layers</span>
-            <p className="text-secondary">Select an active job from the dropdown above to view its pipeline.</p>
+            <p className="text-secondary">{t('pipelinePage.selectJobPrompt')}</p>
          </div>
       )}
 

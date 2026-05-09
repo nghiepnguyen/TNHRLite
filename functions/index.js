@@ -4,6 +4,8 @@ const cors = require('cors');
 const mammoth = require('mammoth');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const admin = require('firebase-admin');
+const { Resend } = require('resend');
+
 
 // Initialize Firebase Admin globally
 admin.initializeApp();
@@ -12,6 +14,10 @@ admin.initializeApp();
 // but for standard Secrets Manager integration or process.env (Gen 2):
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
 
 const app = express();
 
@@ -330,9 +336,50 @@ app.post('/api/compare', authenticate, validateWorkspace(['owner', 'admin', 'edi
   }
 });
 
+// Email endpoint
+app.post('/api/send-email', authenticate, async (req, res) => {
+  try {
+    const { to, subject, html, text } = req.body;
+    
+    if (!to || !subject || (!html && !text)) {
+      return res.status(400).json({ error: 'Missing required fields (to, subject, and either html or text)' });
+    }
+
+    if (!resend) {
+      console.warn("RESEND_API_KEY not found. Skipping email send.");
+      return res.json({ 
+        success: true, 
+        message: 'Resend API Key missing. Email not sent, but request was valid (mock mode).',
+        mock: true 
+      });
+    }
+
+    console.log(`Sending email to: ${to} | Subject: ${subject}`);
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+      text
+    });
+
+    if (error) {
+      console.error("Resend API Error:", error);
+      return res.status(400).json({ error: 'Resend API Error', details: error });
+    }
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error in send-email endpoint:', error);
+    res.status(500).json({ error: 'Internal server error while sending email', details: error.message });
+  }
+});
+
+
 // Export the Express app as a Cloud Function
 exports.api = onRequest({
   timeoutSeconds: 120, // Give Gemini time to process
   cors: true,
-  maxInstances: 10
+  maxInstances: 10,
+  secrets: ["GEMINI_API_KEY", "RESEND_API_KEY", "RESEND_FROM_EMAIL"]
 }, app);

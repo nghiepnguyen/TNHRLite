@@ -1,0 +1,141 @@
+{
+  "settings": {
+    "title": "Cài đặt không gian",
+    "subtitle": "Quản lý nhóm và quyền hạn của không gian làm việc.",
+    "back": "Quay lại Dashboard",
+    "tabs": {
+      "general": "Chung & Thành viên",
+      "activity": "Lịch sử hoạt động"
+    },
+    "general": {
+      "title": "Thông tin cơ bản",
+      "nameLabel": "Tên không gian",
+      "namePlaceholder": "v.d. Tuyển dụng Acme Corp",
+      "saveBtn": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "adminOnly": "Chỉ quản trị viên mới có thể thay đổi tên không gian."
+    },
+    "members": {
+      "title": "Thành viên",
+      "removeTooltip": "Xóa thành viên",
+      "invitesTitle": "Lời mời đã gửi",
+      "pending": "Đang chờ",
+      "revokeBtn": "Thu hồi",
+      "revoking": "Đang thu hồi...",
+      "removeConfirm": "Bạn có chắc chắn muốn xóa {{email}} khỏi không gian làm việc?",
+      "revokeConfirm": "Bạn có chắc chắn muốn thu hồi lời mời này? Người dùng sẽ không thể tham gia bằng liên kết này nữa."
+    },
+    "invite": {
+      "title": "Mời thành viên",
+      "emailLabel": "Địa chỉ Email",
+      "emailPlaceholder": "colleague@example.com",
+      "roleLabel": "Vai trò",
+      "sendBtn": "Gửi lời mời",
+      "sending": "Đang gửi...",
+      "restrictedTitle": "Bị hạn chế quyền",
+      "restrictedDesc": "Chỉ Chủ sở hữu và Quản trị viên mới có thể mời thành viên mới. Vai trò hiện tại của bạn là {{role}}.",
+      "success": "Đã gửi lời mời đến {{email}}",
+      "fail": "Không thể gửi lời mời."
+    },
+    "roles": {
+      "guide": "Hướng dẫn quyền hạn",
+      "owner": {
+        "title": "Chủ sở hữu",
+        "desc": "Toàn quyền truy cập, quản lý thanh toán và xóa không gian."
+      },
+      "admin": {
+        "title": "Quản trị viên",
+        "desc": "Có thể quản lý thành viên, công việc và tất cả dữ liệu.",
+        "option": "Quản trị viên (Toàn quyền)"
+      },
+      "editor": {
+        "title": "Biên tập viên",
+        "desc": "Có thể tạo/sửa công việc và ứng viên. Không thể quản lý thành viên.",
+        "option": "Biên tập viên (Đọc/Ghi)"
+      },
+      "viewer": {
+        "title": "Người xem",
+        "desc": "Chỉ có quyền đọc. Không thể thay đổi dữ liệu.",
+        "option": "Người xem (Chỉ đọc)"
+      }
+    },
+    "danger": {
+      "title": "Khu vực nguy hiểm",
+      "deleteDesc": "Xóa không gian này sẽ xóa tất cả thành viên khỏi đó. Hành động này không thể hoàn tác.",
+      "lastWorkspaceNote": "Lưu ý: Vì đây là không gian làm việc cuối cùng của bạn, việc xóa nó sẽ thiết lập lại tài khoản và tạo một không gian mới trống rỗng.",
+      "typeToConfirm": "Nhập {{name}} để xác nhận",
+      "typePlaceholder": "Nhập tên không gian tại đây",
+      "deleteBtn": "Xóa không gian",
+      "deleting": "Đang xóa...",
+      "leaveBtn": "Rời khỏi không gian",
+      "leaving": "Đang rời khỏi...",
+      "leaveDesc": "Rời khỏi không gian này sẽ thu hồi ngay quyền truy cập của bạn vào dữ liệu và ứng viên. Để quay lại, bạn cần yêu cầu lời mời mới từ quản trị viên.",
+      "leaveConfirm": "Bạn có chắc chắn muốn rời khỏi không gian này? Bạn sẽ mất quyền truy cập ngay lập tức.",
+      "ownerLeaveError": "Chủ sở hữu không thể rời khỏi không gian. Bạn phải xóa không gian hoặc chuyển quyền sở hữu trước.",
+      "nameMismatch": "Tên không gian không khớp!",
+      "deleteConfirm": "Bạn có hoàn toàn chắc chắn không? Tất cả công việc và ứng viên gắn liền với không gian này sẽ bị xóa!",
+      "deleteConfirmOnly": "⚠️ NGUY HIỂM: Đây là không gian DUY NHẤT của bạn! Xóa nó sẽ xóa toàn bộ dữ liệu. Một không gian mới trống rỗng sẽ được tạo lại. Bạn có chắc chắn không?"
+    },
+    "activity": {
+      "title": "Nhật ký hoạt động mở rộng",
+      "subtitle": "Toàn bộ lịch sử các thay đổi gần đây trong không gian làm việc của bạn.",
+      "empty": "Không tìm thấy nhật ký hoạt động nào cho không gian này.",
+      "emptyHint": "Khi bạn thêm công việc, ứng viên hoặc thành viên, nhật ký sẽ xuất hiện tại đây.",
+      "justNow": "Vừa xong",
+      "ago": "{{count}}{{unit}} trước",
+      "actionId": "Mã hoạt động",
+      "messages": {
+        "JOB_CREATED": "đã đăng một tin tuyển dụng mới: {{name}}",
+        "CANDIDATE_CREATED": "đã thêm ứng viên: {{name}}",
+        "CV_UPLOADED": "đã tải CV cho: {{name}}",
+        "STAGE_CHANGED": "đã chuyển {{name}} sang {{stage}}",
+        "APPLICATION_CREATED": "đã liên kết {{name}} vào quy trình tuyển dụng",
+        "NOTE_ADDED": "đã cập nhật ghi chú cho: {{name}}",
+        "INVITATION_ACCEPTED": "đã chấp nhận lời mời tham gia với vai trò {{role}}",
+        "INVITATION_DECLINED": "đã từ chối lời mời tham gia không gian",
+        "MEMBER_REMOVED": "đã xóa {{name}} khỏi không gian làm việc",
+        "MEMBER_LEFT": "đã rời khỏi không gian làm việc"
+      }
+    },
+    "user": {
+      "title": "Cài đặt tài khoản",
+      "subtitle": "Quản lý hồ sơ cá nhân và tùy chọn thông báo qua email.",
+      "loading": "Đang tải cài đặt của bạn...",
+      "profile": {
+        "title": "Thông tin cá nhân",
+        "nameLabel": "Tên hiển thị",
+        "namePlaceholder": "Tên của bạn",
+        "emailLabel": "Địa chỉ Email",
+        "emailHint": "Địa chỉ email không thể thay đổi."
+      },
+      "notifications": {
+        "title": "Thông báo Email",
+        "desc": "Cập nhật thông tin về quy trình tuyển dụng. Tắt chúng để giảm bớt email rác.",
+        "welcome": {
+          "title": "Chào mừng & Mẹo",
+          "desc": "Email giới thiệu và các mẹo để bắt đầu."
+        },
+        "invite": {
+          "title": "Lời mời tham gia không gian",
+          "desc": "Khi bạn được mời tham gia một không gian làm việc mới."
+        },
+        "newJob": {
+          "title": "Tin tuyển dụng mới",
+          "desc": "Khi một thành viên trong nhóm đăng tin tuyển dụng mới."
+        },
+        "newCandidate": {
+          "title": "Ứng viên mới",
+          "desc": "Khi có ứng viên mới được thêm vào các công việc đang hoạt động."
+        },
+        "pipeline": {
+          "title": "Thay đổi quy trình",
+          "desc": "Khi giai đoạn của ứng viên được cập nhật trong quy trình."
+        }
+      },
+      "saveBtn": "Lưu tất cả thay đổi",
+      "saving": "Đang lưu thay đổi...",
+      "success": "Đã lưu cài đặt thành công.",
+      "fail": "Không thể lưu cài đặt."
+    }
+  }
+}

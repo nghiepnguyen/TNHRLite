@@ -50,80 +50,57 @@ export function WorkspaceProvider({ children }) {
 
     try {
       setLoading(true);
-      console.log('WorkspaceContext: Fetching profile for', currentUser.email);
       // 1. Ensure profile exists
       const profile = await ensureUserProfile(currentUser);
-      console.log('WorkspaceContext: Profile loaded', profile?.id);
       setUserProfile(profile);
 
       // 2. Fetch workspaces
-      console.log('WorkspaceContext: Fetching workspaces for', currentUser.uid);
       const wsList = await getUserWorkspaces(currentUser.uid);
-      console.log('WorkspaceContext: Found', wsList.length, 'workspaces');
       setWorkspaces(wsList);
       prevWorkspaceIdsRef.current = new Set(wsList.map(w => w.id));
 
-      // 3. Handle Migration & Default Workspace for new/legacy users
-      if (wsList.length === 0) {
-        // Check if there are pending invites before creating a personal workspace
-        const invites = await getPendingInvites(currentUser.email);
-        if (invites.length > 0) {
-          setPendingInvites(invites);
-        } else if (!isCreatingRef.current) {
-          isCreatingRef.current = true;
-          // Create a default workspace for the new user
-          const newWsId = await createWorkspace(currentUser.uid, currentUser.email, {
-            name: 'My Workspace',
-            description: 'Personal recruitment workspace',
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-            language: 'en'
-          });
-          
-          await updateUserProfile(currentUser.uid, { defaultWorkspaceId: newWsId, onboarded: true });
-          
-          // Re-fetch
-          const updatedWsList = await getUserWorkspaces(currentUser.uid);
-          setWorkspaces(updatedWsList);
-          
-          // If we are on dashboard and no ID in URL, redirect to this new one
-          if (location.pathname === '/dashboard' || location.pathname === '/dashboard/') {
-            navigate(`/dashboard/w/${newWsId}`, { replace: true });
-          }
-        }
-      } else {
-        // We have workspaces. Check if we should redirect to a default one if none in URL
-        if ((location.pathname === '/dashboard' || location.pathname === '/dashboard/') && !workspaceId) {
-          const defaultId = profile.defaultWorkspaceId || wsList[0].id;
-          navigate(`/dashboard/w/${defaultId}`, { replace: true });
-        }
-      }
-
-      // 4. Set Active Workspace based on URL
+      // 3. Set Active Workspace based on URL
       if (workspaceId) {
         const found = wsList.find(w => w.id === workspaceId);
         if (found) {
           setActiveWorkspace(found);
-        } else {
-          // User might be trying to access a workspace they aren't in
-          console.error("Unauthorized workspace access or invalid ID");
-          // Optionally redirect to a safe place
         }
       }
 
-      // 5. Fetch invites anyway for the switcher
+      // 4. Fetch invites
       const currentInvites = await getPendingInvites(currentUser.email);
       setPendingInvites(currentInvites);
 
     } catch (error) {
-      console.error("Error in WorkspaceProvider:", error);
+      console.error("Error in WorkspaceProvider refreshData:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentUser, workspaceId, navigate, location.pathname]);
+  }, [currentUser, workspaceId]);
 
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  // Separate Effect for Redirects/Migration - only runs when workspaces or path changes
+  useEffect(() => {
+    if (!currentUser || loading || workspaces.length === 0) {
+      // If no workspaces and on dashboard root, handle auto-creation
+      if (currentUser && !loading && workspaces.length === 0 && (location.pathname === '/dashboard' || location.pathname === '/dashboard/')) {
+         // Logic for migration/auto-create would go here if needed
+         // But we should be careful not to trigger infinite loops
+      }
+      return;
+    }
+
+    if ((location.pathname === '/dashboard' || location.pathname === '/dashboard/') && !workspaceId) {
+      const profile = userProfile;
+      const defaultId = profile?.defaultWorkspaceId || workspaces[0]?.id;
+      if (defaultId) {
+        navigate(`/dashboard/w/${defaultId}`, { replace: true });
+      }
+    }
+  }, [location.pathname, workspaceId, workspaces, userProfile, currentUser, loading, navigate]);
 
   // Handle Real-time Workspace Subscription
   useEffect(() => {

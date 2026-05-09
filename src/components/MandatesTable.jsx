@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useToast } from '../contexts/ToastContext';
 import Skeleton from './Skeleton';
@@ -7,6 +8,7 @@ import Skeleton from './Skeleton';
  * MandatesTable Component - Phase 2 & 4 Improvement
  */
 const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   
   const handleActionClick = (e, type, mandate) => {
@@ -14,13 +16,13 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
     
     // Provide immediate feedback via Toast
     if (type === 'duplicate') {
-      toast({ type: 'success', message: `Duplicate created for "${mandate.title}"` });
+      toast({ type: 'success', message: t('jobsPage.messages.cloneSuccess') });
     }
     if (type === 'extend') {
-      toast({ type: 'info', message: `Extension requested for ${mandate.title}` });
+      toast({ type: 'info', message: t('jobsPage.messages.extendSuccess', { date: mandate.title }) });
     }
     if (type === 'close') {
-      toast({ type: 'warning', message: `Closing mandate "${mandate.title}"...` });
+      toast({ type: 'warning', message: t('jobsPage.messages.closeConfirm', { title: mandate.title }) });
     }
     
     onAction?.(type, mandate);
@@ -46,7 +48,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     return {
-      formatted: date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      formatted: date.toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
       isExpiringSoon: diffDays > 0 && diffDays < 14,
       isExpired: diffDays <= 0
     };
@@ -59,11 +61,11 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
           <table className="mandates-table-advanced">
             <thead>
               <tr>
-                <th>Mandate & Client</th>
-                <th>Status</th>
-                <th>Open Roles</th>
-                <th>Deadline</th>
-                <th className="text-right">Actions</th>
+                <th>{t('jobsPage.table.mandateClient')}</th>
+                <th>{t('jobsPage.table.status')}</th>
+                <th>{t('jobsPage.table.openRoles')}</th>
+                <th>{t('jobsPage.table.deadline')}</th>
+                <th className="text-right">{t('jobsPage.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -113,11 +115,11 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
         <table className="mandates-table-advanced">
           <thead>
             <tr>
-              <th>Mandate & Client</th>
-              <th>Status</th>
-              <th>Open Roles</th>
-              <th>Deadline</th>
-              <th className="text-right">Actions</th>
+              <th>{t('jobsPage.table.mandateClient')}</th>
+              <th>{t('jobsPage.table.status')}</th>
+              <th>{t('jobsPage.table.openRoles')}</th>
+              <th>{t('jobsPage.table.deadline')}</th>
+              <th className="text-right">{t('jobsPage.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -129,13 +131,13 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
                     <div className="mandate-info">
                       <span className="mandate-name">{mandate.title}</span>
                       <span className="mandate-meta">
-                        <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">business</span> {mandate.clientName || 'Internal'}
+                        <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">business</span> {mandate.clientName || t('reportsPage.table.internal')}
                       </span>
                     </div>
                   </td>
                   <td>
                     <span className={`status-badge ${getStatusBadgeClass(mandate.status)}`}>
-                      {mandate.status.replace('_', ' ')}
+                      {t(`jobsPage.tabs.${(mandate.status || 'Active').toLowerCase().replace(/[_\s-]/g, '') === 'onhold' ? 'onHold' : (mandate.status || 'Active').toLowerCase()}`)}
                     </span>
                   </td>
                   <td>
@@ -161,12 +163,12 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
                   </td>
                   <td className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="action-button-group">
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)} data-tooltip="Chỉnh sửa mandate"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span></button>
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'extend', mandate)} data-tooltip="Gia hạn deadline"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span></button>
-                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'duplicate', mandate)} data-tooltip="Nhân bản"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">content_copy</span></button>
-                      <button className="action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)} data-tooltip="Đóng mandate"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">cancel</span></button>
-                      <button className="action-btn btn-delete text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)} data-tooltip="Xóa vĩnh viễn"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span></button>
-                      <button className="action-btn btn-info" onClick={(e) => handleActionClick(e, 'report', mandate)} data-tooltip="Xem chi tiết"><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">visibility</span></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)} data-tooltip={t('jobsPage.table.tooltips.edit')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'extend', mandate)} data-tooltip={t('jobsPage.table.tooltips.extend')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span></button>
+                      <button className="action-btn" onClick={(e) => handleActionClick(e, 'duplicate', mandate)} data-tooltip={t('jobsPage.table.tooltips.duplicate')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">content_copy</span></button>
+                      <button className="action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)} data-tooltip={t('jobsPage.table.tooltips.close')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">cancel</span></button>
+                      <button className="action-btn btn-delete text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)} data-tooltip={t('jobsPage.table.tooltips.delete')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span></button>
+                      <button className="action-btn btn-info" onClick={(e) => handleActionClick(e, 'report', mandate)} data-tooltip={t('jobsPage.table.tooltips.view')}><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">visibility</span></button>
                     </div>
                   </td>
                 </tr>
@@ -184,7 +186,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
             <div key={mandate.id} className="mandate-mobile-card" onClick={() => onRowClick?.(mandate)}>
               <div className="card-mobile-header">
                 <span className={`status-badge ${getStatusBadgeClass(mandate.status)}`}>
-                  {mandate.status}
+                  {t(`jobsPage.tabs.${(mandate.status || 'Active').toLowerCase().replace(/[_\s-]/g, '') === 'onhold' ? 'onHold' : (mandate.status || 'Active').toLowerCase()}`)}
                 </span>
                 <span className={`mobile-deadline ${deadlineInfo.isExpiringSoon ? 'text-warning' : ''}`}>
                    {deadlineInfo.formatted}
@@ -212,10 +214,10 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
 
               <div className="m-card-footer" onClick={e => e.stopPropagation()}>
                 <div className="m-action-group">
-                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">edit</span> Edit</button>
-                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'clone', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> Clone</button>
-                  <button className="m-action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">cancel</span> Close</button>
-                  <button className="m-action-btn text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> Delete</button>
+                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'edit', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">edit</span> {t('common.save')}</button>
+                  <button className="m-action-btn" onClick={(e) => handleActionClick(e, 'clone', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">content_copy</span> {t('jobsPage.table.tooltips.duplicate')}</button>
+                  <button className="m-action-btn btn-danger" onClick={(e) => handleActionClick(e, 'close', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">cancel</span> {t('jobsPage.table.tooltips.close')}</button>
+                  <button className="m-action-btn text-danger" onClick={(e) => handleActionClick(e, 'delete', mandate)}><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">delete</span> {t('common.delete')}</button>
                 </div>
               </div>
             </div>
@@ -226,7 +228,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
       {mandates.length === 0 && (
         <div className="empty-table-state">
            <span className="material-symbols-outlined flex-shrink-0 !text-[32px]" opacity={0.5}>info</span>
-           <p>Không tìm thấy mandate nào</p>
+           <p>{t('jobsPage.table.noMandates')}</p>
         </div>
       )}
 

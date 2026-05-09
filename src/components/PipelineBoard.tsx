@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CandidateCard from './CandidateCard';
 import { getAppState } from '../utils/pipelineUtils';
@@ -25,7 +26,7 @@ interface PipelineBoardProps {
   selectedAppId?: string;
 }
 
-const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
+// Move STAGES inside component to use t()
 
 const PipelineBoard: React.FC<PipelineBoardProps> = ({
   filteredApplications,
@@ -41,6 +42,9 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
   selectedAppId
 }) => {
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
+  const { t } = useTranslation();
+
+  const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
 
   // Validation Logic for DND
   const canMoveTo = (sourceStage: string, targetStage: string) => {
@@ -92,7 +96,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
           <span className="material-symbols-outlined flex-shrink-0 !text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
           <input 
             type="text" 
-            placeholder="Search candidates by name..."
+            placeholder={t('pipelinePage.searchPlaceholder') || "Search candidates by name..."}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -107,10 +111,10 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
             >
-              <option value="All">All Priorities</option>
-              <option value="High">High</option>
-              <option value="Block">Block</option>
-              <option value="Standard">Standard</option>
+              <option value="All">{t('common.priorities.All')}</option>
+              <option value="High">{t('common.priorities.High')}</option>
+              <option value="Block">{t('common.priorities.Block')}</option>
+              <option value="Standard">{t('common.priorities.Standard')}</option>
             </select>
           </div>
 
@@ -121,20 +125,20 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
               value={filterOwner}
               onChange={(e) => setFilterOwner(e.target.value)}
             >
-              <option value="All">All Owners</option>
+              <option value="All">{t('drawer.labels.owner') + ': ' + t('common.priorities.All')}</option>
             </select>
           </div>
 
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 whitespace-nowrap">
             <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-slate-500">label</span>
-            <span className="text-xs font-semibold text-slate-400">Tags...</span>
+            <span className="text-xs font-semibold text-slate-400">{t('drawer.labels.tags')}...</span>
           </div>
         </div>
         
         {/* Mobile Scroll Hint */}
         <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-blue-50/50 rounded-lg border border-blue-100/50">
           <span className="material-symbols-outlined flex-shrink-0 !text-[14px] text-blue-400">swipe_left</span>
-          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">Vuốt ngang để xem các bước</span>
+          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">{t('pipelinePage.swipeHint')}</span>
         </div>
       </div>
 
@@ -158,7 +162,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
                     'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
                   }`} />
                   <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest leading-none">
-                    {stage}
+                    {t(`common.stages.${stage}`)}
                   </h3>
                 </div>
                 <div className="bg-slate-200/70 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[24px] text-center">
@@ -206,7 +210,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
                 {appsInStage.length === 0 && (
                   <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200/40 rounded-xl m-1">
                     <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-slate-200 mb-2">dashboard</span>
-                    <span className="text-[10px] text-slate-300 font-medium italic">Empty</span>
+                    <span className="text-[10px] text-slate-300 font-medium italic">{t('common.empty') || 'Empty'}</span>
                   </div>
                 )}
               </div>

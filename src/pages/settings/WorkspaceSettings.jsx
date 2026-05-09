@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -10,6 +11,7 @@ import { useToast } from '../../contexts/ToastContext';
 export default function WorkspaceSettings() {
   const { workspaceId } = useParams();
   const { activeWorkspace, userProfile, workspaces } = useWorkspace();
+  const { t, i18n } = useTranslation();
   const isOnlyWorkspace = workspaces?.length === 1;
   const toast = useToast();
   
@@ -19,6 +21,8 @@ export default function WorkspaceSettings() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
+  const [revokingId, setRevokingId] = useState(null);
+  const [removingMemberId, setRemovingMemberId] = useState(null);
   
   const [workspaceName, setWorkspaceName] = useState(activeWorkspace?.name || '');
   const [updatingName, setUpdatingName] = useState(false);
@@ -52,7 +56,7 @@ export default function WorkspaceSettings() {
         setInvites(invitesData.filter(inv => inv.status === 'pending'));
       } catch (err) {
         console.error("Error loading members/invites:", err);
-        toast({ type: 'error', message: 'Failed to load workspace data.' });
+        toast({ type: 'error', message: t('jobsPage.messages.loadError') });
       } finally {
         setLoading(false);
       }
@@ -83,30 +87,30 @@ export default function WorkspaceSettings() {
   };
 
   const formatRelativeTime = (timestamp) => {
-    if (!timestamp || typeof timestamp.toDate !== 'function') return 'Just now';
+    if (!timestamp || typeof timestamp.toDate !== 'function') return t('settings.activity.justNow');
     const date = timestamp.toDate();
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    return date.toLocaleDateString();
+    if (diffInSeconds < 60) return t('settings.activity.justNow');
+    if (diffInSeconds < 3600) return t('settings.activity.ago', { count: Math.floor(diffInSeconds / 60), unit: 'm' });
+    if (diffInSeconds < 86400) return t('settings.activity.ago', { count: Math.floor(diffInSeconds / 3600), unit: 'h' });
+    return date.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB');
   };
 
   const getActivityMessage = (act) => {
     const name = <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span>;
     switch (act.action) {
-      case 'JOB_CREATED': return <>posted a new job: {name}</>;
-      case 'CANDIDATE_CREATED': return <>added candidate: {name}</>;
-      case 'CV_UPLOADED': return <>uploaded CV for: {name}</>;
-      case 'STAGE_CHANGED': return <>moved {name} to <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.newStage}</span></>;
-      case 'APPLICATION_CREATED': return <>linked {name} to a job pipeline</>;
-      case 'NOTE_ADDED': return <>updated notes for: {name}</>;
-      case 'INVITATION_ACCEPTED': return <>accepted the workspace invitation to join as <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.role}</span></>;
-      case 'INVITATION_DECLINED': return <><span style={{ color: 'var(--color-danger)' }}>declined</span> the workspace invitation</>;
-      case 'MEMBER_REMOVED': return <>removed <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span> from the workspace</>;
-      case 'MEMBER_LEFT': return <><span style={{ color: 'var(--color-danger)' }}>left</span> the workspace</>;
+      case 'JOB_CREATED': return t('settings.activity.messages.JOB_CREATED', { name: act.entity?.name });
+      case 'CANDIDATE_CREATED': return t('settings.activity.messages.CANDIDATE_CREATED', { name: act.entity?.name });
+      case 'CV_UPLOADED': return t('settings.activity.messages.CV_UPLOADED', { name: act.entity?.name });
+      case 'STAGE_CHANGED': return t('settings.activity.messages.STAGE_CHANGED', { name: act.entity?.name, stage: act.details?.newStage });
+      case 'APPLICATION_CREATED': return t('settings.activity.messages.APPLICATION_CREATED', { name: act.entity?.name });
+      case 'NOTE_ADDED': return t('settings.activity.messages.NOTE_ADDED', { name: act.entity?.name });
+      case 'INVITATION_ACCEPTED': return t('settings.activity.messages.INVITATION_ACCEPTED', { role: act.details?.role });
+      case 'INVITATION_DECLINED': return t('settings.activity.messages.INVITATION_DECLINED');
+      case 'MEMBER_REMOVED': return t('settings.activity.messages.MEMBER_REMOVED', { name: act.entity?.name });
+      case 'MEMBER_LEFT': return t('settings.activity.messages.MEMBER_LEFT');
       default: return <>action: {act.action}</>;
     }
   };
@@ -161,21 +165,22 @@ export default function WorkspaceSettings() {
         window.gtag('event', 'send_invite', { 'role': inviteRole });
       }
 
-      toast({ type: 'success', message: `Invitation sent to ${inviteEmail}` });
+      toast({ type: 'success', message: t('settings.invite.success', { email: inviteEmail }) });
       setInviteEmail('');
       // Reload lists
       const invitesData = await getWorkspaceInvites(workspaceId);
       setInvites(invitesData.filter(inv => inv.status === 'pending'));
     } catch (err) {
       console.error("Error inviting member:", err);
-      toast({ type: 'error', message: 'Failed to send invitation.' });
+      toast({ type: 'error', message: t('settings.invite.fail') });
     } finally {
       setInviting(false);
     }
   };
 
   const handleRevokeInvite = async (inviteId) => {
-    if (!window.confirm('Are you sure you want to revoke this invitation? The user will no longer be able to join using this link.')) return;
+    if (!window.confirm(t('settings.members.revokeConfirm'))) return;
+    setRevokingId(inviteId);
     try {
       await deleteInvite(inviteId);
 
@@ -183,13 +188,16 @@ export default function WorkspaceSettings() {
         window.gtag('event', 'revoke_invite');
       }
 
-      toast({ type: 'success', message: 'Invitation revoked.' });
+      toast({ type: 'success', message: t('common.success') });
       setInvites(invites.filter(inv => inv.id !== inviteId));
     } catch (err) {
       console.error("Error revoking invite:", err);
-      toast({ type: 'error', message: 'Failed to revoke invitation.' });
+      toast({ type: 'error', message: t('settings.members.revokeFail') || t('common.error') });
+    } finally {
+      setRevokingId(null);
     }
   };
+
 
   const handleUpdateName = async (e) => {
     e.preventDefault();
@@ -198,12 +206,12 @@ export default function WorkspaceSettings() {
     setUpdatingName(true);
     try {
       await updateWorkspace(workspaceId, { name: workspaceName });
-      toast({ type: 'success', message: 'Workspace name updated' });
+      toast({ type: 'success', message: t('common.success') });
       // Reload page to reflect name changes in context
       window.location.reload(); 
     } catch (err) {
       console.error("Error updating workspace name:", err);
-      toast({ type: 'error', message: 'Failed to update workspace name' });
+      toast({ type: 'error', message: t('common.error') });
     } finally {
       setUpdatingName(false);
     }
@@ -211,13 +219,13 @@ export default function WorkspaceSettings() {
 
   const handleDeleteWorkspace = async () => {
     if (deleteConfirmName !== activeWorkspace?.name) {
-      toast({ type: 'error', message: 'Workspace name does not match!' });
+      toast({ type: 'error', message: t('settings.danger.nameMismatch') });
       return;
     }
     
-    let confirmMessage = 'Are you absolutely sure? All jobs and candidates tied to this workspace will become orphaned or deleted!';
+    let confirmMessage = t('settings.danger.deleteConfirm');
     if (isOnlyWorkspace) {
-      confirmMessage = '⚠️ DANGER: This is your ONLY workspace! Deleting it will wipe all your visible data. A fresh, empty "My Workspace" will be created for you upon reload. Are you absolutely sure?';
+      confirmMessage = t('settings.danger.deleteConfirmOnly');
     }
 
     if (!window.confirm(confirmMessage)) return;
@@ -230,24 +238,24 @@ export default function WorkspaceSettings() {
         window.gtag('event', 'delete_workspace');
       }
 
-      toast({ type: 'success', message: 'Workspace deleted successfully.' });
+      toast({ type: 'success', message: t('common.success') });
       // Redirect to dashboard root, WorkspaceProvider will pick the next available workspace
       navigate('/dashboard', { replace: true });
       window.location.reload();
     } catch (err) {
       console.error("Error deleting workspace:", err);
-      toast({ type: 'error', message: 'Failed to delete workspace' });
+      toast({ type: 'error', message: t('common.error') });
       setIsDeleting(false);
     }
   };
 
   const handleLeaveWorkspace = async () => {
     if (activeWorkspace?.myRole === 'owner') {
-      toast({ type: 'error', message: 'The owner cannot leave the workspace. You must delete the workspace or transfer ownership first.' });
+      toast({ type: 'error', message: t('settings.danger.ownerLeaveError') });
       return;
     }
 
-    const confirmMessage = "Are you sure you want to leave this workspace? You will lose access immediately, and you will need to be re-invited to join again.";
+    const confirmMessage = t('settings.danger.leaveConfirm');
     if (!window.confirm(confirmMessage)) return;
 
     setIsLeaving(true);
@@ -266,13 +274,13 @@ export default function WorkspaceSettings() {
         { email: userProfile.email, role: activeWorkspace?.myRole }
       );
 
-      toast({ type: 'success', message: 'You have left the workspace successfully.' });
+      toast({ type: 'success', message: t('common.success') });
       // Redirect to dashboard root, WorkspaceProvider will pick the next available workspace or default
       navigate('/dashboard', { replace: true });
       window.location.reload();
     } catch (err) {
       console.error("Error leaving workspace:", err);
-      toast({ type: 'error', message: 'Failed to leave the workspace.' });
+      toast({ type: 'error', message: t('common.error') });
       setIsLeaving(false);
     }
   };
@@ -284,8 +292,9 @@ export default function WorkspaceSettings() {
       return;
     }
 
-    if (!window.confirm(`Are you sure you want to remove ${member.email} from the workspace?`)) return;
+    if (!window.confirm(t('settings.members.removeConfirm', { email: member.email }))) return;
 
+    setRemovingMemberId(member.userId);
     try {
       const { removeWorkspaceMember } = await import('../../services/workspace.service');
       const { logActivity } = await import('../../services/db');
@@ -305,14 +314,17 @@ export default function WorkspaceSettings() {
         window.gtag('event', 'remove_member', { 'role': member.role });
       }
 
-      toast({ type: 'success', message: 'Member removed successfully.' });
+      toast({ type: 'success', message: t('common.success') });
       // Update local state instead of full reload
       setMembers(members.filter(m => m.userId !== member.userId));
     } catch (err) {
       console.error("Error removing member in settings:", err);
-      toast({ type: 'error', message: 'Failed to remove member.' });
+      toast({ type: 'error', message: t('common.error') });
+    } finally {
+      setRemovingMemberId(null);
     }
   };
+
 
   const getRoleIcon = (role) => {
     switch (role) {
@@ -326,16 +338,16 @@ export default function WorkspaceSettings() {
 
   const canInvite = activeWorkspace?.myRole === 'owner' || activeWorkspace?.myRole === 'admin';
 
-  if (loading) return <div style={{ padding: '2rem' }}>Loading workspace settings...</div>;
+  if (loading) return <div style={{ padding: '2rem' }}>{t('workspace.loading')}</div>;
 
   return (
     <div className="settings-container">
       <div style={{ marginBottom: '2.5rem' }}>
         <Link to={`/dashboard/w/${workspaceId}`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Dashboard
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('settings.back')}
         </Link>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>Workspace Settings</h1>
-        <p className="text-secondary" style={{ marginTop: '0.5rem' }}>Manage your team and workspace permissions.</p>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>{t('settings.title')}</h1>
+        <p className="text-secondary" style={{ marginTop: '0.5rem' }}>{t('settings.subtitle')}</p>
       </div>
 
       {/* TABS NAVIGATION */}
@@ -345,14 +357,14 @@ export default function WorkspaceSettings() {
           className={`ws-tab-btn ${activeTab === 'general' ? 'ws-tab-active' : ''}`}
         >
           <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">settings</span>
-          <span>General &amp; Members</span>
+          <span>{t('settings.tabs.general')}</span>
         </button>
         <button 
           onClick={() => setTab('activity')}
           className={`ws-tab-btn ${activeTab === 'activity' ? 'ws-tab-active' : ''}`}
         >
           <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">history</span>
-          <span>Activity History</span>
+          <span>{t('settings.tabs.activity')}</span>
         </button>
       </div>
 
@@ -365,26 +377,26 @@ export default function WorkspaceSettings() {
           {/* General Settings */}
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">settings</span> General Basics
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">settings</span> {t('settings.general.title')}
             </h3>
             <form onSubmit={handleUpdateName}>
               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label className="form-label">Workspace Name</label>
+                <label className="form-label">{t('settings.general.nameLabel')}</label>
                 <input 
                   type="text" 
                   className="form-control" 
                   value={workspaceName}
                   onChange={(e) => setWorkspaceName(e.target.value)}
-                  placeholder="e.g. Acme Corp Recruiting"
+                  placeholder={t('settings.general.namePlaceholder')}
                   required
                 />
               </div>
               {activeWorkspace?.myRole === 'owner' || activeWorkspace?.myRole === 'admin' ? (
                 <button type="submit" className="btn btn-primary" disabled={updatingName || workspaceName === activeWorkspace?.name}>
-                  {updatingName ? 'Saving...' : 'Save Changes'}
+                  {updatingName ? t('settings.general.saving') : t('settings.general.saveBtn')}
                 </button>
               ) : (
-                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Only admins can change the workspace name.</p>
+                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{t('settings.general.adminOnly')}</p>
               )}
             </form>
           </div>
@@ -394,7 +406,7 @@ export default function WorkspaceSettings() {
           {/* Members List */}
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">group</span> Workspace Members
+              <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">group</span> {t('settings.members.title')}
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -407,7 +419,7 @@ export default function WorkspaceSettings() {
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontWeight: 600, fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', textTransform: 'capitalize', marginTop: '0.125rem' }}>
-                        {getRoleIcon(member.role)} {member.role}
+                        {getRoleIcon(member.role)} {t(`settings.roles.${member.role}.title`)}
                       </div>
                     </div>
                   </div>
@@ -415,12 +427,16 @@ export default function WorkspaceSettings() {
                   {member.role !== 'owner' && (activeWorkspace?.myRole === 'owner' || activeWorkspace?.myRole === 'admin') && (
                     <button 
                       className="btn btn-icon text-danger" 
-                      title="Remove member"
+                      title={t('settings.members.removeTooltip')}
                       onClick={() => handleRemoveMember(member)}
+                      disabled={removingMemberId === member.userId}
                     >
-                      <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
+                      <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">
+                        {removingMemberId === member.userId ? 'sync' : 'delete'}
+                      </span>
                     </button>
                   )}
+
                 </div>
               ))}
             </div>
@@ -430,7 +446,7 @@ export default function WorkspaceSettings() {
           {invites.length > 0 && (
             <div className="card" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">schedule</span> Sent Invitations (Outgoing)
+                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">schedule</span> {t('settings.members.invitesTitle')}
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -443,7 +459,7 @@ export default function WorkspaceSettings() {
                       <div>
                         <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{invite.email}</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', textTransform: 'capitalize', marginTop: '0.125rem' }}>
-                          {getRoleIcon(invite.role)} {invite.role} (Pending)
+                          {getRoleIcon(invite.role)} {t(`settings.roles.${invite.role}.title`)} ({t('settings.members.pending')})
                         </div>
                       </div>
                     </div>
@@ -452,11 +468,13 @@ export default function WorkspaceSettings() {
                       <button 
                         className="btn btn-sm btn-outline text-danger" 
                         onClick={() => handleRevokeInvite(invite.id)}
+                        disabled={revokingId === invite.id}
                         style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
                       >
-                        Revoke
+                        {revokingId === invite.id ? t('settings.members.revoking') : t('settings.members.revokeBtn')}
                       </button>
                     )}
+
                   </div>
                 ))}
               </div>
@@ -469,19 +487,19 @@ export default function WorkspaceSettings() {
           {canInvite ? (
             <div className="card" style={{ padding: '2rem' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">person_add</span> Invite Team Member
+                <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-primary">person_add</span> {t('settings.invite.title')}
               </h3>
               
               <form onSubmit={handleInvite}>
                 <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                  <label className="form-label">Email Address</label>
+                  <label className="form-label">{t('settings.invite.emailLabel')}</label>
                   <div style={{ position: 'relative' }}>
                     <span className="material-symbols-outlined flex-shrink-0 !text-[18px]" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>mail</span>
                     <input 
                       type="email" 
                       className="form-control" 
                       style={{ paddingLeft: '40px' }} 
-                      placeholder="colleague@example.com"
+                      placeholder={t('settings.invite.emailPlaceholder')}
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       required
@@ -490,15 +508,15 @@ export default function WorkspaceSettings() {
                 </div>
                 
                 <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                  <label className="form-label">Role</label>
+                  <label className="form-label">{t('settings.invite.roleLabel')}</label>
                   <select 
                     className="form-control"
                     value={inviteRole}
                     onChange={(e) => setInviteRole(e.target.value)}
                   >
-                    <option value="admin">Admin (Full Control)</option>
-                    <option value="editor">Editor (Read/Write)</option>
-                    <option value="viewer">Viewer (Read Only)</option>
+                    <option value="admin">{t('settings.roles.admin.option')}</option>
+                    <option value="editor">{t('settings.roles.editor.option')}</option>
+                    <option value="viewer">{t('settings.roles.viewer.option')}</option>
                   </select>
                 </div>
                 
@@ -508,7 +526,7 @@ export default function WorkspaceSettings() {
                   style={{ width: '100%' }}
                   disabled={inviting}
                 >
-                  {inviting ? 'Sending...' : 'Send Invitation'}
+                  {inviting ? t('settings.invite.sending') : t('settings.invite.sendBtn')}
                 </button>
               </form>
             </div>
@@ -517,9 +535,9 @@ export default function WorkspaceSettings() {
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[20px] text-secondary">shield</span>
                 <div>
-                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>Role Restricted</h4>
+                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>{t('settings.invite.restrictedTitle')}</h4>
                   <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                    Only Workspace Owners and Admins can invite new members. Your current role is <strong>{activeWorkspace?.myRole}</strong>.
+                    {t('settings.invite.restrictedDesc', { role: t(`settings.roles.${activeWorkspace?.myRole}.title`) })}
                   </p>
                 </div>
               </div>
@@ -527,27 +545,27 @@ export default function WorkspaceSettings() {
           )}
 
           <div className="card" style={{ padding: '1.5rem' }}>
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>Permission Guide</h4>
+            <h4 style={{ fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>{t('settings.roles.guide')}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-warning"  style={{ flexShrink: 0, marginTop: '2px' }}>stars</span>
                 <div>
-                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>Owner</div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Full access, payment control, and workspace deletion.</p>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>{t('settings.roles.owner.title')}</div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{t('settings.roles.owner.desc')}</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary"  style={{ flexShrink: 0, marginTop: '2px' }}>local_police</span>
                 <div>
-                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>Admin</div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Can manage members, jobs, and all data.</p>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>{t('settings.roles.admin.title')}</div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{t('settings.roles.admin.desc')}</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-success"  style={{ flexShrink: 0, marginTop: '2px' }}>how_to_reg</span>
                 <div>
-                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>Editor</div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Can create/edit jobs and candidates. Cannot manage members.</p>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 700 }}>{t('settings.roles.editor.title')}</div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{t('settings.roles.editor.desc')}</p>
                 </div>
               </div>
             </div>
@@ -557,27 +575,27 @@ export default function WorkspaceSettings() {
           {activeWorkspace?.myRole === 'owner' && (
             <div className="card border-danger" style={{ padding: '2rem', border: '1px solid var(--color-danger)' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--color-danger)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">error</span> Danger Zone
+                <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">error</span> {t('settings.danger.title')}
               </h3>
               <p className="text-secondary" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-                Deleting this workspace will remove all members from it. This action cannot be undone.
+                {t('settings.danger.deleteDesc')}
                 {isOnlyWorkspace && (
                   <span style={{ display: 'block', marginTop: '0.5rem', color: 'var(--color-danger)', fontWeight: 600 }}>
-                    Note: Since this is your last workspace, deleting it will reset your account and create a fresh, empty workspace.
+                    {t('settings.danger.lastWorkspaceNote')}
                   </span>
                 )}
               </p>
               
               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                 <label className="form-label" style={{ fontWeight: 600 }}>
-                  Type <strong style={{ color: 'var(--color-text)' }}>{activeWorkspace?.name}</strong> to confirm
+                  {t('settings.danger.typeToConfirm', { name: activeWorkspace?.name })}
                 </label>
                 <input 
                   type="text" 
                   className="form-control" 
                   value={deleteConfirmName}
                   onChange={(e) => setDeleteConfirmName(e.target.value)}
-                  placeholder="Type workspace name here"
+                  placeholder={t('settings.danger.typePlaceholder')}
                 />
               </div>
               <button 
@@ -586,7 +604,7 @@ export default function WorkspaceSettings() {
                 disabled={isDeleting || deleteConfirmName !== activeWorkspace?.name}
               >
                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
-                <span>{isDeleting ? 'Deleting...' : 'Delete Workspace'}</span>
+                <span>{isDeleting ? t('settings.danger.deleting') : t('settings.danger.deleteBtn')}</span>
               </button>
             </div>
           )}
@@ -595,10 +613,10 @@ export default function WorkspaceSettings() {
           {activeWorkspace?.myRole !== 'owner' && (
             <div className="card border-warning" style={{ padding: '2rem', border: '1px solid var(--color-warning)' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--color-warning)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">error</span> Danger Zone
+                <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">error</span> {t('settings.danger.title')}
               </h3>
               <p className="text-secondary" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-                Leaving this workspace will immediately revoke your access to its data and candidates. To return, you will need to request a new invitation from an administrator.
+                {t('settings.danger.leaveDesc')}
               </p>
               <button 
                 className="btn btn-outline" 
@@ -607,7 +625,7 @@ export default function WorkspaceSettings() {
                 disabled={isLeaving}
               >
                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
-                <span>{isLeaving ? 'Leaving...' : 'Leave Workspace'}</span>
+                <span>{isLeaving ? t('settings.danger.leaving') : t('settings.danger.leaveBtn')}</span>
               </button>
             </div>
           )}
@@ -619,16 +637,16 @@ export default function WorkspaceSettings() {
         /* FULL ACTIVITY HISTORY TAB */
         <div className="card" style={{ padding: '2rem' }}>
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>Extended Activity Logs</h3>
-            <p className="text-secondary" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>A complete audit trail of recent changes in your workspace.</p>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{t('settings.activity.title')}</h3>
+            <p className="text-secondary" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>{t('settings.activity.subtitle')}</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {activities.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '4rem 1.5rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-surface-border)' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[48px]" style={{ opacity: 0.2, marginBottom: '1.5rem' }}>history</span>
-                <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-text-secondary)', fontSize: '1rem' }}>No activity logs found for this workspace.</p>
-                <p style={{ fontSize: '0.8125rem', marginTop: '0.5rem', opacity: 0.7 }}>As you add jobs, candidates, or team members, logs will appear here.</p>
+                <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-text-secondary)', fontSize: '1rem' }}>{t('settings.activity.empty')}</p>
+                <p style={{ fontSize: '0.8125rem', marginTop: '0.5rem', opacity: 0.7 }}>{t('settings.activity.emptyHint')}</p>
               </div>
             ) : (
               activities.map((act, idx) => (
@@ -645,7 +663,7 @@ export default function WorkspaceSettings() {
                     <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                       <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">schedule</span> {formatRelativeTime(act.timestamp)} 
                       <span style={{ opacity: 0.5 }}>•</span>
-                      <span>Action ID: {act.id.substring(0, 8)}...</span>
+                      <span>{t('settings.activity.actionId')}: {act.id.substring(0, 8)}...</span>
                     </div>
                   </div>
                 </div>

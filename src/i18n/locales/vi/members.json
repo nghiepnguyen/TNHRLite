@@ -1,0 +1,71 @@
+{
+  "membersPage": {
+    "title": "Thành viên nhóm",
+    "subtitle": "Quản lý quyền truy cập và phân quyền trong không gian làm việc này.",
+    "inviteBtn": "Mời thành viên",
+    "activeMembers": "Thành viên không gian làm việc",
+    "sentInvites": "Lời mời đã gửi",
+    "totalCount": "Tổng số {{count}}",
+    "itsYou": "Là bạn",
+    "noInvites": "Không có lời mời nào đang chờ.",
+    "table": {
+      "member": "Thành viên",
+      "role": "Vai trò",
+      "joinedAt": "Ngày tham gia",
+      "actions": "Thao tác",
+      "status": "Trạng thái",
+      "sentAt": "Ngày gửi"
+    },
+    "roles": {
+      "owner": "Chủ sở hữu",
+      "admin": "Quản trị viên",
+      "editor": "Biên tập viên",
+      "viewer": "Người xem"
+    },
+    "statuses": {
+      "pending": "Đang chờ",
+      "accepted": "Đã chấp nhận",
+      "revoked": "Đã thu hồi",
+      "expired": "Đã hết hạn"
+    },
+    "actions": {
+      "revoke": "Thu hồi",
+      "removeMember": "Xóa thành viên",
+      "deleteLog": "Xóa nhật ký",
+      "cancel": "Hủy",
+      "send": "Gửi lời mời",
+      "sending": "Đang gửi..."
+    },
+    "modal": {
+      "title": "Mời thành viên nhóm",
+      "desc": "Người dùng được mời sẽ thấy lời mời khi họ đăng nhập.",
+      "email": "Địa chỉ Email",
+      "role": "Vai trò",
+      "roleNotes": {
+        "admin": "Quản trị viên (Quản lý thành viên & dữ liệu)",
+        "editor": "Biên tập viên (Tạo & Chỉnh sửa dữ liệu)",
+        "viewer": "Người xem (Chỉ đọc)",
+        "adminNote": "Quản trị viên có thể mời và xóa các thành viên khác.",
+        "editorNote": "Biên tập viên có thể quản lý tin tuyển dụng và ứng viên.",
+        "viewerNote": "Người xem chỉ có thể xem bảng điều khiển và báo cáo."
+      }
+    },
+    "messages": {
+      "alreadyMember": "{{email}} đã là thành viên của không gian làm việc này.",
+      "alreadyInvited": "Một lời mời đã được gửi tới {{email}}.",
+      "inviteSent": "Đã gửi lời mời tới {{email}}",
+      "revokeConfirm": "Bạn có chắc chắn muốn thu hồi lời mời này không?",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa vĩnh viễn nhật ký lời mời này không?",
+      "removeConfirm": "Bạn có chắc chắn muốn xóa {{name}} khỏi không gian làm việc không? Quyền truy cập của họ sẽ bị thu hồi ngay lập tức.",
+      "ownerCannotRemove": "Không thể xóa chủ sở hữu không gian làm việc.",
+      "loadError": "Không thể tải dữ liệu nhóm.",
+      "inviteError": "Không thể gửi lời mời.",
+      "revokeSuccess": "Đã thu hồi lời mời.",
+      "revokeError": "Không thể thu hồi lời mời.",
+      "deleteSuccess": "Đã xóa bản ghi lời mời.",
+      "deleteError": "Không thể xóa bản ghi lời mời.",
+      "removeSuccess": "Đã xóa thành viên thành công.",
+      "removeError": "Không thể xóa thành viên: {{error}}"
+    }
+  }
+}

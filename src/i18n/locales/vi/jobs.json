@@ -1,0 +1,214 @@
+{
+  "jobsPage": {
+    "form": {
+      "title": "Tiêu đề công việc",
+      "client": "Tên khách hàng",
+      "dept": "Phòng ban",
+      "location": "Địa điểm",
+      "headcount": "Số lượng tuyển dụng",
+      "deadline": "Hạn chót ứng tuyển",
+      "type": "Hình thức làm việc",
+      "status": "Trạng thái",
+      "mode": "Chế độ làm việc",
+      "salary": "Mức lương",
+      "contact": "Thông tin liên hệ HR",
+      "jd": "Mô tả công việc",
+      "required": "Kỹ năng bắt buộc",
+      "optional": "Kỹ năng ưu tiên",
+      "saveChanges": "Lưu thay đổi",
+      "createJob": "Tạo công việc",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa công việc này? Tất cả các ứng viên trong quy trình sẽ bị xóa.",
+      "placeholder": {
+        "title": "v.d. Kỹ sư Frontend cao cấp",
+        "client": "Tên công ty hoặc Nội bộ",
+        "dept": "v.d. Kỹ thuật, Kinh doanh",
+        "location": "v.d. Từ xa, Hà Nội",
+        "salary": "v.d. 20.000.000 - 30.000.000 VND",
+        "contact": "Tên, Email hoặc Số điện thoại của recruiter phụ trách",
+        "jd": "Dán yêu cầu công việc, trách nhiệm...",
+        "required": "React, Node.js, Typescript (cách nhau bằng dấu phẩy)",
+        "optional": "GraphQL, AWS (cách nhau bằng dấu phẩy)"
+      },
+      "types": {
+        "fulltime": "Toàn thời gian",
+        "parttime": "Bán thời gian",
+        "contract": "Hợp đồng",
+        "freelance": "Tự do"
+      },
+      "modes": {
+        "onsite": "Tại văn phòng",
+        "remote": "Từ xa",
+        "hybrid": "Linh hoạt (Hybrid)"
+      }
+    },
+    "title": "Tin tuyển dụng",
+    "subtitle": "Tổng quan về các yêu cầu tuyển dụng hiện tại và trạng thái quy trình",
+    "createBtn": "Tạo tin tuyển dụng mới",
+    "kpis": {
+      "active": "Tin đang hoạt động",
+      "expiring": "Sắp hết hạn",
+      "openRoles": "Tổng vị trí trống",
+      "expiringNote": "< 14 ngày"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Hoạt động",
+      "onHold": "Tạm dừng",
+      "closed": "Đã đóng"
+    },
+    "filters": {
+      "title": "Bộ lọc",
+      "client": "Tổ chức khách hàng",
+      "clientPlaceholder": "Tìm kiếm khách hàng...",
+      "dept": "Phòng ban vận hành",
+      "deptPlaceholder": "Tìm kiếm phòng ban..."
+    },
+    "footer": {
+      "showing": "Hiển thị",
+      "of": "trên",
+      "records": "bản ghi"
+    },
+    "detail": {
+      "title": "Chi tiết yêu cầu tuyển dụng",
+      "editingTitle": "Đang chỉnh sửa",
+      "backToDetails": "Quay lại chi tiết",
+      "exportReport": "Xuất báo cáo (CSV)",
+      "editSettings": "Thiết lập",
+      "cloneMandate": "Nhân bản",
+      "closeMandate": "Đóng yêu cầu",
+      "confirmClose": "Bạn có chắc chắn?",
+      "editJob": "Chỉnh sửa công việc",
+      "confirmYes": "Có, Đóng ngay",
+      "confirmNo": "Không, Giữ lại",
+      "sections": {
+        "jobDescription": "Mô tả công việc",
+        "keyRequirements": "Yêu cầu trọng tâm",
+        "timeline": "Lộ trình tuyển dụng",
+        "pipeline": "Quy trình ứng viên"
+      },
+      "labels": {
+        "department": "Phòng ban",
+        "location": "Địa điểm",
+        "workingMode": "Hình thức",
+        "salaryRange": "Mức lương",
+        "hrContact": "Liên hệ HR",
+        "deadline": "Hạn chót",
+        "created": "Ngày tạo",
+        "sourcing": "Tìm kiếm & Sàng lọc"
+      },
+      "placeholders": {
+        "noDescription": "Chưa có mô tả cho yêu cầu này.",
+        "notSpecified": "Chưa xác định"
+      },
+      "timeline": {
+        "hiringTeamAssigned": "Đội ngũ tuyển dụng đã được chỉ định",
+        "daysAgo": "{{count}} ngày trước",
+        "activeNow": "Đang hoạt động"
+      },
+      "pipeline": {
+        "screened": "Đã sàng lọc",
+        "interview": "Phỏng vấn",
+        "offer": "Đề nghị",
+        "hired": "Đã tuyển"
+      },
+      "loading": "Đang tải chi tiết..."
+    },
+    "editForm": {
+      "title": "Chỉnh sửa thiết lập",
+      "subtitle": "Cập nhật các tham số tuyển dụng cho vai trò này",
+      "labels": {
+        "status": "Trạng thái",
+        "deadline": "Hạn chót tuyển dụng",
+        "headcount": "Tổng số lượng (Headcount)",
+        "workingMode": "Hình thức làm việc",
+        "salary": "Mức lương",
+        "hrContact": "Thông tin liên hệ HR",
+        "note": "Ghi chú thay đổi nội bộ"
+      },
+      "placeholders": {
+        "salary": "v.d. 20 - 30 triệu VNĐ",
+        "hrContact": "Tên, Email hoặc Số điện thoại của HR phụ trách",
+        "note": "Mô tả ngắn gọn lý do thay đổi (v.d. tăng số lượng, hoãn ngân sách)..."
+      },
+      "errors": {
+        "headcountTooLow": "Tổng số lượng không thể thấp hơn số lượng đã tuyển ({{count}}).",
+        "deadlineFuture": "Hạn chót phải là hôm nay hoặc trong tương lai.",
+        "saveFailed": "Không thể cập nhật cơ sở dữ liệu."
+      },
+      "success": "Cập nhật yêu cầu thành công.",
+      "progress": "Tiến độ hiện tại: {{filled}} đã tuyển / {{total}} tổng số"
+    },
+    "table": {
+      "mandateClient": "Mandate & Khách hàng",
+      "status": "Trạng thái",
+      "openRoles": "Vị trí trống",
+      "deadline": "Hạn chót",
+      "actions": "Thao tác",
+      "tooltips": {
+        "edit": "Chỉnh sửa mandate",
+        "extend": "Gia hạn deadline",
+        "duplicate": "Nhân bản",
+        "close": "Đóng mandate",
+        "delete": "Xóa vĩnh viễn",
+        "view": "Xem chi tiết"
+      },
+      "noMandates": "Không tìm thấy mandate nào"
+    },
+    "messages": {
+      "deleteConfirm": "CẢNH BÁO: Bạn có chắc chắn muốn xóa tin tuyển dụng này không? Thao tác này cũng sẽ xóa toàn bộ dữ liệu ứng tuyển liên quan và không thể hoàn tác.",
+      "closeConfirm": "Bạn có chắc chắn muốn đóng \"{{title}}\" không? Tin này sẽ bị ẩn khỏi chế độ xem quy trình đang hoạt động.",
+      "deleteSuccess": "Đã xóa vĩnh viễn tin tuyển dụng và lịch sử.",
+      "closeSuccess": "Đã đóng tin tuyển dụng thành công.",
+      "cloneSuccess": "Đã sao chép tin tuyển dụng thành công.",
+      "extendSuccess": "Hạn chót đã được gia hạn đến {{date}}",
+      "execError": "Thực thi thất bại: {{type}}",
+      "loadError": "Không thể tải dữ liệu tuyển dụng. Vui lòng kiểm tra kết nối.",
+      "connError": "Lỗi kết nối",
+      "retry": "Thử lại đồng bộ",
+      "JOB_CREATED": "Đã tạo yêu cầu"
+    }
+  },
+  "drawer": {
+    "noTitle": "Chưa có chức danh",
+    "tabs": {
+      "overview": "Tổng quan",
+      "notes": "Ghi chú",
+      "interview": "Phỏng vấn",
+      "offer": "Đề nghị (Offer)"
+    },
+    "searchOwner": "Tìm hoặc nhập người quản lý...",
+    "nextStepPlaceholder": "Ví dụ: Theo dõi sau 2 ngày...",
+    "tagsPlaceholder": "Ví dụ: giới thiệu, kỹ thuật...",
+    "notesPlaceholder": "Viết tóm tắt phỏng vấn hoặc ghi chú nội bộ tại đây...",
+    "offerPlaceholder": "Ví dụ: 15000000",
+    "labels": {
+      "stage": "Trạng thái hiện tại",
+      "owner": "Người quản lý ứng viên",
+      "priority": "Mức độ ưu tiên",
+      "nextStep": "Bước tiếp theo dự kiến",
+      "tags": "Nhãn / Thẻ",
+      "notes": "Đánh giá & Phản hồi từ nhóm",
+      "interviewDate": "Ngày & Giờ phỏng vấn",
+      "meetingLink": "Link họp trực tuyến",
+      "interviewStatus": "Trạng thái phỏng vấn",
+      "offerValue": "Lương cơ bản năm ($/VND)",
+      "commitment": "Hình thức cam kết"
+    },
+    "statuses": {
+      "scheduled": "Đã lên lịch",
+      "completed": "Đã hoàn thành",
+      "cancelled": "Đã hủy",
+      "fullTime": "Toàn thời gian",
+      "contract": "Dự án / Hợp đồng",
+      "internship": "Thực tập / Mới tốt nghiệp"
+    },
+    "actions": {
+      "save": "Lưu tiến độ",
+      "dismiss": "Đóng"
+    },
+    "errors": {
+      "ownerRequired": "Yêu cầu nhập người quản lý ứng viên.",
+      "saveFailed": "Đã xảy ra lỗi khi lưu. Vui lòng thử lại."
+    }
+  }
+}

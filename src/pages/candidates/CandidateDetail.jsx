@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { getCandidate, updateCandidate, getJobs, createApplication, deleteCandidate, getApplicationsByCandidate, logActivity } from '../../services/db';
 import { compareCandidateToJob } from '../../services/ai';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateDetail() {
+  const { t, i18n } = useTranslation();
   const { workspaceId, id } = useParams();
   const { userProfile } = useWorkspace();
   const navigate = useNavigate();
@@ -18,6 +20,8 @@ export default function CandidateDetail() {
   const [linkedApplications, setLinkedApplications] = useState([]);
   const [savingNotes, setSavingNotes] = useState(false);
   const [linking, setLinking] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   useEffect(() => {
     async function fetchData() {
@@ -54,17 +58,16 @@ export default function CandidateDetail() {
         });
       }
 
-      // Toast or alert is fine, user current uses alert
-      alert('Notes saved!');
+      alert(t('candidateDetail.notesSaved'));
     } catch (e) {
       console.error(e);
-      alert('Failed to save notes');
+      alert(t('candidateDetail.saveNotesFail'));
     }
     setSavingNotes(false);
   };
 
   const handleLinkToJob = async () => {
-    if (!selectedJob) return alert('Select a job first');
+    if (!selectedJob) return alert(t('candidateDetail.selectJobError'));
     setLinking(true);
     try {
       const targetJob = jobs.find(j => j.id === selectedJob);
@@ -116,15 +119,18 @@ export default function CandidateDetail() {
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to permanently delete this candidate? Pipeline history forms will be wiped.')) {
+      setIsDeleting(true);
       try {
         await deleteCandidate(id);
         navigate(`/dashboard/w/${workspaceId}/candidates`);
       } catch (error) {
         console.error(error);
         alert('Could not delete the candidate.');
+        setIsDeleting(false);
       }
     }
   };
+
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading Candidate...</div>;
   if (!candidate) return <div style={{ padding: '2rem' }}>Candidate not found.</div>;
@@ -137,7 +143,7 @@ export default function CandidateDetail() {
         
         <div style={{ position: 'relative', zIndex: 1 }}>
           <Link to={`/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
-            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Talent Pool
+            <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('candidateDetail.back')}
           </Link>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }} className="candidate-header-top">
@@ -148,32 +154,33 @@ export default function CandidateDetail() {
               <div>
                 <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>{candidate.fullName}</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '1.125rem', color: 'var(--color-text-primary)', fontWeight: 500 }}>{candidate.currentTitle}</span>
-                  <span className="text-secondary" style={{ fontSize: '1rem' }}>at</span>
-                  <span style={{ fontSize: '1.125rem', color: 'var(--color-primary)', fontWeight: 600 }}>{candidate.currentCompany}</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-text-primary)', fontWeight: 500 }}>{candidate.currentTitle || t('candidatesPage.na')}</span>
+                  <span className="text-secondary" style={{ fontSize: '1rem' }}>{t('candidateForm.company').toLowerCase()}</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-primary)', fontWeight: 600 }}>{candidate.currentCompany || t('candidatesPage.na')}</span>
                 </div>
               </div>
             </div>
             
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <Link to={`/dashboard/w/${workspaceId}/candidates/${id}/edit`} className="btn btn-secondary" style={{ height: '42px' }}>
-                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span> Edit
+                 <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">edit</span> {t('candidateDetail.editBtn')}
               </Link>
-              <button onClick={handleDelete} className="btn" style={{ height: '42px', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">delete</span>
+              <button onClick={handleDelete} className="btn" disabled={isDeleting} style={{ height: '42px', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }}>
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">{isDeleting ? 'sync' : 'delete'}</span> {t('candidateDetail.delete')}
               </button>
+
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
             <div className="badge badge-primary" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">work</span> {candidate.yearsExperience} Years Exp.
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">work</span> {candidate.yearsExperience} {t('candidateForm.exp')}
             </div>
             <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">location_on</span> {candidate.location || 'Remote/TBD'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">location_on</span> {candidate.location || t('candidatesPage.na')}
             </div>
             <div className="badge badge-neutral" style={{ padding: '0.75rem 1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> {candidate.education?.split(',')[0] || 'Degree N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> {candidate.education?.split(',')[0] || t('candidateDetail.education')}
             </div>
             {candidate.cvFileUrl && (
               <a href={candidate.cvFileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginLeft: 'auto', height: '44px' }}>
@@ -190,13 +197,13 @@ export default function CandidateDetail() {
           
           <div className="card" style={{ padding: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', backgroundColor: 'var(--color-surface-hover)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">mail</span> {candidate.email || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">mail</span> {candidate.email || t('candidatesPage.na')}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">phone</span> {candidate.phone || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-primary">phone</span> {candidate.phone || t('candidatesPage.na')}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">location_on</span> {candidate.location || 'N/A'}
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">location_on</span> {candidate.location || t('candidatesPage.na')}
             </div>
           </div>
 
@@ -205,44 +212,44 @@ export default function CandidateDetail() {
               <span className="material-symbols-outlined flex-shrink-0 !text-[20px]" style={{ color: 'var(--color-warning)' }}>bolt</span> AI Execution Summary
             </h2>
             <div style={{ fontSize: '1rem', color: 'var(--color-text-primary)', lineHeight: 1.6, fontWeight: 500, fontStyle: 'italic' }}>
-              "{candidate.parsedResume || 'No summary available.'}"
+              "{candidate.parsedResume || t('candidateDetail.noResume')}"
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> Education
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">school</span> {t('candidateDetail.education')}
               </h3>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.education || 'Not specified'}</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.education || t('jobsPage.detail.none')}</p>
             </div>
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-secondary)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">workspace_premium</span> Certifications
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">workspace_premium</span> {t('candidateForm.certs')}
               </h3>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.certifications || 'No certifications detected'}</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{candidate.certifications || t('jobsPage.detail.none')}</p>
             </div>
           </div>
 
           <div className="card" style={{ padding: '2rem' }}>
              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1.25rem', borderBottom: '1px solid var(--color-surface-border)', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-               <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">psychology</span> Technical Skills & Expertise
+               <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">psychology</span> {t('candidateDetail.skills')}
              </h3>
              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                 {candidate.skills && candidate.skills.length > 0 ? candidate.skills.map((s, i) => (
-                  <span key={i} className="badge badge-primary" style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', fontSize: '0.875rem', fontWeight: 500 }}>{s}</span>
-                )) : <span className="text-muted">None</span>}
+                   <span key={i} className="badge badge-primary" style={{ padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', fontSize: '0.875rem', fontWeight: 500 }}>{s}</span>
+                )) : <span className="text-muted">{t('jobsPage.detail.none')}</span>}
              </div>
           </div>
 
           {/* Linked Pipelines Section */}
           <div className="card" style={{ padding: '2rem' }}>
              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">layers</span> Linked Pipelines
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">layers</span> {t('candidateDetail.applications')}
              </h3>
              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {linkedApplications.length === 0 ? (
-                  <p className="text-muted" style={{ fontSize: '0.875rem' }}>This candidate is not linked to any active jobs yet.</p>
+                  <p className="text-muted" style={{ fontSize: '0.875rem' }}>{t('candidateDetail.noApps')}</p>
                 ) : linkedApplications.map(app => {
                   const job = allJobs.find(j => j.id === app.jobId);
                   const isJobInactive = job && job.status !== 'Active';
@@ -263,7 +270,7 @@ export default function CandidateDetail() {
                     >
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                          <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{job?.title || 'Unknown/Deleted Job'}</span>
+                           <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{job?.title || t('common.unknown')}</span>
                           {job && (
                             <span style={{ 
                               fontSize: '0.65rem', 
@@ -274,7 +281,7 @@ export default function CandidateDetail() {
                               color: job.status === 'Active' ? 'var(--color-success)' : job.status === 'Closed' ? 'var(--color-danger)' : 'var(--color-warning)',
                               fontWeight: 700
                             }}>
-                              {job.status}
+                               {t(`jobsPage.tabs.${job.status.toLowerCase().replace('-', '')}`)}
                             </span>
                           )}
                         </div>
@@ -282,7 +289,7 @@ export default function CandidateDetail() {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <div style={{ textAlign: 'right' }}>
-                          <div className={app.fitScore > 75 ? 'text-success' : 'text-warning'} style={{ fontWeight: 700, fontSize: '0.875rem' }}>{app.fitScore}% Match</div>
+                          <div className={app.fitScore > 75 ? 'text-success' : 'text-warning'} style={{ fontWeight: 700, fontSize: '0.875rem' }}>{app.fitScore}% {t('candidateDetail.match')}</div>
                           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>{app.stage}</div>
                         </div>
                         <Link to={`/dashboard/w/${workspaceId}/pipeline`} className="btn btn-secondary" style={{ padding: '0.375rem' }}>
@@ -301,30 +308,30 @@ export default function CandidateDetail() {
           
           <div className="card" style={{ padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">add_link</span> Add to Pipeline
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">add_link</span> {t('candidateDetail.linkJob')}
             </h3>
              <select className="form-control" style={{ marginBottom: '1rem' }} value={selectedJob} onChange={(e) => setSelectedJob(e.target.value)}>
-                <option value="">Select a Job...</option>
+                <option value="">{t('candidateDetail.selectJob')}</option>
                 {jobs.map(j => <option key={j.id} value={j.id}>{j.title} - {j.clientName}</option>)}
              </select>
              <button className="btn btn-primary" style={{ width: '100%' }} onClick={handleLinkToJob} disabled={linking}>
-               {linking ? 'Linking...' : 'Link to Job Pipeline'}
+               {linking ? t('candidateDetail.linking') : t('candidateDetail.linkBtn')}
              </button>
           </div>
 
           <div className="card" style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">description</span> Recruiter Notes
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-secondary">description</span> {t('candidateDetail.notes')}
             </h3>
             <textarea 
               className="form-control" 
               style={{ flex: 1, minHeight: '150px', marginBottom: '1rem', resize: 'vertical' }}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add internal notes about this candidate..."
+              placeholder={t('candidateDetail.notesPlaceholder')}
             />
             <button className="btn btn-secondary" onClick={handleSaveNotes} disabled={savingNotes}>
-              {savingNotes ? 'Saving...' : 'Save Notes'}
+              {savingNotes ? t('candidateForm.saving') : t('candidateDetail.saveNotes')}
             </button>
           </div>
 

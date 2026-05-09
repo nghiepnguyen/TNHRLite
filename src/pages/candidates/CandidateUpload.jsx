@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { uploadCV, createCandidate, logActivity } from '../../services/db';
 import { parseCvFromUrl } from '../../services/ai';
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function CandidateUpload() {
+  const { t } = useTranslation();
   const { workspaceId } = useParams();
   const { userProfile } = useWorkspace();
   const [file, setFile] = useState(null);
@@ -27,7 +29,7 @@ export default function CandidateUpload() {
 
     setLoading(true);
     try {
-      setStatusText('Uploading CV to Storage...');
+      setStatusText(t('candidateUpload.uploading'));
       // 1. Upload to Storage
       const { downloadUrl, path } = await uploadCV(file, currentUser?.uid, workspaceId);
       
@@ -36,7 +38,7 @@ export default function CandidateUpload() {
         window.gtag('event', 'cv_uploaded', { 'event_label': file.name });
       }
 
-      setStatusText('AI is analyzing resume patterns & experience...');
+      setStatusText(t('candidateUpload.analyzing'));
       // 2. AI Parsing Route
       const parsedData = await parseCvFromUrl(workspaceId, downloadUrl);
       
@@ -51,9 +53,9 @@ export default function CandidateUpload() {
       }
       
       if (isFallback) {
-        setStatusText('AI Key Missing. Proceeding with manual entry mode...');
+        setStatusText(t('candidateUpload.fallback'));
       } else {
-        setStatusText('Successfully extracted candidate data!');
+        setStatusText(t('candidateUpload.success'));
       }
       // 3. Save Candidate to Firestore
       const candidateId = await createCandidate(workspaceId, {
@@ -76,7 +78,7 @@ export default function CandidateUpload() {
       navigate(`/dashboard/w/${workspaceId}/candidates/${candidateId}`);
     } catch (error) {
       console.error(error);
-      alert('Failed to process candidate. Check configuration rules.');
+      alert(t('candidateUpload.processFail'));
       setLoading(false);
     }
   };
@@ -85,10 +87,10 @@ export default function CandidateUpload() {
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <Link to={`/dashboard/w/${workspaceId}/candidates`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back to Talent Pool
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('candidateDetail.back')}
         </Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Upload Candidate CV</h1>
-        <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Upload a PDF or Word document to parse into a structured profile.</p>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{t('candidateUpload.title')}</h1>
+        <p className="text-secondary" style={{ marginTop: '0.25rem' }}>{t('candidateUpload.subtitle')}</p>
       </div>
 
       <div className="card" style={{ maxWidth: '600px', padding: '2.5rem', textAlign: 'center' }}>
@@ -113,13 +115,13 @@ export default function CandidateUpload() {
                 <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-primary">description</span>
                 <p style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '0.5rem' }}>{file.name}</p>
                 <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                <button type="button" onClick={(e) => { e.preventDefault(); setFile(null); }} className="text-danger" style={{ marginTop: '1rem', fontSize: '0.875rem', zIndex: 10, position: 'relative' }}>Clear File</button>
+                <button type="button" onClick={(e) => { e.preventDefault(); setFile(null); }} className="text-danger" style={{ marginTop: '1rem', fontSize: '0.875rem', zIndex: 10, position: 'relative' }}>{t('candidateDetail.clearFile')}</button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                 <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted">cloud_upload</span>
-                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>Click or drag file to upload</p>
-                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>Supports PDF, DOCX, TXT up to 10MB</p>
+                <p style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{t('candidateUpload.dropzone')}</p>
+                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{t('candidateUpload.supports')}</p>
               </div>
             )}
           </div>
@@ -132,7 +134,7 @@ export default function CandidateUpload() {
 
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button type="submit" className="btn btn-primary" disabled={!file || loading} style={{ width: '100%' }}>
-              {loading ? 'Processing...' : 'Upload and Parse'}
+              {loading ? t('candidateUpload.processing') : t('candidateUpload.uploadBtn')}
             </button>
           </div>
         </form>

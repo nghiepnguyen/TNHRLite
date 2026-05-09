@@ -48,4 +48,7 @@ Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 
    - Chỉ Deploy Cloud Functions (API): `firebase deploy --only functions`
    - Chỉ Deploy Rules Security Database: `firebase deploy --only firestore:rules`
 
-> **Lưu ý quan trọng:** Đối với Backend, phải thiết lập API Key của Gemini AI thông qua Secret Manager của Firebase (`firebase functions:secrets:set GEMINI_API_KEY`) trước khi Deploy Cloud Functions.
+> **Lưu ý quan trọng:** Đối với Backend, phải thiết lập các API Key thông qua Secret Manager của Firebase trước khi Deploy Cloud Functions:
+> - Gemini AI: `firebase functions:secrets:set GEMINI_API_KEY`
+> - Resend API: `firebase functions:secrets:set RESEND_API_KEY`
+> - Resend Sender: `firebase functions:secrets:set RESEND_FROM_EMAIL`

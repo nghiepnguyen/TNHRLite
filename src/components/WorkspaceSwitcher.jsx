@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useToast } from '../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
 import './WorkspaceSwitcher.css';
 
 const WORKSPACE_COLORS = [
@@ -25,12 +26,13 @@ const getWorkspaceColor = (id) => {
   return WORKSPACE_COLORS[index];
 };
 
-export default function WorkspaceSwitcher({ variant = 'default' }) {
+export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = false }) {
   const { workspaces, activeWorkspace, switchWorkspace, createWorkspace } = useWorkspace();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
+  const { t } = useTranslation();
   
   // Form State
   const [formData, setFormData] = useState({
@@ -93,27 +95,34 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
   const activeColor = getWorkspaceColor(activeWorkspace?.id);
 
   return (
-    <div className={`workspace-switcher-container ${variant === 'header' ? 'variant-header' : ''}`} ref={dropdownRef}>
+    <div className={`workspace-switcher-container ${variant === 'header' ? 'variant-header' : ''} ${isCollapsed ? 'collapsed' : ''}`} ref={dropdownRef}>
       <button 
         className={`workspace-trigger ${isOpen ? 'active' : ''}`} 
         onClick={() => setIsOpen(!isOpen)}
+        title={isCollapsed ? activeWorkspace?.name : undefined}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
       >
         <div className="workspace-avatar" style={{ backgroundColor: activeColor }}>
           {activeWorkspace?.name?.charAt(0).toUpperCase() || 'W'}
         </div>
-        <div className="workspace-info">
-          <span className="workspace-name">{activeWorkspace?.name || 'Loading...'}</span>
-          <span className="workspace-role">{activeWorkspace?.myRole || 'Member'}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span className={`material-symbols-outlined flex-shrink-0 !text-[16px] ${ `chevron ${isOpen ? 'rotated' : '' }`} `}>expand_more</span>
-        </div>
+        {!isCollapsed && (
+          <>
+            <div className="workspace-info">
+              <span className="workspace-name">{activeWorkspace?.name || t('workspace.loading')}</span>
+              <span className="workspace-role">{activeWorkspace?.myRole || t('workspace.member')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span className={`material-symbols-outlined flex-shrink-0 !text-[16px] ${ `chevron ${isOpen ? 'rotated' : '' }`} `}>expand_more</span>
+            </div>
+          </>
+        )}
       </button>
 
       {isOpen && (
         <div className="workspace-dropdown">
           <div className="dropdown-section">
-            <h4 className="section-title">Your Workspaces</h4>
+            <h4 className="section-title">{t('workspace.yourWorkspaces')}</h4>
             {workspaces.map((ws) => (
               <button 
                 key={ws.id} 
@@ -136,7 +145,7 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
           
           <button className="dropdown-item-action" onClick={() => setShowCreateModal(true)}>
             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">add</span>
-            <span>Create New Workspace</span>
+            <span>{t('workspace.createNew')}</span>
           </button>
         </div>
       )}
@@ -145,42 +154,42 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
         <div className="modal-overlay">
           <div className="modal-content wide" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Create New Workspace</h3>
-              <p className="text-secondary" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Set up your team's recruitment environment.</p>
+              <h3>{t('workspace.createNew')}</h3>
+              <p className="text-secondary" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>{t('workspace.createSubtitle')}</p>
             </div>
             
             <div className="modal-body">
               <form onSubmit={handleCreate}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label>Workspace Name*</label>
+                  <label>{t('workspace.nameLabel')}</label>
                   <input 
                     type="text" 
                     autoFocus 
                     required
-                    placeholder="e.g. Acme Recruitment Team"
+                    placeholder={t('workspace.namePlaceholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
                   {formData.name && (
                     <div className="slug-preview">
-                      URL identifier: <span className="text-primary">hrlite.app/w/{slugPreview}</span>
+                      {t('workspace.urlIdentifier')}: <span className="text-primary">hrlite.app/w/{slugPreview}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label>Description</label>
+                  <label>{t('workspace.descriptionLabel')}</label>
                   <input 
                     type="text"
-                    placeholder="Briefly describe the purpose of this workspace..."
+                    placeholder={t('workspace.descriptionPlaceholder')}
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Language</label>
+                  <label>{t('workspace.languageLabel')}</label>
                   <select 
                     value={formData.language}
                     onChange={(e) => setFormData({...formData, language: e.target.value})}
@@ -191,7 +200,7 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
                 </div>
 
                 <div className="form-group">
-                  <label>Timezone</label>
+                  <label>{t('workspace.timezoneLabel')}</label>
                   <select 
                     value={formData.timezone}
                     onChange={(e) => setFormData({...formData, timezone: e.target.value})}
@@ -204,7 +213,7 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
                 </div>
 
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label>Logo / Avatar URL</label>
+                  <label>{t('workspace.avatarLabel')}</label>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <input 
                       type="url" 
@@ -224,10 +233,10 @@ export default function WorkspaceSwitcher({ variant = 'default' }) {
 
                 <div className="flex flex-col sm:flex-row justify-end gap-4 mt-10">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)} disabled={isSubmitting}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                    {isSubmitting ? 'Creating...' : 'Create Workspace'}
+                    {isSubmitting ? t('workspace.creating') : t('workspace.createNew')}
                   </button>
                 </div>
               </form>

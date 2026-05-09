@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "Tổng quan tuyển dụng",
+    "subtitle": "Chào mừng trở lại. Đây là tình hình quy trình tuyển dụng của bạn.",
+    "activeJobs": "Tin tuyển dụng",
+    "talentPool": "Nguồn ứng viên",
+    "newApps": "Hồ sơ mới",
+    "interviews": "Phỏng vấn",
+    "topMatches": "Ứng viên phù hợp nhất (AI)",
+    "noMatches": "Chưa có ứng viên nào phù hợp.",
+    "funnelPreview": "Xem trước phễu tuyển dụng",
+    "needsAttention": "Cần chú ý",
+    "allClear": "Tất cả các tin tuyển dụng đều đang hoạt động tốt.",
+    "zeroApps": "0 hồ sơ",
+    "viewMandate": "Xem chi tiết",
+    "workspaceActivity": "Hoạt động gần đây",
+    "noActivity": "Không có hoạt động nào gần đây.",
+    "activitySubtitle": "Các cập nhật mới nhất sẽ hiển thị tại đây.",
+    "viewFullActivity": "Xem toàn bộ hoạt động",
+    "justNow": "Vừa xong",
+    "minsAgo": "{{count}} phút trước",
+    "hoursAgo": "{{count}} giờ trước",
+    "someone": "Ai đó",
+    "activity": {
+      "postedJob": "đã đăng tin tuyển dụng mới: {{name}}",
+      "addedCandidate": "đã thêm ứng viên: {{name}}",
+      "uploadedCv": "đã tải lên CV cho: {{name}}",
+      "movedStage": "đã chuyển {{name}} sang {{stage}}",
+      "linkedPipeline": "đã liên kết {{name}} vào quy trình",
+      "updatedNotes": "đã cập nhật ghi chú cho: {{name}}",
+      "acceptedInvite": "đã chấp nhận lời mời tham gia với vai trò {{role}}",
+      "declinedInvite": "đã từ chối lời mời tham gia",
+      "removedMember": "đã xóa {{name}} khỏi không gian làm việc",
+      "leftWorkspace": "đã rời khỏi không gian làm việc"
+    }
+  }
+}

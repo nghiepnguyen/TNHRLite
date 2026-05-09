@@ -1,0 +1,71 @@
+{
+  "membersPage": {
+    "title": "Team Members",
+    "subtitle": "Manage who has access to this workspace and their permissions.",
+    "inviteBtn": "Invite Member",
+    "activeMembers": "Workspace Members",
+    "sentInvites": "Sent Invitations",
+    "totalCount": "{{count}} Total",
+    "itsYou": "It's you",
+    "noInvites": "No pending invitations.",
+    "table": {
+      "member": "Member",
+      "role": "Role",
+      "joinedAt": "Joined At",
+      "actions": "Actions",
+      "status": "Status",
+      "sentAt": "Sent At"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "editor": "Editor",
+      "viewer": "Viewer"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "revoked": "Revoked",
+      "expired": "Expired"
+    },
+    "actions": {
+      "revoke": "Revoke",
+      "removeMember": "Remove Member",
+      "deleteLog": "Delete Log",
+      "cancel": "Cancel",
+      "send": "Send Invitation",
+      "sending": "Sending..."
+    },
+    "modal": {
+      "title": "Invite Team Member",
+      "desc": "Invited users will see the invitation when they login.",
+      "email": "Email Address",
+      "role": "Role",
+      "roleNotes": {
+        "admin": "Admin (Manage members & data)",
+        "editor": "Editor (Create & Edit data)",
+        "viewer": "Viewer (Read only)",
+        "adminNote": "Admins can invite and remove other members.",
+        "editorNote": "Editors can manage jobs and candidates.",
+        "viewerNote": "Viewers can only see dashboard and reports."
+      }
+    },
+    "messages": {
+      "alreadyMember": "{{email}} is already a member of this workspace.",
+      "alreadyInvited": "An invitation has already been sent to {{email}}.",
+      "inviteSent": "Invitation sent to {{email}}",
+      "revokeConfirm": "Are you sure you want to revoke this invitation?",
+      "deleteConfirm": "Are you sure you want to permanently delete this invitation log?",
+      "removeConfirm": "Are you sure you want to remove {{name}} from the workspace? This will immediately revoke their access.",
+      "ownerCannotRemove": "The workspace owner cannot be removed.",
+      "loadError": "Failed to load team data.",
+      "inviteError": "Failed to send invitation.",
+      "revokeSuccess": "Invitation revoked.",
+      "revokeError": "Failed to revoke invitation.",
+      "deleteSuccess": "Invitation record deleted.",
+      "deleteError": "Failed to delete invitation record.",
+      "removeSuccess": "Member removed successfully.",
+      "removeError": "Failed to remove member: {{error}}"
+    }
+  }
+}

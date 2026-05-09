@@ -18,5 +18,15 @@
 - `services/`: Các module giao tiếp trực tiếp với Firebase (Database, Storage) và API nội bộ bằng Fetch.
 - `utils/`: Hàm tiện ích hỗ trợ (export CSV, parse date...).
 
+## Tối ưu hiệu năng (Performance)
+- **Code Splitting:** Ứng dụng sử dụng **React.lazy** và **Suspense** để chia nhỏ gói cài đặt (bundle). Các trang chỉ được tải khi người dùng truy cập, giúp giảm thời gian tải ban đầu và tiết kiệm tài nguyên.
+- **Context Efficiency:** Hệ thống `WorkspaceContext` được tối ưu để tránh fetch lại dữ liệu không cần thiết khi chuyển đổi giữa các sub-pages trong cùng một workspace.
+- **Image Lazy Loading:** Toàn bộ hình ảnh không ưu tiên (như Avatar) được cấu hình `loading="lazy"`.
+
+## Đa ngôn ngữ (Internationalization - i18n)
+- **Framework:** Sử dụng **react-i18next** với cấu trúc JSON tách biệt theo namespace (common, jobs, candidates, settings...).
+- **Locales:** Hỗ trợ chính thức tiếng Anh (EN) và tiếng Việt (VI). Toàn bộ text cứng đã được loại bỏ khỏi component và chuyển vào các file JSON trong `src/i18n/locales/`.
+- **Date Formatting:** Tự động điều chỉnh định dạng ngày tháng (`DD/MM/YYYY` cho VI và `MM/DD/YYYY` cho EN) dựa trên ngôn ngữ hiện tại của người dùng.
+
 ## Mẫu Component Chuẩn
 Dự án sử dụng 100% **Hook functional components**. Các hiệu ứng phụ được kiểm soát qua `useEffect`, và các trạng thái nội tại được đưa vào `useState`.

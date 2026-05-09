@@ -1,0 +1,40 @@
+{
+  "reportsPage": {
+    "title": "Reports & Analytics",
+    "subtitle": "Internal data summaries and hiring volume.",
+    "noData": {
+      "title": "Not Enough Data",
+      "desc": "Create your first mandate and start adding candidates into the pipeline to generate analytical reports!"
+    },
+    "noApps": {
+      "title": "No Applications Yet",
+      "desc": "Start linking structured candidates to your job pipelines to view stage volume matrices and AI fit score distributions."
+    },
+    "kpis": {
+      "totalApps": "Total Applications",
+      "totalHired": "Total Hired",
+      "conversionRate": "Conversion Rate",
+      "avgFitScore": "Avg AI Fit Score"
+    },
+    "charts": {
+      "volumeByStage": "Application Volume by Stage",
+      "matchDistribution": "AI Match Quality Distribution",
+      "workloadOverview": "Active Jobs Workload Overview"
+    },
+    "matchTiers": {
+      "high": "High Match",
+      "medium": "Medium Match",
+      "low": "Low Match"
+    },
+    "table": {
+      "jobTitle": "Job Title",
+      "client": "Client",
+      "inPipeline": "In Pipeline",
+      "offersHired": "Offers / Hired",
+      "noWorkloads": "No active workloads.",
+      "internal": "Internal",
+      "pipelinePct": "{{pct}}% of total pipeline",
+      "excludedApps": "* {{count}} application(s) without an AI score are excluded."
+    }
+  }
+}

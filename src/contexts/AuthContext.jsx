@@ -8,7 +8,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
-  getRedirectResult
+  getRedirectResult,
+  sendEmailVerification,
+  reload
 } from 'firebase/auth';
 
 const AuthContext = createContext();
@@ -27,7 +29,25 @@ export function AuthProvider({ children }) {
   }
 
   function register(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then(async (credential) => {
+        await sendEmailVerification(credential.user);
+        return credential;
+      });
+  }
+
+  function sendVerification() {
+    if (auth.currentUser) {
+      return sendEmailVerification(auth.currentUser);
+    }
+    return Promise.reject("No user logged in");
+  }
+
+  async function reloadUser() {
+    if (auth.currentUser) {
+      await reload(auth.currentUser);
+      setCurrentUser({...auth.currentUser});
+    }
   }
 
   function loginWithGoogle() {
@@ -64,7 +84,9 @@ export function AuthProvider({ children }) {
     login,
     register,
     loginWithGoogle,
-    logout
+    logout,
+    sendVerification,
+    reloadUser
   };
 
   return (

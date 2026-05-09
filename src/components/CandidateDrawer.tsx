@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { updateApplication } from '../services/db';
 
@@ -15,9 +16,9 @@ interface CandidateDrawerProps {
 
 type TabType = 'Overview' | 'Notes' | 'Interview' | 'Offer';
 
-const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
-
 const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidate, onClose, onSave }) => {
+  const { t } = useTranslation();
+  const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
   const [activeTab, setActiveTab] = useState<TabType>('Overview');
   const [formData, setFormData] = useState({
     stage: application?.stage || 'New',
@@ -59,7 +60,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
   const handleSave = async () => {
     // Simple Validation
     if (!formData.owner.trim()) {
-      setError('A candidate owner is required.');
+      setError(t('drawer.errors.ownerRequired'));
       setActiveTab('Overview');
       return;
     }
@@ -90,7 +91,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
       onSave(); // Refresh parent state
     } catch (err: any) {
       console.error(err);
-      setError('An error occurred while saving. Please try again.');
+      setError(t('drawer.errors.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -118,7 +119,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
             <div>
               <h2 className="text-xl font-black text-slate-800 tracking-tight">{candidate.fullName}</h2>
               <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">dashboard</span> {candidate.currentTitle || 'No Title'}
+                <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">dashboard</span> {candidate.currentTitle || t('drawer.noTitle')}
               </p>
             </div>
           </div>
@@ -147,7 +148,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                 {tab === 'Notes' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">description</span>}
                 {tab === 'Interview' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">calendar_month</span>}
                 {tab === 'Offer' && <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">attach_money</span>}
-                {tab}
+                {t(`common.tabs.${tab}`)}
                 {isActive && (
                   <div className="absolute bottom-0 left-4 right-4 h-1 bg-blue-600 rounded-t-full shadow-[0_-2px_6px_rgba(37,99,235,0.3)]" />
                 )}
@@ -169,20 +170,20 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Current Stage</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.stage')}</label>
                   <select 
                     className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                     value={formData.stage}
                     onChange={e => setFormData({...formData, stage: e.target.value})}
                   >
-                    {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                    {STAGES.map(s => <option key={s} value={s}>{t(`common.stages.${s}`)}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Candidate Owner</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.owner')}</label>
                   <input 
                     type="text" 
-                    placeholder="Search or enter owner..."
+                    placeholder={t('drawer.searchOwner')}
                     className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 placeholder:text-slate-300 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                     value={formData.owner}
                     onChange={e => setFormData({...formData, owner: e.target.value})}
@@ -192,22 +193,22 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Priority Level</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.priority')}</label>
                   <select 
                     className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
                   >
-                    <option value="Standard">Standard</option>
-                    <option value="High">High</option>
-                    <option value="Block">Block</option>
+                    <option value="Standard">{t('common.priorities.Standard')}</option>
+                    <option value="High">{t('common.priorities.High')}</option>
+                    <option value="Block">{t('common.priorities.Block')}</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Planned Next Step</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.nextStep')}</label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Follow up in 2 days..."
+                    placeholder={t('drawer.nextStepPlaceholder')}
                     className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 placeholder:text-slate-300 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                     value={formData.nextStep}
                     onChange={e => setFormData({...formData, nextStep: e.target.value})}
@@ -216,10 +217,10 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Labels / Tags</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.tags')}</label>
                 <input 
                   type="text" 
-                  placeholder="e.g. referral, technical..."
+                  placeholder={t('drawer.tagsPlaceholder')}
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 placeholder:text-slate-300 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                   value={formData.tags}
                   onChange={e => setFormData({...formData, tags: e.target.value})}
@@ -230,10 +231,10 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
 
           {activeTab === 'Notes' && (
             <div className="h-full space-y-2 flex flex-col">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Evaluation & Team Feedback</label>
+              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.notes')}</label>
               <textarea 
                 className="flex-1 w-full p-6 bg-slate-50 border border-slate-200 rounded-2xl font-medium text-slate-700 leading-relaxed placeholder:text-slate-300 focus:ring-0 focus:border-blue-500 outline-none transition-all resize-none min-h-[350px]"
-                placeholder="Write interview summaries or internal comments here..."
+                placeholder={t('drawer.notesPlaceholder')}
                 value={formData.notes}
                 onChange={e => setFormData({...formData, notes: e.target.value})}
               />
@@ -243,7 +244,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
           {activeTab === 'Interview' && (
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Schedule Date & Time</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.interviewDate')}</label>
                 <input 
                   type="datetime-local" 
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:border-blue-500 transition-all"
@@ -252,7 +253,7 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Online Meeting Link</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.meetingLink')}</label>
                 <input 
                   type="url" 
                   placeholder="https://zoom.us/j/..."
@@ -262,15 +263,15 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Interview Status</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.interviewStatus')}</label>
                 <select 
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:border-blue-500 transition-all"
                   value={formData.interviewStatus}
                   onChange={e => setFormData({...formData, interviewStatus: e.target.value})}
                 >
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
+                  <option value="Scheduled">{t('drawer.statuses.scheduled')}</option>
+                  <option value="Completed">{t('drawer.statuses.completed')}</option>
+                  <option value="Cancelled">{t('drawer.statuses.cancelled')}</option>
                 </select>
               </div>
             </div>
@@ -279,12 +280,12 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
           {activeTab === 'Offer' && (
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Annual Basic Value ($)</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.offerValue')}</label>
                 <div className="relative">
                   <span className="material-symbols-outlined flex-shrink-0 !text-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">attach_money</span>
                   <input 
                     type="number" 
-                    placeholder="e.g. 150000"
+                    placeholder={t('drawer.offerPlaceholder')}
                     className="w-full h-12 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 placeholder:text-slate-300 outline-none focus:border-blue-500 transition-all"
                     value={formData.offerValue}
                     onChange={e => setFormData({...formData, offerValue: e.target.value})}
@@ -292,15 +293,15 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">Role Commitment</label>
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">{t('drawer.labels.commitment')}</label>
                 <select 
                   className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:border-blue-500 transition-all"
                   value={formData.offerType}
                   onChange={e => setFormData({...formData, offerType: e.target.value})}
                 >
-                  <option value="Full-time">Full-time</option>
-                  <option value="Contract">Project-based / Contract</option>
-                  <option value="Internship">Internship / Grad Role</option>
+                  <option value="Full-time">{t('drawer.statuses.fullTime')}</option>
+                  <option value="Contract">{t('drawer.statuses.contract')}</option>
+                  <option value="Internship">{t('drawer.statuses.internship')}</option>
                 </select>
               </div>
             </div>
@@ -317,14 +318,14 @@ const CandidateDrawer: React.FC<CandidateDrawerProps> = ({ application, candidat
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <><span className="material-symbols-outlined flex-shrink-0 !text-[20px] group-hover:rotate-12 transition-transform">check</span> Save Progress</>
+              <><span className="material-symbols-outlined flex-shrink-0 !text-[20px] group-hover:rotate-12 transition-transform">check</span> {t('drawer.actions.save')}</>
             )}
           </button>
           <button 
             onClick={onClose}
             className="flex-1 h-12 sm:h-14 border border-slate-200 text-slate-500 font-black rounded-xl sm:rounded-2xl hover:bg-white hover:text-slate-700 hover:border-slate-300 transition-all order-2 sm:order-1"
           >
-            Dismiss
+            {t('drawer.actions.dismiss')}
           </button>
         </div>
       </div>

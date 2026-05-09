@@ -1,53 +1,61 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ToastProvider } from './contexts/ToastContext';
 
-import Login from './pages/Login';
-import LandingPage from './pages/LandingPage';
+// Layouts
 import DashboardLayout from './layouts/DashboardLayout';
 
-import Jobs from './pages/jobs/Jobs';
-import JobForm from './pages/jobs/JobForm';
-import JobDetail from './pages/jobs/JobDetail';
+// Pages - Lazy Loaded
+const Login = lazy(() => import('./pages/Login'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 
-import Candidates from './pages/candidates/Candidates';
-import CandidateUpload from './pages/candidates/CandidateUpload';
-import CandidateDetail from './pages/candidates/CandidateDetail';
-import CandidateForm from './pages/candidates/CandidateForm';
+const Jobs = lazy(() => import('./pages/jobs/Jobs'));
+const JobForm = lazy(() => import('./pages/jobs/JobForm'));
+const JobDetail = lazy(() => import('./pages/jobs/JobDetail'));
 
-import Pipeline from './pages/pipeline/Pipeline';
-import Dashboard from './pages/dashboard/Dashboard';
-import Reports from './pages/reports/Reports';
-import WorkspaceSettings from './pages/settings/WorkspaceSettings';
-import Members from './pages/settings/Members';
-import AdminDashboard from './pages/admin/AdminDashboard';
+const Candidates = lazy(() => import('./pages/candidates/Candidates'));
+const CandidateUpload = lazy(() => import('./pages/candidates/CandidateUpload'));
+const CandidateDetail = lazy(() => import('./pages/candidates/CandidateDetail'));
+const CandidateForm = lazy(() => import('./pages/candidates/CandidateForm'));
 
-import PrivacyPolicy from './pages/legal/PrivacyPolicy';
-import TermsOfService from './pages/legal/TermsOfService';
-import CookiePolicy from './pages/legal/CookiePolicy';
-import ContactSupport from './pages/support/ContactSupport';
+const Pipeline = lazy(() => import('./pages/pipeline/Pipeline'));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+const Reports = lazy(() => import('./pages/reports/Reports'));
+const WorkspaceSettings = lazy(() => import('./pages/settings/WorkspaceSettings'));
+const Members = lazy(() => import('./pages/settings/Members'));
+const UserSettings = lazy(() => import('./pages/settings/UserSettings'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+
+const PrivacyPolicy = lazy(() => import('./pages/legal/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/legal/TermsOfService'));
+const CookiePolicy = lazy(() => import('./pages/legal/CookiePolicy'));
+const ContactSupport = lazy(() => import('./pages/support/ContactSupport'));
+
+const PageLoading = () => (
+  <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-surface-base)' }}>
+    <div className="spinner" style={{ width: '40px', height: '40px', border: '3px solid var(--color-surface-border)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  </div>
+);
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser, loading } = useAuth();
   
   if (loading) {
-    console.log('ProtectedRoute: Auth is initial loading...');
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-surface-base)' }}>
-        <div className="spinner" style={{ width: '40px', height: '40px', border: '3px solid var(--color-surface-border)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
+    return <PageLoading />;
   }
   
   if (!currentUser) {
-    console.log('ProtectedRoute: No user detected, redirecting to /login');
     return <Navigate to="/login" replace />;
   }
+
+  if (!currentUser.emailVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
   
-  console.log('ProtectedRoute: User detected:', currentUser.email);
   return children;
 };
 
@@ -56,57 +64,57 @@ function App() {
     <Router>
       <ToastProvider>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/cookie-policy" element={<CookiePolicy />} />
-            <Route path="/contact-support" element={<ContactSupport />} />
-            
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <WorkspaceProvider>
-                  <DashboardLayout />
-                </WorkspaceProvider>
-              </ProtectedRoute>
-            }>
-              {/* Fallback for /dashboard - WorkspaceProvider will handle redirect */}
-              <Route index element={<Dashboard />} />
+          <Suspense fallback={<PageLoading />}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               
-              <Route path="w/:workspaceId">
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/cookie-policy" element={<CookiePolicy />} />
+              <Route path="/contact-support" element={<ContactSupport />} />
+              
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <WorkspaceProvider>
+                    <DashboardLayout />
+                  </WorkspaceProvider>
+                </ProtectedRoute>
+              }>
                 <Route index element={<Dashboard />} />
                 
-                {/* Jobs Routes */}
-                <Route path="jobs" element={<Jobs />} />
-                <Route path="jobs/new" element={<JobForm />} />
-                <Route path="jobs/:id" element={<JobDetail />} />
-                <Route path="jobs/:id/edit" element={<JobForm />} />
-                
-                {/* Candidates Routes */}
-                <Route path="candidates" element={<Candidates />} />
-                <Route path="candidates/upload" element={<CandidateUpload />} />
-                <Route path="candidates/:id" element={<CandidateDetail />} />
-                <Route path="candidates/:id/edit" element={<CandidateForm />} />
-                <Route path="candidates/new" element={<CandidateForm />} />
-                
-                <Route path="pipeline" element={<Pipeline />} />
-                <Route path="reports" element={<Reports />} />
-                <Route path="members" element={<Members />} />
-                <Route path="settings" element={<WorkspaceSettings />} />
-                <Route path="admin" element={<AdminDashboard />} />
+                <Route path="w/:workspaceId">
+                  <Route index element={<Dashboard />} />
+                  <Route path="jobs" element={<Jobs />} />
+                  <Route path="jobs/new" element={<JobForm />} />
+                  <Route path="jobs/:id" element={<JobDetail />} />
+                  <Route path="jobs/:id/edit" element={<JobForm />} />
+                  
+                  <Route path="candidates" element={<Candidates />} />
+                  <Route path="candidates/upload" element={<CandidateUpload />} />
+                  <Route path="candidates/:id" element={<CandidateDetail />} />
+                  <Route path="candidates/:id/edit" element={<CandidateForm />} />
+                  <Route path="candidates/new" element={<CandidateForm />} />
+                  
+                  <Route path="pipeline" element={<Pipeline />} />
+                  <Route path="reports" element={<Reports />} />
+                  <Route path="members" element={<Members />} />
+                  <Route path="settings" element={<WorkspaceSettings />} />
+                  <Route path="profile" element={<UserSettings />} />
+                  <Route path="admin" element={<AdminDashboard />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={
-              <div style={{ padding: '2rem', textAlign: 'center' }}>
-                <h1>404: Not Found</h1>
-                <p>The page you are looking for does not exist.</p>
-                <a href="/">Go to Home</a>
-              </div>
-            } />
-          </Routes>
+              <Route path="*" element={
+                <div style={{ padding: '2rem', textAlign: 'center' }}>
+                  <h1>404: Not Found</h1>
+                  <p>The page you are looking for does not exist.</p>
+                  <a href="/">Go to Home</a>
+                </div>
+              } />
+            </Routes>
+          </Suspense>
         </AuthProvider>
       </ToastProvider>
     </Router>

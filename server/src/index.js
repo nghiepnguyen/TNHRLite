@@ -5,6 +5,8 @@ const mammoth = require('mammoth');
 const fs = require('fs');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { Resend } = require('resend');
+
 dotenv.config();
 
 // Initialize Firebase Admin with Service Account if available
@@ -47,6 +49,10 @@ const PORT = process.env.PORT || 3001;
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+
 /**
  * Utility to extract JSON from AI response, handling markdown blocks or extra chatter.
  */
@@ -62,32 +68,41 @@ function cleanJsonResponse(text) {
   }
 }
 
-// Admin Middleware: Ensures caller is the authenticated admin.
-const verifyAdmin = async (req, res, next) => {
+/**
+ * Basic authentication: Verifies Firebase ID Token and attaches user to req.user
+ */
+const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing or invalid authorization token' });
   }
-  
+
   const token = authHeader.split('Bearer ')[1];
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    // Use environment variable for admin email check
-    const adminEmail = process.env.ADMIN_EMAIL || 'thanhnghiep@gmail.com';
-    
-    if (decodedToken.email !== adminEmail) {
-      console.warn(`Unauthorized admin access attempt from: ${decodedToken.email}`);
-      return res.status(403).json({ error: 'Forbidden: Admin access required. Email mismatch.' });
-    }
-    
-    console.log(`Admin verified: ${decodedToken.email}`);
     req.user = decodedToken;
     next();
   } catch (error) {
-    console.error("Admin verifyIdToken error:", error.message);
-    return res.status(401).json({ error: 'Unauthorized: Invalid or expired token', details: error.message });
+    console.error("Auth verify error:", error.message);
+    return res.status(401).json({ error: 'Unauthorized: Invalid token', details: error.message });
   }
 };
+
+// Admin Middleware: Ensures caller is the authenticated admin.
+const verifyAdmin = async (req, res, next) => {
+  await authenticate(req, res, () => {
+    const adminEmail = process.env.ADMIN_EMAIL || 'thanhnghiep@gmail.com';
+    
+    if (req.user.email !== adminEmail) {
+      console.warn(`Unauthorized admin access attempt from: ${req.user.email}`);
+      return res.status(403).json({ error: 'Forbidden: Admin access required. Email mismatch.' });
+    }
+    
+    console.log(`Admin verified: ${req.user.email}`);
+    next();
+  });
+};
+
 
 // Admin Endpoint: List Users & Stats
 app.get('/api/admin/users', verifyAdmin, async (req, res) => {
@@ -293,6 +308,46 @@ app.post('/api/compare', async (req, res) => {
     res.status(500).json({ error: 'Failed comparison', details: error.message || error.toString() });
   }
 });
+
+// Email endpoint
+app.post('/api/send-email', authenticate, async (req, res) => {
+  try {
+    const { to, subject, html, text } = req.body;
+    
+    if (!to || !subject || (!html && !text)) {
+      return res.status(400).json({ error: 'Missing required fields (to, subject, and either html or text)' });
+    }
+
+    if (!resend) {
+      console.warn("RESEND_API_KEY not found. Skipping email send.");
+      return res.json({ 
+        success: true, 
+        message: 'Resend API Key missing. Email not sent, but request was valid (mock mode).',
+        mock: true 
+      });
+    }
+
+    console.log(`Sending email to: ${to} | Subject: ${subject}`);
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+      text
+    });
+
+    if (error) {
+      console.error("Resend API Error:", error);
+      return res.status(400).json({ error: 'Resend API Error', details: error });
+    }
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error in send-email endpoint:', error);
+    res.status(500).json({ error: 'Internal server error while sending email', details: error.message });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`AI Proxy Server running on port ${PORT}`);

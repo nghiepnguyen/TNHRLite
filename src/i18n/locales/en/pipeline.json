@@ -1,0 +1,23 @@
+{
+  "pipelinePage": {
+    "title": "Pipeline",
+    "subtitle": "Organize candidates by progressing their application stage.",
+    "searchPlaceholder": "Search candidates by name...",
+    "jobMandate": "Job Mandate:",
+    "chooseJob": "-- Choose job --",
+    "exportCsv": "Export CSV",
+    "selectJobPrompt": "Select an active job from the dropdown above to view its pipeline.",
+    "errors": {
+      "init": "Failed to load initial data. Please check your connection or permissions.",
+      "fetch": "Failed to load applications for this job.",
+      "update": "Failed to update stage. Reverting...",
+      "saveFailed": "An error occurred while saving. Please try again.",
+      "swipeHint": "Swipe horizontally to see stages"
+    },
+    "candidateCard": {
+      "noTitle": "No title specified",
+      "match": "{{score}}% Match",
+      "today": "Today"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "common": {
+    "locale": "en",
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "actions": "Actions",
+    "processing": "Processing...",
+    "recruiter": "Recruiter",
+    "stages": {
+      "New": "New",
+      "Reviewed": "Reviewed",
+      "Shortlisted": "Shortlisted",
+      "Interview": "Interview",
+      "Offer": "Offer",
+      "Hired": "Hired",
+      "Rejected": "Rejected"
+    },
+    "priorities": {
+      "All": "All Priorities",
+      "Standard": "Standard",
+      "High": "High",
+      "Block": "Block"
+    },
+    "workingModes": {
+      "onsite": "On-site",
+      "remote": "Remote",
+      "hybrid": "Hybrid"
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "dismiss": "Dismiss"
+    },
+    "tabs": {
+      "Overview": "Overview",
+      "Notes": "Notes",
+      "Interview": "Interview",
+      "Offer": "Offer"
+    },
+    "empty": "Empty"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "jobs": "Jobs",
+    "candidates": "Candidates",
+    "applications": "Applications",
+    "pipeline": "Pipeline",
+    "reports": "Reports",
+    "members": "Members",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "admin": "Admin Portal",
+    "logout": "Log Out"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to manage your recruitment",
+    "email": "Email Address",
+    "password": "Password",
+    "rePassword": "Confirm Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "googleSignIn": "Continue with Google",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "errorHeader": "Authentication Error",
+    "placeholders": {
+      "email": "e.g. recruiter@company.com",
+      "password": "Enter your password",
+      "rePassword": "Re-enter your password"
+    },
+    "errors": {
+      "passMismatch": "Passwords do not match.",
+      "invalidCreds": "Invalid email or password. You may need to Sign Up first.",
+      "emailInUse": "Email is already registered. Switch to Log In.",
+      "googleFail": "Failed to sign in with Google.",
+      "generic": "An error occurred. Check if Firebase structure is valid."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications yet",
+    "invitation": {
+      "title": "Workspace Invitation",
+      "message": "You've been invited to {{workspaceName}} as {{role}}.",
+      "clickToReview": "Click to review invitation",
+      "reviewSubtitle": "Review your invitation details below",
+      "invitedBy": "Invited by:",
+      "workspace": "Workspace:",
+      "requestedRole": "Requested Role:",
+      "terms": "By joining this workspace, you will be able to collaborate with the team, view mandate details, and participate in the recruitment process based on your assigned role.",
+      "decline": "Decline",
+      "accept": "Accept Invitation",
+      "accepting": "Accepting...",
+      "processing": "Processing..."
+    },
+    "tooltips": {
+      "markRead": "Mark as read",
+      "delete": "Delete"
+    }
+  },
+  "verify": {
+    "title": "Verify your email",
+    "subtitle": "We've sent a verification link to {{email}}. Please check your inbox and click the link to activate your account.",
+    "resendButton": "Resend verification email",
+    "resendSuccess": "Verification email sent! Check your inbox.",
+    "checkButton": "I've verified my email",
+    "errors": {
+      "resendFail": "Failed to resend verification email.",
+      "checkFail": "Failed to refresh user status."
+    }
+  },
+  "workspace": {
+    "loading": "Loading...",
+    "member": "Member",
+    "yourWorkspaces": "Your Workspaces",
+    "createNew": "Create New Workspace",
+    "createSubtitle": "Set up your team's recruitment environment.",
+    "nameLabel": "Workspace Name*",
+    "namePlaceholder": "e.g. Acme Recruitment Team",
+    "urlIdentifier": "URL identifier",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Briefly describe the purpose of this workspace...",
+    "languageLabel": "Language",
+    "timezoneLabel": "Timezone",
+    "avatarLabel": "Logo / Avatar URL",
+    "creating": "Creating..."
+  }
+}

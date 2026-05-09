@@ -58,20 +58,21 @@ service cloud.firestore {
     // Warning: Do not mutate resource.data (like lower()) so query evaluator works!
     match /invites/{inviteId} {
       allow read: if isAuthenticated() && (
-        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email.lower()) ||
         ("workspaceId" in resource.data && isMember(resource.data.workspaceId))
       );
       
       allow create: if isAuthenticated() && "workspaceId" in request.resource.data && hasRole(request.resource.data.workspaceId, ['owner', 'admin']);
       allow update: if isAuthenticated() && (
-        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email.lower()) ||
         ("workspaceId" in resource.data && isMember(resource.data.workspaceId))
       );
       allow delete: if isAuthenticated() && (
-        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email) ||
+        ("email" in resource.data && request.auth.token.email.lower() == resource.data.email.lower()) ||
         ("workspaceId" in resource.data && hasRole(resource.data.workspaceId, ['owner', 'admin']))
       );
     }
+
 
     // DATA SCOPED BY WORKSPACE (Jobs, Candidates, Applications, Activities)
     function canAccessLegacyData() {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -12,13 +13,16 @@ import {
 import './NotificationBell.css';
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const { currentUser } = useAuth();
   const { pendingInvites, acceptInvite, declineInvite } = useWorkspace() || { pendingInvites: [] };
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [activeInvite, setActiveInvite] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const dropdownRef = useRef(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,31 +81,40 @@ export default function NotificationBell() {
   };
 
   const handleAcceptInvite = async (invite) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
     try {
       await acceptInvite(invite);
       setShowReviewModal(false);
       setActiveInvite(null);
     } catch (err) {
       alert("Failed to accept invite: " + err.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleDeclineInvite = async (invite) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
     try {
       await declineInvite(invite);
       setShowReviewModal(false);
       setActiveInvite(null);
     } catch (err) {
       alert("Failed to decline invite: " + err.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
+
 
   const combinedItems = [
     ...notifications.map(n => ({ ...n, itemType: 'notification' })),
     ...pendingInvites.map(i => ({
       id: i.id,
-      title: 'Workspace Invitation',
-      message: `You've been invited to ${i.workspaceName} as ${i.role}.`,
+      title: t('notifications.invitation.title'),
+      message: t('notifications.invitation.message', { workspaceName: i.workspaceName, role: i.role }),
       type: 'success',
       status: 'unread',
       createdAt: i.createdAt,
@@ -133,10 +146,10 @@ export default function NotificationBell() {
       {isOpen && (
         <div className="notif-dropdown" style={{ display: 'block', visibility: 'visible', opacity: 1 }}>
           <div className="notif-header">
-            <h3>Notifications ({combinedItems.length})</h3>
+            <h3>{t('notifications.title')} ({combinedItems.length})</h3>
             {unreadNotifs.length > 0 && (
               <button className="text-btn" onClick={() => markAllAsRead(currentUser.uid)}>
-                Mark all as read
+                {t('notifications.markAllRead')}
               </button>
             )}
           </div>
@@ -145,7 +158,7 @@ export default function NotificationBell() {
             {combinedItems.length === 0 ? (
               <div className="notif-empty">
                 <span className="material-symbols-outlined !text-[48px] text-muted">notifications_off</span>
-                <p>No notifications yet</p>
+                <p>{t('notifications.noNotifications')}</p>
               </div>
             ) : (
               combinedItems.map((item) => (
@@ -168,17 +181,17 @@ export default function NotificationBell() {
                     
                     {item.itemType === 'invite' ? (
                       <div className="invite-hint">
-                        <span>Click to review invitation</span>
+                        <span>{t('notifications.invitation.clickToReview')}</span>
                         <span className="material-symbols-outlined !text-[14px]">arrow_forward</span>
                       </div>
                     ) : (
                       <div className="notif-actions">
                          {item.status === 'unread' && (
-                           <button className="action-btn" title="Mark as read" onClick={(e) => handleMarkAsRead(e, item)}>
+                           <button className="action-btn" title={t('notifications.tooltips.markRead')} onClick={(e) => handleMarkAsRead(e, item)}>
                              <span className="material-symbols-outlined !text-[14px]">done</span>
                            </button>
                          )}
-                         <button className="action-btn text-danger" title="Delete" onClick={(e) => handleDelete(e, item.id)}>
+                         <button className="action-btn text-danger" title={t('notifications.tooltips.delete')} onClick={(e) => handleDelete(e, item.id)}>
                            <span className="material-symbols-outlined !text-[14px]">delete</span>
                          </button>
                       </div>
@@ -199,37 +212,53 @@ export default function NotificationBell() {
               <div className="invite-icon-large">
                 <span className="material-symbols-outlined !text-[48px] text-primary">mail</span>
               </div>
-              <h2>Workspace Invitation</h2>
-              <p className="text-secondary">Review your invitation details below</p>
+              <h2>{t('notifications.invitation.title')}</h2>
+              <p className="text-secondary">{t('notifications.invitation.reviewSubtitle')}</p>
             </div>
             
             <div className="invite-details-box">
               <div className="invite-detail-row">
-                <span className="label">Invited by:</span>
+                <span className="label">{t('notifications.invitation.invitedBy')}</span>
                 <span className="value">{activeInvite.invitedByEmail}</span>
               </div>
               <div className="invite-detail-row">
-                <span className="label">Workspace:</span>
+                <span className="label">{t('notifications.invitation.workspace')}</span>
                 <span className="value highlighted">{activeInvite.workspaceName}</span>
               </div>
               <div className="invite-detail-row">
-                <span className="label">Requested Role:</span>
+                <span className="label">{t('notifications.invitation.requestedRole')}</span>
                 <span className="value capitalize">{activeInvite.role}</span>
               </div>
             </div>
 
             <p className="invite-description">
-              By joining this workspace, you will be able to collaborate with the team, 
-              view mandate details, and participate in the recruitment process based on your assigned role.
+              {t('notifications.invitation.terms')}
             </p>
 
             <div className="invite-modal-actions">
-              <button className="btn-decline" onClick={() => handleDeclineInvite(activeInvite)}>Decline</button>
-              <button className="btn-accept" onClick={() => handleAcceptInvite(activeInvite)}>
-                <span className="material-symbols-outlined !text-[18px]">check</span>
-                Accept Invitation
+              <button 
+                className="btn-decline" 
+                onClick={() => handleDeclineInvite(activeInvite)}
+                disabled={isProcessing}
+              >
+                {isProcessing ? t('notifications.invitation.processing') : t('notifications.invitation.decline')}
+              </button>
+              <button 
+                className="btn-accept" 
+                onClick={() => handleAcceptInvite(activeInvite)}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  t('notifications.invitation.accepting')
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined !text-[18px]">check</span>
+                    {t('notifications.invitation.accept')}
+                  </>
+                )}
               </button>
             </div>
+
             
             <button className="modal-close-btn" onClick={() => setShowReviewModal(false)}>
               <span className="material-symbols-outlined">close</span>

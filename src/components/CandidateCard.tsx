@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 
 /**
@@ -28,6 +29,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   onClick,
   selected
 }) => {
+  const { t } = useTranslation();
   // Calculate days in stage
   const getDaysInStage = () => {
     if (!lastStageChangedAt) return 0;
@@ -67,7 +69,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           {fullName}
         </h4>
         <p className="text-xs text-slate-500 truncate">
-          {currentTitle || 'No title specified'}
+          {currentTitle || t('pipelinePage.candidateCard.noTitle')}
         </p>
       </div>
 
@@ -85,13 +87,13 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                   : 'bg-slate-100 text-slate-600'}
             `}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[10px]">psychology</span>
-              <span>{fitScore}% Match</span>
+              <span>{t('pipelinePage.candidateCard.match', { score: fitScore })}</span>
             </div>
           )}
 
           {/* Time in Stage Tracker */}
           <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
-            <span className={overdue ? 'text-amber-600' : ''}>{days > 0 ? `${days}d` : 'Today'}</span>
+            <span className={overdue ? 'text-amber-600' : ''}>{days > 0 ? `${days}d` : t('pipelinePage.candidateCard.today')}</span>
             {overdue && (
               <span className="material-symbols-outlined flex-shrink-0 !text-[12px] text-amber-500 animate-pulse">error</span>
             )}

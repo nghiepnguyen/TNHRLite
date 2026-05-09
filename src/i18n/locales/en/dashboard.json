@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "Recruitment Overview",
+    "subtitle": "Welcome back. Here is the pulse of your talent pipeline.",
+    "activeJobs": "Active Jobs",
+    "talentPool": "Talent Pool",
+    "newApps": "New Apps",
+    "interviews": "Interviews",
+    "topMatches": "Top AI Matched Candidates",
+    "noMatches": "No parsed applications matched yet.",
+    "funnelPreview": "Active Funnel Preview",
+    "needsAttention": "Needs Attention",
+    "allClear": "All active jobs have pipeline engagement.",
+    "zeroApps": "0 applications",
+    "viewMandate": "View Mandate",
+    "workspaceActivity": "Workspace Activity",
+    "noActivity": "No recent activity.",
+    "activitySubtitle": "Recent workspace updates will appear here.",
+    "viewFullActivity": "View Full Activity",
+    "justNow": "Just now",
+    "minsAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "someone": "Someone",
+    "activity": {
+      "postedJob": "posted a new job: {{name}}",
+      "addedCandidate": "added candidate: {{name}}",
+      "uploadedCv": "uploaded CV for: {{name}}",
+      "movedStage": "moved {{name}} to {{stage}}",
+      "linkedPipeline": "linked {{name}} to a job pipeline",
+      "updatedNotes": "updated notes for: {{name}}",
+      "acceptedInvite": "accepted the workspace invitation to join as {{role}}",
+      "declinedInvite": "declined the workspace invitation",
+      "removedMember": "removed {{name}} from the workspace",
+      "leftWorkspace": "left the workspace"
+    }
+  }
+}

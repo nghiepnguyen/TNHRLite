@@ -1,0 +1,40 @@
+{
+  "reportsPage": {
+    "title": "Báo cáo & Phân tích",
+    "subtitle": "Tóm tắt dữ liệu nội bộ và khối lượng tuyển dụng.",
+    "noData": {
+      "title": "Không đủ dữ liệu",
+      "desc": "Hãy tạo tin tuyển dụng đầu tiên và bắt đầu thêm ứng viên vào quy trình để tạo báo cáo phân tích!"
+    },
+    "noApps": {
+      "title": "Chưa có ứng tuyển",
+      "desc": "Bắt đầu liên kết ứng viên với quy trình tuyển dụng để xem ma trận khối lượng và phân bổ điểm phù hợp AI."
+    },
+    "kpis": {
+      "totalApps": "Tổng số ứng tuyển",
+      "totalHired": "Tổng số đã tuyển",
+      "conversionRate": "Tỉ lệ chuyển đổi",
+      "avgFitScore": "Điểm phù hợp AI TB"
+    },
+    "charts": {
+      "volumeByStage": "Khối lượng ứng tuyển theo trạng thái",
+      "matchDistribution": "Phân bổ chất lượng phù hợp AI",
+      "workloadOverview": "Tổng quan khối lượng công việc đang hoạt động"
+    },
+    "matchTiers": {
+      "high": "Phù hợp cao",
+      "medium": "Phù hợp trung bình",
+      "low": "Phù hợp thấp"
+    },
+    "table": {
+      "jobTitle": "Chức danh",
+      "client": "Khách hàng",
+      "inPipeline": "Trong quy trình",
+      "offersHired": "Đề nghị / Đã tuyển",
+      "noWorkloads": "Không có công việc đang hoạt động.",
+      "internal": "Nội bộ",
+      "pipelinePct": "{{pct}}% tổng quy trình",
+      "excludedApps": "* {{count}} ứng tuyển không có điểm AI bị loại trừ."
+    }
+  }
+}

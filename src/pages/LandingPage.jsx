@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const LandingPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   
@@ -41,19 +44,22 @@ const LandingPage = () => {
               HR Lite
             </span>
             <div className="hidden md:flex gap-8">
-              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#features">Tính năng</a>
-              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#workflow">Quy trình</a>
-              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#analytics">Phân tích</a>
-              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#faq">Hỏi đáp</a>
+              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#features">{t('landing.nav.features')}</a>
+              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#workflow">{t('landing.nav.workflow')}</a>
+              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#analytics">{t('landing.nav.analytics')}</a>
+              <a className="font-semibold text-sm tracking-tight text-[#1F1F1F]/70 dark:text-[#FAF9F6]/70 hover:text-primary transition-colors duration-200" href="#faq">{t('landing.nav.faq')}</a>
             </div>
           </div>
           
           <div className="flex items-center gap-2 md:gap-6">
+            <div className="mr-2">
+              <LanguageSwitcher />
+            </div>
             <button
               onClick={() => navigate('/login')}
               className="hidden sm:block editorial-gradient text-white px-5 py-2.5 rounded-lg font-headline font-bold text-sm hover:opacity-90 active:scale-95 transition-all"
             >
-              Bắt đầu ngay
+              {t('landing.nav.getStarted')}
             </button>
             
             {/* Mobile Menu Toggle */}
@@ -72,16 +78,16 @@ const LandingPage = () => {
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-surface-container-high shadow-xl animate-in fade-in slide-in-from-top-4 duration-200">
             <div className="flex flex-col p-6 gap-4">
-              <a className="font-bold text-lg p-2" href="#features" onClick={() => setIsMenuOpen(false)}>Tính năng</a>
-              <a className="font-bold text-lg p-2" href="#workflow" onClick={() => setIsMenuOpen(false)}>Quy trình</a>
-              <a className="font-bold text-lg p-2" href="#analytics" onClick={() => setIsMenuOpen(false)}>Phân tích</a>
-              <a className="font-bold text-lg p-2" href="#faq" onClick={() => setIsMenuOpen(false)}>Hỏi đáp</a>
+              <a className="font-bold text-lg p-2" href="#features" onClick={() => setIsMenuOpen(false)}>{t('landing.nav.features')}</a>
+              <a className="font-bold text-lg p-2" href="#workflow" onClick={() => setIsMenuOpen(false)}>{t('landing.nav.workflow')}</a>
+              <a className="font-bold text-lg p-2" href="#analytics" onClick={() => setIsMenuOpen(false)}>{t('landing.nav.analytics')}</a>
+              <a className="font-bold text-lg p-2" href="#faq" onClick={() => setIsMenuOpen(false)}>{t('landing.nav.faq')}</a>
               <hr className="my-2 border-surface-container-high" />
               <button
                 onClick={() => navigate('/login')}
                 className="editorial-gradient text-white px-5 py-4 rounded-xl font-headline font-bold text-center"
               >
-                Bắt đầu ngay
+                {t('landing.nav.getStarted')}
               </button>
             </div>
           </div>
@@ -97,20 +103,20 @@ const LandingPage = () => {
                 className="inline-block uppercase tracking-[0.1em] font-bold text-[10px] md:text-xs px-3 py-1 rounded-full reveal reveal-up reveal-delay-200"
                 style={{ color: 'rgb(79, 70, 229)', backgroundColor: 'rgb(224, 231, 255)' }}
               >
-                HR Lite dành cho Nhà tuyển dụng độc lập
+                {t('landing.hero.badge')}
               </span>
               <h1 className="font-headline font-extrabold text-3xl sm:text-5xl lg:text-6xl text-on-surface leading-[1.1] tracking-tight">
-                Thoát khỏi Excel và dữ liệu rời rạc trong tuyển dụng
+                {t('landing.hero.title')}
               </h1>
               <p className="text-on-surface-variant text-sm sm:text-base md:text-lg max-w-md mx-auto md:mx-0 font-light leading-relaxed reveal reveal-up reveal-delay-300">
-                Thay thế các bảng tính rườm rà bằng một dashboard tinh gọn, được thiết kế riêng cho recruiter độc lập và đội ngũ nhỏ.
+                {t('landing.hero.description')}
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start reveal reveal-up reveal-delay-400">
                 <button
                   onClick={handleCTA}
                   className="editorial-gradient text-white px-10 py-5 rounded-xl font-headline font-bold text-lg hover:opacity-90 transition-opacity w-full sm:w-auto shadow-xl shadow-primary/20"
                 >
-                  Bắt đầu ngay
+                  {t('landing.hero.getStarted')}
                 </button>
               </div>
             </div>
@@ -119,10 +125,10 @@ const LandingPage = () => {
                 {/* Realistic Dashboard Preview */}
                 <div className="bg-white rounded-lg overflow-hidden border border-surface-container-high shadow-sm">
                   <div className="p-4 border-b border-surface-container-high flex justify-between items-center" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
-                    <span className="font-headline font-bold text-sm">Danh sách công việc</span>
+                    <span className="font-headline font-bold text-sm">{t('landing.hero.preview.jobList')}</span>
                     <div className="flex gap-2">
-                      <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">đang tuyển</span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase">tạm dừng</span>
+                      <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">{t('landing.hero.preview.status.active')}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase">{t('landing.hero.preview.status.onHold')}</span>
                     </div>
                   </div>
                   <div className="p-4 space-y-3">
@@ -130,26 +136,26 @@ const LandingPage = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary font-bold">PD</div>
                         <div>
-                          <div className="font-bold">Product Designer</div>
-                          <div className="text-on-surface-variant">Phụ trách: Minh Nguyễn</div>
+                          <div className="font-bold">{t('landing.hero.preview.job1.title')}</div>
+                          <div className="text-on-surface-variant">{t('landing.hero.preview.job1.owner')}</div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">Hạn: 20/12</div>
-                        <div className="text-primary font-bold">Đang tuyển</div>
+                        <div className="font-medium">{t('landing.hero.preview.job1.deadline')}</div>
+                        <div className="text-primary font-bold uppercase text-[10px]">{t('landing.hero.preview.status.active')}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs opacity-60 reveal reveal-up reveal-delay-500">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded bg-tertiary/10 flex items-center justify-center text-tertiary font-bold">FE</div>
                         <div>
-                          <div className="font-bold">Frontend Engineer</div>
-                          <div className="text-on-surface-variant">Phụ trách: Lan Anh</div>
+                          <div className="font-bold">{t('landing.hero.preview.job2.title')}</div>
+                          <div className="text-on-surface-variant">{t('landing.hero.preview.job2.owner')}</div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">Hạn: 15/12</div>
-                        <div className="text-amber-600 font-bold">Tạm dừng</div>
+                        <div className="font-medium">{t('landing.hero.preview.job2.deadline')}</div>
+                        <div className="text-amber-600 font-bold uppercase text-[10px]">{t('landing.hero.preview.status.onHold')}</div>
                       </div>
                     </div>
                   </div>
@@ -157,11 +163,11 @@ const LandingPage = () => {
               </div>
               {/* Floating Stats - Hidden on Small Mobile, Repositioned on Desktop */}
               <div className="hidden sm:block absolute -top-8 -right-4 bg-white p-5 rounded-xl shadow-xl border border-surface-container-high space-y-1 transform transition-transform hover:scale-105 reveal reveal-up reveal-delay-500">
-                <span className="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Việc đang tuyển</span>
+                <span className="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">{t('landing.hero.stats.activeJobs')}</span>
                 <span className="block text-3xl font-headline font-black text-primary">12</span>
               </div>
               <div className="hidden sm:block absolute -bottom-10 -left-6 bg-white p-5 rounded-xl shadow-xl border border-surface-container-high space-y-1 transform transition-transform hover:scale-105 reveal reveal-up reveal-delay-600">
-                <span className="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Điểm tương thích</span>
+                <span className="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">{t('landing.hero.stats.matchScore')}</span>
                 <span className="block text-3xl font-headline font-black" style={{ color: 'rgb(124, 58, 237)' }}>92%</span>
               </div>
               <div className="hidden lg:flex absolute top-1/2 -right-16 transform -translate-y-1/2 flex-col gap-4 reveal reveal-right reveal-delay-700">
@@ -169,7 +175,7 @@ const LandingPage = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-8 rounded-full" style={{ backgroundColor: 'rgb(79, 70, 229)' }}></div>
                     <div>
-                      <span className="block text-[10px] font-bold text-on-surface uppercase pr-4">Ứng viên</span>
+                      <span className="block text-[10px] font-bold text-on-surface uppercase pr-4">{t('landing.hero.stats.candidates')}</span>
                       <span className="block text-xl font-headline font-black">84</span>
                     </div>
                   </div>
@@ -178,7 +184,7 @@ const LandingPage = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-8 rounded-full" style={{ backgroundColor: 'rgb(124, 58, 237)' }}></div>
                     <div>
-                      <span className="block text-[10px] font-bold text-on-surface uppercase pr-4">Tiến độ</span>
+                      <span className="block text-[10px] font-bold text-on-surface uppercase pr-4">{t('landing.hero.stats.progress')}</span>
                       <span className="block text-xl font-headline font-black">45%</span>
                     </div>
                   </div>
@@ -191,14 +197,14 @@ const LandingPage = () => {
         <section className="py-24" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
           <div className="max-w-7xl mx-auto px-8">
             <div className="mb-16 reveal reveal-up">
-              <h2 className="font-headline font-extrabold text-3xl mb-4 max-w-lg">Quản lý dữ liệu tuyển dụng tập trung, thay vì dùng nhiều file rời rạc và bảng tính thiếu ổn định.</h2>
+              <h2 className="font-headline font-extrabold text-3xl mb-4 max-w-lg">{t('landing.painPoints.title')}</h2>
             </div>
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 md:col-span-7 bg-white p-10 rounded-2xl flex flex-col justify-between min-h-[300px] shadow-sm transition-shadow hover:shadow-md reveal reveal-left">
                 <span className="material-symbols-outlined text-tertiary text-4xl mb-6">scatter_plot</span>
                 <div>
-                  <h3 className="font-headline font-bold text-3xl mb-4 text-on-surface tracking-tight">Công việc rải rác khắp các tab</h3>
-                  <p className="text-on-surface-variant leading-relaxed text-lg">Đừng tốn thời gian tìm kiếm trong trang bookmark và các luồng email. Lưu trữ tất cả vị trí tuyển dụng và yêu cầu khách hàng trong một hệ thống duy nhất.</p>
+                  <h3 className="font-headline font-bold text-3xl mb-4 text-on-surface tracking-tight">{t('landing.painPoints.items.scattered.title')}</h3>
+                  <p className="text-on-surface-variant leading-relaxed text-lg">{t('landing.painPoints.items.scattered.desc')}</p>
                 </div>
               </div>
               <div
@@ -207,8 +213,8 @@ const LandingPage = () => {
               >
                 <span className="material-symbols-outlined text-tertiary text-4xl mb-6">person_search</span>
                 <div>
-                  <h3 className="font-headline font-bold text-3xl mb-4 text-on-surface tracking-tight">Khó theo dõi ứng viên</h3>
-                  <p className="text-on-surface-variant leading-relaxed text-lg">Đừng để ứng viên tiềm năng bị trôi mất trong email. Quản lý toàn bộ quy trình tuyển dụng tại một nơi.</p>
+                  <h3 className="font-headline font-bold text-3xl mb-4 text-on-surface tracking-tight">{t('landing.painPoints.items.tracking.title')}</h3>
+                  <p className="text-on-surface-variant leading-relaxed text-lg">{t('landing.painPoints.items.tracking.desc')}</p>
                 </div>
               </div>
               <div
@@ -216,21 +222,21 @@ const LandingPage = () => {
                 style={{ backgroundColor: 'rgb(224, 231, 255)' }}
               >
                 <span className="material-symbols-outlined text-primary text-4xl mb-6 font-bold">speed</span>
-                <h3 className="font-headline font-bold text-xl mb-3 text-on-primary-container tracking-tight">Sàng lọc chậm chạp</h3>
-                <p className="text-on-primary-container text-sm leading-relaxed">Lọc thủ công mất hàng giờ. Hệ thống tính điểm của chúng tôi thực hiện trong vài giây.</p>
+                <h3 className="font-headline font-bold text-xl mb-3 text-on-primary-container tracking-tight">{t('landing.painPoints.items.screening.title')}</h3>
+                <p className="text-on-primary-container text-sm leading-relaxed">{t('landing.painPoints.items.screening.desc')}</p>
               </div>
               <div className="col-span-12 md:col-span-4 bg-white p-10 rounded-2xl shadow-sm border border-surface-container-high hover:border-tertiary/20 transition-colors reveal reveal-up reveal-delay-100">
                 <span className="material-symbols-outlined text-tertiary text-4xl mb-6">visibility_off</span>
-                <h3 className="font-headline font-bold text-xl mb-3 text-on-surface tracking-tight">Mất kiểm soát quy trình tuyển dụng</h3>
-                <p className="text-on-surface-variant text-sm leading-relaxed">Theo dõi trạng thái của mọi ứng viên ngay trên một bảng điều khiển duy nhất.</p>
+                <h3 className="font-headline font-bold text-xl mb-3 text-on-surface tracking-tight">{t('landing.painPoints.items.pipeline.title')}</h3>
+                <p className="text-on-surface-variant text-sm leading-relaxed">{t('landing.painPoints.items.pipeline.desc')}</p>
               </div>
               <div
                 className="col-span-12 md:col-span-4 text-white p-10 rounded-2xl shadow-xl shadow-primary/10 transition-transform hover:scale-[1.02] reveal reveal-up reveal-delay-200"
                 style={{ backgroundColor: 'rgb(79, 70, 229)' }}
               >
                 <span className="material-symbols-outlined text-white text-4xl mb-6">analytics</span>
-                <h3 className="font-headline font-bold text-xl mb-3 tracking-tight">Không có dữ liệu để ra quyết định.</h3>
-                <p className="text-white text-sm leading-relaxed font-medium">Đo lường hiệu quả và cải thiện tỷ lệ tuyển dụng bằng dữ liệu thực tế.</p>
+                <h3 className="font-headline font-bold text-xl mb-3 tracking-tight">{t('landing.painPoints.items.data.title')}</h3>
+                <p className="text-white text-sm leading-relaxed font-medium">{t('landing.painPoints.items.data.desc')}</p>
               </div>
             </div>
           </div>
@@ -239,8 +245,8 @@ const LandingPage = () => {
         {/* Workflow Overview */}
         <section className="py-24 md:py-32 max-w-7xl mx-auto px-6 md:px-8 overflow-hidden" id="workflow">
           <div className="text-center mb-16 md:mb-20 reveal reveal-up">
-            <h2 className="font-headline font-extrabold text-3xl md:text-4xl mb-4">Quy trình Dashboard</h2>
-            <p className="text-on-surface-variant max-w-xl mx-auto text-sm md:text-base px-4">Sự chuyển đổi liền mạch từ tìm kiếm đến tuyển dụng thành công.</p>
+            <h2 className="font-headline font-extrabold text-3xl md:text-4xl mb-4">{t('landing.workflow.title')}</h2>
+            <p className="text-on-surface-variant max-w-xl mx-auto text-sm md:text-base px-4">{t('landing.workflow.subtitle')}</p>
           </div>
           <div className="relative flex flex-col md:flex-row justify-between items-center gap-12 md:gap-8 px-4 md:px-12">
             {/* Connection Lines */}
@@ -251,35 +257,35 @@ const LandingPage = () => {
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center border-4 border-surface group-hover:border-primary transition-all duration-300 flex-shrink-0">
                 <span className="material-symbols-outlined text-primary !text-2xl md:!text-3xl">add_circle</span>
               </div>
-              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">Tạo việc</span>
+              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">{t('landing.workflow.steps.createJob')}</span>
             </div>
             
             <div className="flex flex-col items-center group bg-white p-2 md:p-0 rounded-full md:bg-transparent flex-shrink-0 reveal reveal-up reveal-delay-100">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center border-4 border-surface group-hover:border-primary transition-all duration-300 flex-shrink-0">
                 <span className="material-symbols-outlined text-primary !text-2xl md:!text-3xl">group_add</span>
               </div>
-              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">Thêm ứng viên</span>
+              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">{t('landing.workflow.steps.addCandidate')}</span>
             </div>
 
             <div className="flex flex-col items-center group bg-white p-4 md:p-0 rounded-full md:bg-transparent relative flex-shrink-0 reveal reveal-up reveal-delay-200">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full editorial-gradient shadow-xl flex items-center justify-center border-8 border-surface md:scale-110 mb-2 md:mb-0 flex-shrink-0 z-10 transition-transform duration-300 group-hover:scale-105">
                 <span className="material-symbols-outlined text-white !text-4xl md:!text-5xl">hub</span>
               </div>
-              <span className="mt-4 font-headline font-extrabold text-primary text-[10px] md:text-sm uppercase tracking-widest text-center">Đối soát</span>
+              <span className="mt-4 font-headline font-extrabold text-primary text-[10px] md:text-sm uppercase tracking-widest text-center">{t('landing.workflow.steps.matching')}</span>
             </div>
 
             <div className="flex flex-col items-center group bg-white p-2 md:p-0 rounded-full md:bg-transparent flex-shrink-0 reveal reveal-up reveal-delay-300">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center border-4 border-surface group-hover:border-primary transition-all duration-300 flex-shrink-0">
                 <span className="material-symbols-outlined text-primary !text-2xl md:!text-3xl">view_kanban</span>
               </div>
-              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">Quy trình</span>
+              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">{t('landing.workflow.steps.pipeline')}</span>
             </div>
 
             <div className="flex flex-col items-center group bg-white p-2 md:p-0 rounded-full md:bg-transparent flex-shrink-0 reveal reveal-up reveal-delay-400">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center border-4 border-surface group-hover:border-primary transition-all duration-300 flex-shrink-0">
                 <span className="material-symbols-outlined text-primary !text-2xl md:!text-3xl">monitoring</span>
               </div>
-              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">Phân tích</span>
+              <span className="mt-4 font-headline font-bold text-[10px] md:text-sm uppercase tracking-widest text-center">{t('landing.workflow.steps.analytics')}</span>
             </div>
           </div>
         </section>
@@ -292,45 +298,40 @@ const LandingPage = () => {
               <div className="rounded-lg p-4 sm:p-8 border border-white/50 shadow-sm" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
                 <div className="bg-white rounded-lg p-5 sm:p-6 space-y-4 shadow-md">
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-headline font-bold text-sm sm:text-base">Danh mục Tuyển dụng</h4>
-                    <button className="text-primary text-[10px] sm:text-sm font-bold">+ Thêm mới</button>
+                    <h4 className="font-headline font-bold text-sm sm:text-base">{t('landing.features.jobCenter.preview.title')}</h4>
+                    <button className="text-primary text-[10px] sm:text-sm font-bold">{t('landing.features.jobCenter.preview.add')}</button>
                   </div>
                   <div className="space-y-3">
                     <div className="p-3 bg-surface-container-low rounded flex items-center justify-between">
                       <div className="flex flex-col">
                         <span className="text-xs sm:text-sm font-bold">UI/UX Designer</span>
-                        <span className="text-[10px] text-on-surface-variant">Hạn: 30/11 • Alex D.</span>
+                        <span className="text-[10px] text-on-surface-variant">Due: Nov 30 • Alex D.</span>
                       </div>
-                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold uppercase">đang tuyển</span>
+                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold uppercase">{t('landing.features.jobCenter.preview.status.active')}</span>
                     </div>
                     <div className="p-3 border border-surface-container-high rounded flex items-center justify-between">
                       <div className="flex flex-col">
                         <span className="text-xs sm:text-sm font-bold">Backend Dev (Go)</span>
-                        <span className="text-[10px] text-on-surface-variant">Hạn: 15/12 • Ngân UK.</span>
+                        <span className="text-[10px] text-on-surface-variant">Due: Dec 15 • UK Ng.</span>
                       </div>
-                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-indigo-100 text-primary rounded-full font-bold uppercase whitespace-nowrap">hoàn thành</span>
+                      <span className="text-[8px] sm:text-[10px] px-2 py-1 bg-indigo-100 text-primary rounded-full font-bold uppercase whitespace-nowrap">{t('landing.features.jobCenter.preview.status.completed')}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div className="order-1 md:order-2 space-y-6 reveal reveal-right">
-              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">Cấu trúc</span>
-              <h2 className="font-headline font-extrabold text-3xl sm:text-4xl">Trung tâm điều hành tuyển dụng</h2>
-              <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed reveal reveal-up reveal-delay-200">Tổ chức các vị trí theo khách hàng, mức độ ưu tiên hoặc trạng thái. Giao diện hiện đại giúp bạn nắm bắt nhanh thông tin và thao tác ngay khi cần.</p>
+              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">{t('landing.features.jobCenter.tag')}</span>
+              <h2 className="font-headline font-extrabold text-3xl sm:text-4xl">{t('landing.features.jobCenter.title')}</h2>
+              <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed reveal reveal-up reveal-delay-200">{t('landing.features.jobCenter.desc')}</p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Gán thẻ tùy chỉnh cho các loại vai trò đặc thù</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Chia sẻ trực tiếp qua cổng thông tin khách hàng</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Tạo mô tả công việc chỉ với một cú nhấp chuột</span>
-                </li>
+                {Array.isArray(t('landing.features.jobCenter.points', { returnObjects: true })) && 
+                 t('landing.features.jobCenter.points', { returnObjects: true }).map((point, i) => (
+                  <li key={i} className="flex items-center gap-3 text-on-surface">
+                    <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
+                    <span className="text-sm">{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -338,22 +339,17 @@ const LandingPage = () => {
           {/* 2. Candidate Cards */}
           <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-20 items-center reveal reveal-up">
             <div className="space-y-6 reveal reveal-left">
-              <span className="text-primary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">Hồ sơ</span>
-              <h2 className="font-headline font-extrabold text-4xl">Hồ sơ ứng viên, được tái định nghĩa</h2>
-              <p className="text-on-surface-variant leading-relaxed reveal reveal-up reveal-delay-200">Không còn phải lục tìm trong file PDF. Hệ thống tự động trích xuất và hiển thị những thông tin quan trọng theo cách rõ ràng, dễ đọc.</p>
+              <span className="text-primary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">{t('landing.features.candidateProfile.tag')}</span>
+              <h2 className="font-headline font-extrabold text-4xl">{t('landing.features.candidateProfile.title')}</h2>
+              <p className="text-on-surface-variant leading-relaxed reveal reveal-up reveal-delay-200">{t('landing.features.candidateProfile.desc')}</p>
               <ul className="space-y-4">
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Tự động phân tích CV thông minh</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Tích hợp tra cứu hồ sơ mạng xã hội</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Ghi chú phỏng vấn với định dạng linh hoạt, dễ trình bày.</span>
-                </li>
+                {Array.isArray(t('landing.features.candidateProfile.points', { returnObjects: true })) && 
+                 t('landing.features.candidateProfile.points', { returnObjects: true }).map((point, i) => (
+                  <li key={i} className="flex items-center gap-3 text-on-surface">
+                    <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
+                    <span className="text-sm">{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
@@ -364,35 +360,35 @@ const LandingPage = () => {
                       <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
                     </div>
                     <div>
-                      <h5 className="font-headline font-bold text-xl">Nguyễn Hoàng Nam</h5>
+                      <h5 className="font-headline font-bold text-xl">Nam Hoang Nguyen</h5>
                       <p className="text-sm text-on-surface-variant">Senior Product Designer</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-xs mb-6">
                     <div>
-                      <span className="block opacity-50 uppercase font-bold mb-1">Kinh nghiệm</span>
-                      <span className="font-bold">6 năm kinh nghiệm</span>
+                      <span className="block opacity-50 uppercase font-bold mb-1">{t('landing.features.candidateProfile.preview.expLabel')}</span>
+                      <span className="font-bold">{t('landing.features.candidateProfile.preview.exp')}</span>
                     </div>
                     <div>
-                      <span className="block opacity-50 uppercase font-bold mb-1">Nguồn</span>
-                      <span className="font-bold">LinkedIn</span>
+                      <span className="block opacity-50 uppercase font-bold mb-1">{t('landing.features.candidateProfile.preview.sourceLabel')}</span>
+                      <span className="font-bold">{t('landing.features.candidateProfile.preview.source')}</span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
                       <span className="px-2 py-1 bg-surface-container rounded text-[10px] font-bold">Figma</span>
                       <span className="px-2 py-1 bg-surface-container rounded text-[10px] font-bold">Prototyping</span>
-                      <span className="px-2 py-1 bg-primary/10 text-primary rounded text-[10px] font-bold">Hồ sơ tốt</span>
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded text-[10px] font-bold">Great Profile</span>
                     </div>
                     <div className="p-3 bg-surface-container-low rounded border-l-4 border-primary italic text-xs">
-                      "Kỹ năng tư duy sản phẩm rất tốt, xử lý vấn đề linh hoạt."
+                      {t('landing.features.candidateProfile.preview.quote')}
                     </div>
                   </div>
                 </div>
                 <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg border border-surface-container-high">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                    <span className="text-sm font-bold">Đề xuất cao</span>
+                    <span className="text-sm font-bold">{t('landing.features.candidateProfile.preview.recommend')}</span>
                   </div>
                 </div>
               </div>
@@ -414,20 +410,20 @@ const LandingPage = () => {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-5xl font-headline font-extrabold">92%</span>
-                      <span className="text-xs uppercase tracking-widest font-bold opacity-50">Điểm tương thích</span>
+                      <span className="text-xs uppercase tracking-widest font-bold opacity-50 text-center px-4">{t('landing.features.matchScore.preview.label')}</span>
                     </div>
                   </div>
                 </div>
                 <div className="w-full max-w-xs bg-white rounded-lg p-6 shadow-sm border border-surface-container-high space-y-4">
                   <div className="flex justify-between items-center text-sm">
-                    <span>Kỹ năng</span>
+                    <span>{t('landing.features.matchScore.preview.skills')}</span>
                     <span className="font-bold text-primary">95%</span>
                   </div>
                   <div className="w-full rounded-full h-1.5" style={{ backgroundColor: 'rgb(241, 245, 249)' }}>
                     <div className="h-1.5 rounded-full" style={{ width: '95%', backgroundColor: 'rgb(79, 70, 229)' }}></div>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span>Kinh nghiệm</span>
+                    <span>{t('landing.features.matchScore.preview.exp')}</span>
                     <span className="font-bold text-primary">88%</span>
                   </div>
                   <div className="w-full rounded-full h-1.5" style={{ backgroundColor: 'rgb(241, 245, 249)' }}>
@@ -437,22 +433,17 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="order-1 md:order-2 space-y-6 reveal reveal-right">
-              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">Trí tuệ</span>
-              <h2 className="font-headline font-extrabold text-4xl">Tính điểm Phù hợp bằng Thuật toán</h2>
-              <p className="text-on-surface-variant leading-relaxed reveal reveal-up reveal-delay-200">Xem ngay ứng viên nào phù hợp nhất với yêu cầu công việc của bạn dựa trên kỹ năng, kinh nghiệm và kỳ vọng về ngân sách.</p>
+              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs reveal reveal-up reveal-delay-100">{t('landing.features.matchScore.tag')}</span>
+              <h2 className="font-headline font-extrabold text-4xl">{t('landing.features.matchScore.title')}</h2>
+              <p className="text-on-surface-variant leading-relaxed reveal reveal-up reveal-delay-200">{t('landing.features.matchScore.desc')}</p>
               <ul className="space-y-4">
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Nhận diện lỗ hổng kỹ năng</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Theo dõi và đối chiếu kỳ vọng lương thưởng của ứng viên.</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Đề xuất câu hỏi đánh giá mức độ phù hợp văn hóa.</span>
-                </li>
+                {Array.isArray(t('landing.features.matchScore.points', { returnObjects: true })) && 
+                 t('landing.features.matchScore.points', { returnObjects: true }).map((point, i) => (
+                  <li key={i} className="flex items-center gap-3 text-on-surface">
+                    <span className="material-symbols-outlined text-tertiary !text-[18px] flex-shrink-0">check_circle</span>
+                    <span className="text-sm">{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -460,28 +451,23 @@ const LandingPage = () => {
           {/* 4. Kanban Pipeline */}
           <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-20 items-center reveal reveal-up">
             <div className="space-y-6 reveal reveal-left">
-              <span className="text-primary font-headline font-bold uppercase tracking-widest text-xs">Hiệu quả</span>
-              <h2 className="font-headline font-extrabold text-4xl">Theo dõi Quy trình Trực quan</h2>
-              <p className="text-on-surface-variant leading-relaxed">Bảng Kanban mượt mà, không còn cảm giác gò bó như bảng tính. Kéo thả dễ dàng và theo dõi tiến trình một cách trực quan.</p>
+              <span className="text-primary font-headline font-bold uppercase tracking-widest text-xs">{t('landing.features.visualPipeline.tag')}</span>
+              <h2 className="font-headline font-extrabold text-4xl">{t('landing.features.visualPipeline.title')}</h2>
+              <p className="text-on-surface-variant leading-relaxed">{t('landing.features.visualPipeline.desc')}</p>
               <ul className="space-y-4">
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Kéo thả ứng viên giữa các giai đoạn dễ dàng</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Tự động nhắc lịch theo dõi</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Phân tích thời gian ở từng giai đoạn</span>
-                </li>
+                {Array.isArray(t('landing.features.visualPipeline.points', { returnObjects: true })) && 
+                 t('landing.features.visualPipeline.points', { returnObjects: true }).map((point, i) => (
+                  <li key={i} className="flex items-center gap-3 text-on-surface">
+                    <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
+                    <span className="text-sm">{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <div className="text-[10px] font-bold uppercase opacity-40">Sàng lọc</div>
+                  <div className="text-[10px] font-bold uppercase opacity-40">{t('landing.features.visualPipeline.preview.screening')}</div>
                   <div className="bg-white p-4 rounded-lg shadow-sm border border-surface-container-high">
                     <div className="font-bold text-sm">Elena R.</div>
                     <div className="text-[10px] text-on-surface-variant uppercase font-bold tracking-tight">Full-stack Dev</div>
@@ -492,12 +478,12 @@ const LandingPage = () => {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="text-[10px] font-bold uppercase text-primary">Phỏng vấn</div>
+                  <div className="text-[10px] font-bold uppercase text-primary">{t('landing.features.visualPipeline.preview.interview')}</div>
                   <div className="editorial-gradient text-white p-4 rounded-lg shadow-md">
                     <div className="font-bold text-sm">Sarah K.</div>
                     <div className="text-[10px] text-white/70 uppercase font-black">Product Lead</div>
                   </div>
-                  <div className="text-[10px] font-bold uppercase opacity-20">Đề nghị</div>
+                  <div className="text-[10px] font-bold uppercase opacity-20">{t('landing.features.visualPipeline.preview.offer')}</div>
                   <div className="bg-surface-container-low/50 border-2 border-dashed border-surface-container-high p-4 rounded-lg h-24 flex items-center justify-center">
                     <span className="material-symbols-outlined opacity-20">add</span>
                   </div>
@@ -511,19 +497,19 @@ const LandingPage = () => {
             <div className="order-2 md:order-1 reveal reveal-left">
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-surface-container-high h-44 flex flex-col justify-between">
-                  <span className="text-[10px] font-bold uppercase opacity-40">Tỷ lệ chuyển đổi</span>
+                  <span className="text-[10px] font-bold uppercase opacity-40">{t('landing.features.dataDriven.preview.conversion')}</span>
                   <span className="text-4xl font-headline font-extrabold text-primary">24%</span>
-                  <span className="text-[10px] text-green-600 font-bold">+2.1% so với tháng trước</span>
+                  <span className="text-[10px] text-green-600 font-bold">{t('landing.features.dataDriven.preview.trend')}</span>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-surface-container-high h-44 flex flex-col justify-between">
-                  <span className="text-[10px] font-bold uppercase opacity-40">Tuyển dụng TB</span>
-                  <span className="text-4xl font-headline font-extrabold text-tertiary">18 ngày</span>
-                  <span className="text-[10px] opacity-40 italic">Thời gian tuyển dụng trung bình</span>
+                  <span className="text-[10px] font-bold uppercase opacity-40">{t('landing.features.dataDriven.preview.avgHiring')}</span>
+                  <span className="text-4xl font-headline font-extrabold text-tertiary">{t('landing.features.dataDriven.preview.hiringTime')}</span>
+                  <span className="text-[10px] opacity-40 italic">{t('landing.features.dataDriven.preview.timeDesc')}</span>
                 </div>
                 <div className="col-span-2 bg-white p-6 rounded-lg shadow-sm border border-surface-container-high h-48">
                   <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-bold uppercase opacity-40">Khối lượng công việc theo tháng</span>
-                    <span className="text-[10px] font-bold text-primary">Nguồn tốt nhất: LinkedIn</span>
+                    <span className="text-[10px] font-bold uppercase opacity-40">{t('landing.features.dataDriven.preview.workload')}</span>
+                    <span className="text-[10px] font-bold text-primary">{t('landing.features.dataDriven.preview.topSource')}</span>
                   </div>
                   <div className="flex items-end justify-between h-24 mt-4 gap-2">
                     <div className="w-full rounded-t-sm" style={{ height: '40%', backgroundColor: 'rgb(226, 232, 240)' }}></div>
@@ -536,22 +522,17 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="order-1 md:order-2 space-y-6">
-              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs">Sự minh bạch</span>
-              <h2 className="font-headline font-extrabold text-4xl">Dữ liệu giúp bạn ra quyết định tốt hơn</h2>
-              <p className="text-on-surface-variant leading-relaxed">Hiểu rõ toàn bộ phễu tuyển dụng trong một cái nhìn. Dễ dàng theo dõi tỷ lệ chuyển đổi, thời gian tuyển dụng và chất lượng nguồn ứng viên.</p>
+              <span className="text-tertiary font-headline font-bold uppercase tracking-widest text-xs">{t('landing.features.dataDriven.tag')}</span>
+              <h2 className="font-headline font-extrabold text-4xl">{t('landing.features.dataDriven.title')}</h2>
+              <p className="text-on-surface-variant leading-relaxed">{t('landing.features.dataDriven.desc')}</p>
               <ul className="space-y-4">
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Theo dõi xu hướng tuyển dụng theo thời gian</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Báo cáo mức độ hài lòng của khách hàng</span>
-                </li>
-                <li className="flex items-center gap-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary !text-[18px] flex-shrink-0">check_circle</span>
-                  <span className="text-sm">Phát hiện điểm rò rỉ trong phễu tuyển dụng</span>
-                </li>
+                {Array.isArray(t('landing.features.dataDriven.points', { returnObjects: true })) && 
+                 t('landing.features.dataDriven.points', { returnObjects: true }).map((point, i) => (
+                  <li key={i} className="flex items-center gap-3 text-on-surface">
+                    <span className="material-symbols-outlined text-secondary !text-[18px] flex-shrink-0">check_circle</span>
+                    <span className="text-sm">{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -560,46 +541,32 @@ const LandingPage = () => {
         {/* How it Works */}
         <section className="py-32 reveal reveal-up" style={{ backgroundColor: 'rgba(226, 232, 240, 0.5)' }}>
           <div className="max-w-7xl mx-auto px-8">
-            <h2 className="font-headline font-extrabold text-4xl mb-16 text-center reveal reveal-up">Thiết lập trong vài phút, không phải vài ngày.</h2>
+            <h2 className="font-headline font-extrabold text-4xl mb-16 text-center reveal reveal-up">{t('landing.howItWorks.title')}</h2>
             <div className="grid md:grid-cols-3 gap-12">
-              <div className="space-y-6 reveal reveal-up reveal-delay-100">
-                <div className="text-6xl font-headline font-extrabold" style={{ color: 'rgb(203, 213, 225)' }}>01</div>
-                <h3 className="font-headline font-bold text-xl">Tạo công việc đầu tiên</h3>
-                <p className="text-on-surface-variant">Nhập yêu cầu từ PDF hoặc link. HR Lite tự động xây dựng cấu trúc tuyển dụng sẵn sàng để bắt đầu.</p>
-              </div>
-              <div className="space-y-6 reveal reveal-up reveal-delay-200">
-                <div className="text-6xl font-headline font-extrabold" style={{ color: 'rgb(203, 213, 225)' }}>02</div>
-                <h3 className="font-headline font-bold text-xl">Thêm ứng viên &amp; ghi chú</h3>
-                <p className="text-on-surface-variant">Tải lên CV hàng loạt hoặc thêm thủ công. Ghi chú phỏng vấn được lưu ngay cạnh từng ứng viên.</p>
-              </div>
-              <div className="space-y-6 reveal reveal-up reveal-delay-300">
-                <div className="text-6xl font-headline font-extrabold" style={{ color: 'rgb(203, 213, 225)' }}>03</div>
-                <h3 className="font-headline font-bold text-xl">Theo dõi quy trình</h3>
-                <p className="text-on-surface-variant">Trực quan hóa toàn bộ hành trình từ sàng lọc đến tuyển chọn với bảng Kanban và phân tích thông minh.</p>
-              </div>
+              {Array.isArray(t('landing.howItWorks.steps', { returnObjects: true })) && 
+               t('landing.howItWorks.steps', { returnObjects: true }).map((step, i) => (
+                <div key={i} className="space-y-6 reveal reveal-up" style={{ transitionDelay: `${(i+1)*100}ms` }}>
+                  <div className="text-6xl font-headline font-extrabold" style={{ color: 'rgb(203, 213, 225)' }}>0{i+1}</div>
+                  <h3 className="font-headline font-bold text-xl">{step.title}</h3>
+                  <p className="text-on-surface-variant">{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Use Cases */}
         <section className="py-32 max-w-7xl mx-auto px-8 reveal reveal-up">
-          <h2 className="font-headline font-extrabold text-3xl mb-12 text-on-surface reveal reveal-up">HR Lite dành cho ai?</h2>
+          <h2 className="font-headline font-extrabold text-3xl mb-12 text-on-surface reveal reveal-up">{t('landing.useCases.title')}</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg border border-surface-container-low shadow-sm reveal reveal-up reveal-delay-100">
-              <h3 className="font-headline font-bold text-xl mb-4 text-primary">HR Tự do</h3>
-              <p className="text-on-surface-variant mb-6 leading-relaxed">Xử lý nhiều khách hàng cùng lúc mà không lo mất dấu ứng viên hay chi tiết dự án.</p>
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Quy trình theo dự án</span>
-            </div>
-            <div className="bg-white p-8 rounded-lg border border-surface-container-low shadow-sm reveal reveal-up reveal-delay-200">
-              <h3 className="font-headline font-bold text-xl mb-4 text-primary">Nhà tuyển dụng độc lập</h3>
-              <p className="text-on-surface-variant mb-6 leading-relaxed">Một CRM tinh gọn tập trung vào nguồn tài năng và tốc độ tuyển chọn của bạn.</p>
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Tập trung Talent CRM</span>
-            </div>
-            <div className="bg-white p-8 rounded-lg border border-surface-container-low shadow-sm reveal reveal-up reveal-delay-300">
-              <h3 className="font-headline font-bold text-xl mb-4 text-primary">Đội ngũ Tuyển dụng nhỏ</h3>
-              <p className="text-on-surface-variant mb-6 leading-relaxed">Cộng tác với những người sáng lập hoặc quản lý mà không bị choáng bởi các hệ thống ATS cồng kềnh.</p>
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Cộng tác đội ngũ</span>
-            </div>
+            {t('landing.useCases.items', { returnObjects: true }) && typeof t('landing.useCases.items', { returnObjects: true }) === 'object' && 
+             Object.entries(t('landing.useCases.items', { returnObjects: true })).map(([key, item], i) => (
+              <div key={key} className="bg-white p-8 rounded-lg border border-surface-container-low shadow-sm reveal reveal-up" style={{ transitionDelay: `${(i+1)*100}ms` }}>
+                <h3 className="font-headline font-bold text-xl mb-4 text-primary">{item.title}</h3>
+                <p className="text-on-surface-variant mb-6 leading-relaxed">{item.desc}</p>
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{item.tag}</span>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -610,14 +577,14 @@ const LandingPage = () => {
         >
           <div className="absolute top-0 right-0 w-1/3 h-full editorial-gradient opacity-50 transform skew-x-12 translate-x-20"></div>
           <div className="max-w-4xl mx-auto px-6 md:px-8 text-center relative z-10 reveal reveal-up">
-            <h2 className="font-headline font-extrabold text-3xl md:text-5xl mb-6 md:mb-8 leading-tight">Sẵn sàng để nâng tầm hoạt động tuyển dụng của bạn?</h2>
-            <p className="text-white/80 text-lg md:text-xl mb-10 md:mb-12 font-light reveal reveal-up reveal-delay-200">Trải nghiệm HR Lite ngay hôm nay — trở thành người đầu tiên khám phá Dashboard.</p>
+            <h2 className="font-headline font-extrabold text-3xl md:text-5xl mb-6 md:mb-8 leading-tight">{t('landing.finalCta.title')}</h2>
+            <p className="text-white/80 text-lg md:text-xl mb-10 md:mb-12 font-light reveal reveal-up reveal-delay-200">{t('landing.finalCta.description')}</p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 reveal reveal-up reveal-delay-300">
               <button
                 onClick={handleCTA}
                 className="bg-white text-primary px-10 py-5 rounded-xl font-headline font-extrabold text-lg hover:bg-surface-container-low transition-colors w-full md:w-auto shadow-2xl active:scale-95"
               >
-                Bắt đầu ngay
+                {t('landing.finalCta.btn')}
               </button>
             </div>
           </div>
@@ -625,43 +592,18 @@ const LandingPage = () => {
 
         {/* FAQ */}
         <section className="py-32 max-w-3xl mx-auto px-8" id="faq">
-          <h2 className="font-headline font-extrabold text-3xl mb-16 text-center text-on-surface">Các câu hỏi thường gặp</h2>
+          <h2 className="font-headline font-extrabold text-3xl mb-16 text-center text-on-surface">{t('landing.faq.title')}</h2>
           <div className="space-y-4">
-            <FaqItem
-              id={0}
-              question="HR Lite khác gì so với một hệ thống ATS truyền thống?"
-              answer="Các hệ thống ATS truyền thống được xây dựng cho các tập đoàn lớn với hàng ngàn ứng viên. HR Lite được xây dựng cho cá nhân—nhấn mạnh vào tốc độ, sự rõ ràng mang tính biên tập và sự dễ dùng, thay vì các tính năng cồng kềnh của doanh nghiệp."
-              openFaq={openFaq}
-              toggleFaq={toggleFaq}
-            />
-            <FaqItem
-              id={1}
-              question="Dữ liệu của tôi có được bảo mật không?"
-              answer="Có. Chúng tôi sử dụng mã hóa tiêu chuẩn ngành và tuân thủ các quy định GDPR nghiêm ngặt để đảm bảo dữ liệu cá nhân của ứng viên luôn được bảo vệ."
-              openFaq={openFaq}
-              toggleFaq={toggleFaq}
-            />
-            <FaqItem
-              id={2}
-              question="Tôi có thể nhập bảng tính hiện có của mình không?"
-              answer="Chắc chắn rồi. Chúng tôi cung cấp công cụ nhập thông minh giúp khớp các cột Excel hoặc CSV của bạn với các trường dữ liệu có cấu trúc của chúng tôi chỉ trong vài giây."
-              openFaq={openFaq}
-              toggleFaq={toggleFaq}
-            />
-            <FaqItem
-              id={3}
-              question="Có gói dành cho đội nhóm không?"
-              answer="Gói dành cho đội nhóm hiện đang được phát triển. Trong thời gian tới, bạn sẽ có thể mời thành viên, chia sẻ quy trình tuyển dụng và cộng tác ghi chú dễ dàng trong cùng một workspace."
-              openFaq={openFaq}
-              toggleFaq={toggleFaq}
-            />
-            <FaqItem
-              id={4}
-              question="Triết lý Dashboard là gì?"
-              answer="Chúng tôi tin rằng tuyển dụng là một công việc mang tính thủ công và cần sự tinh tế. Vì vậy, công cụ bạn dùng cũng nên được thiết kế kỹ lưỡng — để xứng đáng với những tài năng mà bạn đang tìm kiếm."
-              openFaq={openFaq}
-              toggleFaq={toggleFaq}
-            />
+            {t('landing.faq.items', { returnObjects: true }).map((item, i) => (
+              <FaqItem
+                key={i}
+                id={i}
+                question={item.q}
+                answer={item.a}
+                openFaq={openFaq}
+                toggleFaq={toggleFaq}
+              />
+            ))}
           </div>
         </section>
       </main>
@@ -671,13 +613,13 @@ const LandingPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
           <div className="space-y-4 text-center md:text-left">
             <span className="text-xl font-bold text-[#1F1F1F] dark:text-[#FAF9F6] font-headline">HR Lite</span>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50">© 2024 HR Lite. Tuyển dụng, đơn giản hơn.</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50">© 2024 HR Lite. {t('landing.footer.desc')}</p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
-            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/privacy-policy">Chính sách bảo mật</Link>
-            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/terms-of-service">Điều khoản dịch vụ</Link>
-            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/cookie-policy">Chính sách Cookie</Link>
-            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/contact-support">Liên hệ hỗ trợ</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/privacy-policy">{t('landing.footer.privacy')}</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/terms-of-service">{t('landing.footer.terms')}</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/cookie-policy">{t('landing.footer.cookie')}</Link>
+            <Link className="text-[10px] uppercase tracking-widest text-[#1F1F1F]/50 dark:text-[#FAF9F6]/50 hover:text-primary underline underline-offset-4 transition-all duration-300" to="/contact-support">{t('landing.footer.support')}</Link>
           </div>
         </div>
       </footer>

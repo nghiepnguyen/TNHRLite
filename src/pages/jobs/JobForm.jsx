@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-import { getJob, createJob, updateJob, logActivity } from '../../services/db';
+import { getJob, createJob, updateJob, logActivity, deleteJob } from '../../services/db';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function JobForm() {
+  const { t } = useTranslation();
   const { workspaceId, id } = useParams();
   const { userProfile } = useWorkspace();
   const isEditing = !!id;
@@ -13,7 +15,9 @@ export default function JobForm() {
   const { currentUser } = useAuth();
   
   const [loading, setLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
+
   
   const [formData, setFormData] = useState({
     title: '',
@@ -66,16 +70,19 @@ export default function JobForm() {
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this job? All candidate links in the pipeline will be removed.')) {
+    if (window.confirm(t('jobsPage.form.deleteConfirm'))) {
+      setIsDeleting(true);
       try {
         await deleteJob(id, workspaceId);
         navigate(`/dashboard/w/${workspaceId}/jobs`);
       } catch (error) {
         console.error(error);
-        alert('Failed to delete job');
+        alert(t('membersPage.messages.removeError', { error: error.message }));
+        setIsDeleting(false);
       }
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,22 +123,22 @@ export default function JobForm() {
       }
     } catch (error) {
       console.error(error);
-      alert(`Failed to ${isEditing ? 'update' : 'create'} job`);
+      alert(t('candidateForm.saveFail'));
       setLoading(false);
     }
   };
 
-  if (fetching) return <div style={{ padding: '2rem' }}>Loading job data...</div>;
+  if (fetching) return <div style={{ padding: '2rem' }}>{t('common.loading')}</div>;
 
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <Link to={isEditing ? `/dashboard/w/${workspaceId}/jobs/${id}` : `/dashboard/w/${workspaceId}/jobs`} className="text-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> Back
+          <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">arrow_back</span> {t('common.back')}
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {isEditing ? <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-muted">edit</span> : null}
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? 'Edit Job' : 'Create New Job'}</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{isEditing ? t('jobsPage.detail.editJob') : t('jobsPage.form.createJob')}</h1>
         </div>
       </div>
 
@@ -139,93 +146,93 @@ export default function JobForm() {
         <form onSubmit={handleSubmit}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Job Title *</label>
-              <input type="text" name="title" className="form-control" value={formData.title} onChange={handleChange} placeholder="e.g. Senior Frontend Engineer" required />
+              <label className="form-label">{t('jobsPage.form.title')} *</label>
+              <input type="text" name="title" className="form-control" value={formData.title} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.title')} required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Client Name</label>
-              <input type="text" name="clientName" className="form-control" value={formData.clientName} onChange={handleChange} placeholder="Company or Internal" />
+              <label className="form-label">{t('jobsPage.form.client')}</label>
+              <input type="text" name="clientName" className="form-control" value={formData.clientName} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.client')} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Department</label>
-              <input type="text" name="department" className="form-control" value={formData.department} onChange={handleChange} placeholder="e.g. Engineering, Sales" />
+              <label className="form-label">{t('jobsPage.form.dept')}</label>
+              <input type="text" name="department" className="form-control" value={formData.department} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.dept')} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Location</label>
-              <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} placeholder="e.g. Remote, San Francisco" />
+              <label className="form-label">{t('jobsPage.form.location')}</label>
+              <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.location')} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Headcount (Total Roles)</label>
+              <label className="form-label">{t('jobsPage.form.headcount')}</label>
               <input type="number" name="totalRoles" className="form-control" value={formData.totalRoles} onChange={handleChange} min="1" />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Submission Deadline</label>
+              <label className="form-label">{t('jobsPage.form.deadline')}</label>
               <input type="date" name="deadline" className="form-control" value={formData.deadline} onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Employment Type</label>
+              <label className="form-label">{t('jobsPage.form.type')}</label>
               <select name="employmentType" className="form-control" value={formData.employmentType} onChange={handleChange}>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Freelance">Freelance</option>
+                <option value="Full-time">{t('jobsPage.form.types.fulltime')}</option>
+                <option value="Part-time">{t('jobsPage.form.types.parttime')}</option>
+                <option value="Contract">{t('jobsPage.form.types.contract')}</option>
+                <option value="Freelance">{t('jobsPage.form.types.freelance')}</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Status</label>
+              <label className="form-label">{t('jobsPage.form.status')}</label>
               <select name="status" className="form-control" value={formData.status} onChange={handleChange}>
-                <option value="Active">Active</option>
-                <option value="Closed">Closed</option>
-                <option value="Draft">Draft</option>
+                <option value="Active">{t('jobsPage.tabs.active')}</option>
+                <option value="Closed">{t('jobsPage.tabs.closed')}</option>
+                <option value="Draft">{t('jobsPage.tabs.draft')}</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Working Mode</label>
+              <label className="form-label">{t('jobsPage.form.mode')}</label>
               <select name="workingMode" className="form-control" value={formData.workingMode} onChange={handleChange}>
-                <option value="On-site">On-site</option>
-                <option value="Remote">Remote</option>
-                <option value="Hybrid">Hybrid</option>
+                <option value="On-site">{t('jobsPage.form.modes.onsite')}</option>
+                <option value="Remote">{t('jobsPage.form.modes.remote')}</option>
+                <option value="Hybrid">{t('jobsPage.form.modes.hybrid')}</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Salary Range</label>
-              <input type="text" name="salaryRange" className="form-control" value={formData.salaryRange} onChange={handleChange} placeholder="e.g. $5,000 - $8,000" />
+              <label className="form-label">{t('jobsPage.form.salary')}</label>
+              <input type="text" name="salaryRange" className="form-control" value={formData.salaryRange} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.salary')} />
             </div>
 
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">HR Contact Information</label>
-              <input type="text" name="hrContact" className="form-control" value={formData.hrContact} onChange={handleChange} placeholder="Name, Email or Phone of the primary recruiter" />
+              <label className="form-label">{t('jobsPage.form.contact')}</label>
+              <input type="text" name="hrContact" className="form-control" value={formData.hrContact} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.contact')} />
             </div>
 
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Job Description *</label>
-              <textarea name="jdText" className="form-control" rows="8" value={formData.jdText} onChange={handleChange} placeholder="Paste job requirements, responsibilities..." required />
+              <label className="form-label">{t('jobsPage.form.jd')} *</label>
+              <textarea name="jdText" className="form-control" rows="8" value={formData.jdText} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.jd')} required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Required Skills</label>
-              <input type="text" name="requiredSkills" className="form-control" value={formData.requiredSkills} onChange={handleChange} placeholder="React, Node.js, Typescript (comma separated)" />
+              <label className="form-label">{t('jobsPage.form.required')}</label>
+              <input type="text" name="requiredSkills" className="form-control" value={formData.requiredSkills} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.required')} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Optional Skills</label>
-              <input type="text" name="optionalSkills" className="form-control" value={formData.optionalSkills} onChange={handleChange} placeholder="GraphQL, AWS (comma separated)" />
+              <label className="form-label">{t('jobsPage.form.optional')}</label>
+              <input type="text" name="optionalSkills" className="form-control" value={formData.optionalSkills} onChange={handleChange} placeholder={t('jobsPage.form.placeholder.optional')} />
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
-            <Link to={isEditing ? `/dashboard/w/${workspaceId}/jobs/${id}` : `/dashboard/w/${workspaceId}/jobs`} className="btn btn-secondary">Cancel</Link>
+            <Link to={isEditing ? `/dashboard/w/${workspaceId}/jobs/${id}` : `/dashboard/w/${workspaceId}/jobs`} className="btn btn-secondary">{t('common.cancel')}</Link>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Job')}
+              {loading ? t('candidateForm.saving') : (isEditing ? t('jobsPage.form.saveChanges') : t('jobsPage.form.createJob'))}
             </button>
           </div>
         </form>

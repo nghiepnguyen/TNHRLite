@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { getJobs, getAllApplications, updateJob, createJob } from '../../services/db';
@@ -14,6 +15,7 @@ import Skeleton from '../../components/Skeleton';
  */
 export default function Jobs() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { workspaceId } = useParams();
   const [mandates, setMandates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function Jobs() {
           
           return {
             ...job,
-            clientName: job.clientName || 'Internal',
+            clientName: job.clientName || t('reportsPage.table.internal'),
             department: job.department || job.employmentType || 'General',
             deadline: deadlineIso,
             totalRoles: parseInt(job.totalRoles || 1),
@@ -84,7 +86,7 @@ export default function Jobs() {
         setMandates(mappedMandates);
       } catch (err) {
         console.error(err);
-        setError('Failed to load recruiting data. Please check connection.');
+        setError(t('jobsPage.messages.loadError'));
       } finally {
         setLoading(false);
       }
@@ -118,21 +120,21 @@ export default function Jobs() {
       }
 
       if (type === 'delete') {
-        if (window.confirm('WARNING: Are you sure you want to delete this mandate? This will also remove all associated application data. This action cannot be undone.')) {
+        if (window.confirm(t('jobsPage.messages.deleteConfirm'))) {
           const { deleteJob } = await import('../../services/db');
           await deleteJob(mandate.id);
-          toast({ type: 'success', message: 'Mandate and history permanently deleted.' });
+          toast({ type: 'success', message: t('jobsPage.messages.deleteSuccess') });
         } else { return; }
       }
 
       if (type === 'close') {
-        if (!window.confirm(`Are you sure you want to close "${mandate.title}"? This will hide it from the active pipeline view.`)) return;
+        if (!window.confirm(t('jobsPage.messages.closeConfirm', { title: mandate.title }))) return;
         await updateJob(mandate.id, { status: 'Closed' });
-        toast({ type: 'success', message: 'Mandate closed successfully.' });
+        toast({ type: 'success', message: t('jobsPage.messages.closeSuccess') });
       } else if (type === 'clone' || type === 'duplicate') {
         const { id, pipeline, createdAt, is_soon_expiring, ...payload } = mandate;
         await createJob(workspaceId, { ...payload, title: `${mandate.title} (Copy)`, status: 'Active' });
-        toast({ type: 'success', message: 'Mandate cloned successfully.' });
+        toast({ type: 'success', message: t('jobsPage.messages.cloneSuccess') });
       } else if (type === 'update') {
         setRefreshKey(prev => prev + 1);
         return;
@@ -143,11 +145,11 @@ export default function Jobs() {
         const newDeadline = new Date(mandate.deadline);
         newDeadline.setDate(newDeadline.getDate() + 30);
         await updateJob(mandate.id, { deadline: newDeadline.toISOString() });
-        toast({ type: 'success', message: `Deadline extended to ${newDeadline.toLocaleDateString('en-GB')}` });
+        toast({ type: 'success', message: t('jobsPage.messages.extendSuccess', { date: newDeadline.toLocaleDateString(t('common.locale')) }) });
       }
       setRefreshKey(prev => prev + 1);
     } catch (err) {
-      toast({ type: 'error', message: `Execution failed: ${type}` });
+      toast({ type: 'error', message: t('jobsPage.messages.execError', { type }) });
     }
   };
 
@@ -178,9 +180,9 @@ export default function Jobs() {
   if (error) return (
     <div className="error-screen">
       <span className="material-symbols-outlined flex-shrink-0 !text-[48px]">error</span>
-      <h3>Connection Error</h3>
+      <h3>{t('jobsPage.messages.connError')}</h3>
       <p>{error}</p>
-      <button onClick={() => setRefreshKey(k => k+1)} className="btn btn-primary">Retry Sync</button>
+      <button onClick={() => setRefreshKey(k => k+1)} className="btn btn-primary">{t('jobsPage.messages.retry')}</button>
     </div>
   );
 
@@ -191,11 +193,11 @@ export default function Jobs() {
         {/* Header Section */}
         <header className="portal-header">
           <div className="title-block">
-            <h1 className="portal-main-title">Recruiting Mandates</h1>
-            <p className="portal-sub-title">Overview of current hiring requirements and pipeline status</p>
+            <h1 className="portal-main-title">{t('jobsPage.title')}</h1>
+            <p className="portal-sub-title">{t('jobsPage.subtitle')}</p>
           </div>
           <Link to={`/dashboard/w/${workspaceId}/jobs/new`} className="btn btn-primary btn-lg">
-            <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">add</span> Create New Mandate
+            <span className="material-symbols-outlined flex-shrink-0 !text-[20px]">add</span> {t('jobsPage.createBtn')}
           </Link>
         </header>
 
@@ -204,24 +206,24 @@ export default function Jobs() {
           <div className="kpi-box">
             <div className="kpi-icon-base active"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">work</span></div>
             <div className="kpi-text-base">
-              <span className="kpi-tag-label">Active Mandates</span>
+              <span className="kpi-tag-label">{t('jobsPage.kpis.active')}</span>
               {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main">{activeCount}</span>}
             </div>
           </div>
           <div className="kpi-box">
             <div className="kpi-icon-base expiring"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">schedule</span></div>
             <div className="kpi-text-base">
-              <span className="kpi-tag-label">Expiring Soon</span>
+              <span className="kpi-tag-label">{t('jobsPage.kpis.expiring')}</span>
               <div className="kpi-value-group">
                 {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main highlight">{expiringSoonCount}</span>}
-                <span className="kpi-mini-badge">{"< 14 days"}</span>
+                <span className="kpi-mini-badge">{t('jobsPage.kpis.expiringNote')}</span>
               </div>
             </div>
           </div>
           <div className="kpi-box">
             <div className="kpi-icon-base roles"><span className="material-symbols-outlined flex-shrink-0 !text-[24px]">group</span></div>
             <div className="kpi-text-base">
-              <span className="kpi-tag-label">Total Open Roles</span>
+              <span className="kpi-tag-label">{t('jobsPage.kpis.openRoles')}</span>
               {loading ? <Skeleton variant="title" width="40px" style={{ margin: 0 }} /> : <span className="kpi-value-main">{totalOpenRoles}</span>}
             </div>
           </div>
@@ -238,25 +240,25 @@ export default function Jobs() {
                   className={`portal-tab ${activeTab === 'All' ? 'active' : ''}`}
                   onClick={() => setActiveTab('All')}
                 >
-                  All <span className="tab-count">{loading ? '...' : mandates.length}</span>
+                  {t('jobsPage.tabs.all')} <span className="tab-count">{loading ? '...' : mandates.length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'Active' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Active')}
                 >
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> Active <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Active').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> {t('jobsPage.tabs.active')} <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Active').length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'On-Hold' ? 'active' : ''}`}
                   onClick={() => setActiveTab('On-Hold')}
                 >
-                  On Hold <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'On-Hold' || m.status === 'On Hold' || m.status === 'Draft').length}</span>
+                  {t('jobsPage.tabs.onHold')} <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'On-Hold' || m.status === 'On Hold' || m.status === 'Draft').length}</span>
                 </button>
                 <button 
                   className={`portal-tab ${activeTab === 'Closed' ? 'active' : ''}`}
                   onClick={() => setActiveTab('Closed')}
                 >
-                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">check_circle</span> Closed <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Closed').length}</span>
+                  <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">check_circle</span> {t('jobsPage.tabs.closed')} <span className="tab-count">{loading ? '...' : mandates.filter(m => m.status === 'Closed').length}</span>
                 </button>
               </div>
             </div>
@@ -264,19 +266,19 @@ export default function Jobs() {
               className={`portal-filter-btn ${isFilterExpanded ? 'active' : ''}`}
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
             >
-              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">filter_alt</span> Filters
+              <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">filter_alt</span> {t('jobsPage.filters.title')}
             </button>
           </div>
 
           <div className={`portal-accordion ${isFilterExpanded ? 'visible' : ''}`}>
             <div className="portal-accordion-inner">
               <div className="filter-input-field">
-                <label>Client Organization</label>
-                <select><option>Search all clients...</option></select>
+                <label>{t('jobsPage.filters.client')}</label>
+                <select><option>{t('jobsPage.filters.clientPlaceholder')}</option></select>
               </div>
               <div className="filter-input-field">
-                <label>Operating Department</label>
-                <select><option>Search all departments...</option></select>
+                <label>{t('jobsPage.filters.dept')}</label>
+                <select><option>{t('jobsPage.filters.deptPlaceholder')}</option></select>
               </div>
             </div>
           </div>
@@ -291,7 +293,7 @@ export default function Jobs() {
           {!loading && filteredMandates.length > 0 && (
             <footer className="portal-table-footer">
               <span className="results-count">
-                Showing <strong>{Math.min(filteredMandates.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}-{Math.min(filteredMandates.length, currentPage * ITEMS_PER_PAGE)}</strong> of <strong>{filteredMandates.length}</strong> records
+                {t('jobsPage.footer.showing')} <strong>{Math.min(filteredMandates.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}-{Math.min(filteredMandates.length, currentPage * ITEMS_PER_PAGE)}</strong> {t('jobsPage.footer.of')} <strong>{filteredMandates.length}</strong> {t('jobsPage.footer.records')}
               </span>
               
               {filteredMandates.length > ITEMS_PER_PAGE && (

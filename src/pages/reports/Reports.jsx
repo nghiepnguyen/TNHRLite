@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { getJobs, getAllApplications } from '../../services/db';
 import Skeleton from '../../components/Skeleton';
@@ -6,6 +7,7 @@ import Skeleton from '../../components/Skeleton';
 
 export default function Reports() {
   const { workspaceId } = useParams();
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,14 +36,14 @@ export default function Reports() {
     return (
       <div>
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Reports &amp; Analytics</h1>
-          <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Internal data summaries and hiring volume.</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{t('reportsPage.title')}</h1>
+          <p className="text-secondary" style={{ marginTop: '0.25rem' }}>{t('reportsPage.subtitle')}</p>
         </div>
         <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
            <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted" style={{ display: 'block', margin: '0 auto 1rem', opacity: 0.5 }}>leaderboard</span>
-           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>Not Enough Data</h2>
+           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t('reportsPage.noData.title')}</h2>
            <p className="text-secondary" style={{ marginTop: '0.5rem', maxWidth: '400px', margin: '0.5rem auto 0' }}>
-             Create your first mandate and start adding candidates into the pipeline to generate analytical reports!
+             {t('reportsPage.noData.desc')}
            </p>
         </div>
       </div>
@@ -52,14 +54,14 @@ export default function Reports() {
     return (
       <div>
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Reports &amp; Analytics</h1>
-          <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Internal data summaries and hiring volume.</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{t('reportsPage.title')}</h1>
+          <p className="text-secondary" style={{ marginTop: '0.25rem' }}>{t('reportsPage.subtitle')}</p>
         </div>
         <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
            <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-muted" style={{ display: 'block', margin: '0 auto 1rem', opacity: 0.5 }}>pie_chart</span>
-           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>No Applications Yet</h2>
+           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t('reportsPage.noApps.title')}</h2>
            <p className="text-secondary" style={{ marginTop: '0.5rem', maxWidth: '400px', margin: '0.5rem auto 0' }}>
-             Start linking structured candidates to your job pipelines to view stage volume matrices and AI fit score distributions.
+             {t('reportsPage.noApps.desc')}
            </p>
         </div>
       </div>
@@ -104,8 +106,8 @@ export default function Reports() {
     <div className="reports-page">
       {/* Page header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Reports &amp; Analytics</h1>
-        <p className="text-secondary" style={{ marginTop: '0.25rem' }}>Internal data summaries and hiring volume.</p>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>{t('reportsPage.title')}</h1>
+        <p className="text-secondary" style={{ marginTop: '0.25rem' }}>{t('reportsPage.subtitle')}</p>
       </div>
 
       {/* KPI Summary Row */}
@@ -116,7 +118,7 @@ export default function Reports() {
           </div>
           <div>
             <div className="reports-kpi-value">{totalApps}</div>
-            <div className="reports-kpi-label">Total Applications</div>
+            <div className="reports-kpi-label">{t('reportsPage.kpis.totalApps')}</div>
           </div>
         </div>
 
@@ -126,7 +128,7 @@ export default function Reports() {
           </div>
           <div>
             <div className="reports-kpi-value" style={{ color: 'var(--color-success)' }}>{hiredCount}</div>
-            <div className="reports-kpi-label">Total Hired</div>
+            <div className="reports-kpi-label">{t('reportsPage.kpis.totalHired')}</div>
           </div>
         </div>
 
@@ -136,7 +138,7 @@ export default function Reports() {
           </div>
           <div>
             <div className="reports-kpi-value" style={{ color: 'var(--color-warning)' }}>{conversionRate}%</div>
-            <div className="reports-kpi-label">Conversion Rate</div>
+            <div className="reports-kpi-label">{t('reportsPage.kpis.conversionRate')}</div>
           </div>
         </div>
 
@@ -146,7 +148,7 @@ export default function Reports() {
           </div>
           <div>
             <div className="reports-kpi-value">{Math.round(avgFitScore)}%</div>
-            <div className="reports-kpi-label">Avg AI Fit Score</div>
+            <div className="reports-kpi-label">{t('reportsPage.kpis.avgFitScore')}</div>
           </div>
         </div>
       </div>
@@ -158,7 +160,7 @@ export default function Reports() {
         <div className="card" style={{ padding: '1.75rem' }}>
           <h3 className="reports-card-title">
             <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">leaderboard</span>
-            Application Volume by Stage
+            {t('reportsPage.charts.volumeByStage')}
           </h3>
 
           {/* Horizontal bar chart (works much better on mobile than vertical bars) */}
@@ -170,7 +172,7 @@ export default function Reports() {
               return (
                 <div key={stage}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>{stage}</span>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>{t(`common.stages.${stage}`)}</span>
                     <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                       {val} <span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>({pct}%)</span>
                     </span>
@@ -195,15 +197,15 @@ export default function Reports() {
         <div className="card" style={{ padding: '1.75rem' }}>
           <h3 className="reports-card-title">
             <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">pie_chart</span>
-            AI Match Quality Distribution
+            {t('reportsPage.charts.matchDistribution')}
           </h3>
           
           {/* Visual donut-like progress bars */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {[
-              { label: 'High Match', range: '76–100%', val: dist.High, color: 'var(--color-success)' },
-              { label: 'Medium Match', range: '51–75%', val: dist.Medium, color: 'var(--color-warning)' },
-              { label: 'Low Match', range: '0–50%', val: dist.Low, color: 'var(--color-surface-border)' },
+              { label: t('reportsPage.matchTiers.high'), range: '76–100%', val: dist.High, color: 'var(--color-success)' },
+              { label: t('reportsPage.matchTiers.medium'), range: '51–75%', val: dist.Medium, color: 'var(--color-warning)' },
+              { label: t('reportsPage.matchTiers.low'), range: '0–50%', val: dist.Low, color: 'var(--color-surface-border)' },
             ].map(tier => {
               const pct = Math.round((tier.val / totalScored) * 100);
               return (
@@ -234,7 +236,7 @@ export default function Reports() {
           {/* Unscored note */}
           {applications.filter(a => typeof a.fitScore !== 'number').length > 0 && (
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '1.25rem', textAlign: 'center' }}>
-              * {applications.filter(a => typeof a.fitScore !== 'number').length} application(s) without an AI score are excluded.
+              {t('reportsPage.table.excludedApps', { count: applications.filter(a => typeof a.fitScore !== 'number').length })}
             </p>
           )}
         </div>
@@ -244,21 +246,21 @@ export default function Reports() {
       <div className="card" style={{ padding: '1.75rem', marginTop: '2rem', overflow: 'hidden' }}>
         <h3 className="reports-card-title">
           <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">monitoring</span>
-          Active Jobs Workload Overview
+          {t('reportsPage.charts.workloadOverview')}
         </h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ minWidth: '480px' }}>
             <thead>
               <tr>
-                <th>Job Title</th>
-                <th style={{ textAlign: 'center' }}>Client</th>
-                <th style={{ textAlign: 'center' }}>In Pipeline</th>
-                <th style={{ textAlign: 'center' }}>Offers / Hired</th>
+                <th>{t('reportsPage.table.jobTitle')}</th>
+                <th style={{ textAlign: 'center' }}>{t('reportsPage.table.client')}</th>
+                <th style={{ textAlign: 'center' }}>{t('reportsPage.table.inPipeline')}</th>
+                <th style={{ textAlign: 'center' }}>{t('reportsPage.table.offersHired')}</th>
               </tr>
             </thead>
             <tbody>
               {activeJobs.length === 0 ? (
-                <tr><td colSpan="4" style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>No active workloads.</td></tr>
+                <tr><td colSpan="4" style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>{t('reportsPage.table.noWorkloads')}</td></tr>
               ) : activeJobs.map(job => {
                 const jobApps = applications.filter(a => a.jobId === job.id);
                 const offers = jobApps.filter(a => a.stage === 'Offer' || a.stage === 'Hired').length;
@@ -268,11 +270,11 @@ export default function Reports() {
                     <td>
                       <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{job.title}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>
-                        {pipelinePct}% of total pipeline
+                        {t('reportsPage.table.pipelinePct', { pct: pipelinePct })}
                       </div>
                     </td>
                     <td style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-                      {job.clientName || 'Internal'}
+                      {job.clientName || t('reportsPage.table.internal')}
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <span className="badge badge-neutral">{jobApps.length}</span>

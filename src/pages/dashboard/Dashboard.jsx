@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getJobs, getCandidates, getAllApplications } from '../../services/db';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -10,6 +11,7 @@ import Skeleton from '../../components/Skeleton';
 export default function Dashboard() {
   const { workspaceId } = useParams();
   const { pendingInvites } = useWorkspace();
+  const { t, i18n } = useTranslation();
   const [jobs, setJobs] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -113,39 +115,42 @@ export default function Dashboard() {
   });
 
   const formatRelativeTime = (timestamp) => {
-    if (!timestamp || typeof timestamp.toDate !== 'function') return 'Just now';
+    if (!timestamp || typeof timestamp.toDate !== 'function') return t('dashboard.justNow');
     const date = timestamp.toDate();
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    return date.toLocaleDateString();
+    if (diffInSeconds < 60) return t('dashboard.justNow');
+    if (diffInSeconds < 3600) return t('dashboard.minsAgo', { count: Math.floor(diffInSeconds / 60) });
+    if (diffInSeconds < 86400) return t('dashboard.hoursAgo', { count: Math.floor(diffInSeconds / 3600) });
+    return date.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB');
   };
 
   const getActivityMessage = (act) => {
-    const name = <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span>;
+    const name = act.entity?.name;
+    const stage = act.details?.newStage;
+    const role = act.details?.role;
+
     switch (act.action) {
-      case 'JOB_CREATED': return <>posted a new job: {name}</>;
-      case 'CANDIDATE_CREATED': return <>added candidate: {name}</>;
-      case 'CV_UPLOADED': return <>uploaded CV for: {name}</>;
-      case 'STAGE_CHANGED': return <>moved {name} to <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.newStage}</span></>;
-      case 'APPLICATION_CREATED': return <>linked {name} to a job pipeline</>;
-      case 'NOTE_ADDED': return <>updated notes for: {name}</>;
-      case 'INVITATION_ACCEPTED': return <>accepted the workspace invitation to join as <span className="badge badge-neutral" style={{ fontSize: '10px' }}>{act.details?.role}</span></>;
-      case 'INVITATION_DECLINED': return <><span style={{ color: 'var(--color-danger)' }}>declined</span> the workspace invitation</>;
-      case 'MEMBER_REMOVED': return <>removed <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span> from the workspace</>;
-      case 'MEMBER_LEFT': return <><span style={{ color: 'var(--color-danger)' }}>left</span> the workspace</>;
-      default: return <>action: {act.action}</>;
+      case 'JOB_CREATED': return t('dashboard.activity.postedJob', { name });
+      case 'CANDIDATE_CREATED': return t('dashboard.activity.addedCandidate', { name });
+      case 'CV_UPLOADED': return t('dashboard.activity.uploadedCv', { name });
+      case 'STAGE_CHANGED': return t('dashboard.activity.movedStage', { name, stage });
+      case 'APPLICATION_CREATED': return t('dashboard.activity.linkedPipeline', { name });
+      case 'NOTE_ADDED': return t('dashboard.activity.updatedNotes', { name });
+      case 'INVITATION_ACCEPTED': return t('dashboard.activity.acceptedInvite', { role });
+      case 'INVITATION_DECLINED': return t('dashboard.activity.declinedInvite');
+      case 'MEMBER_REMOVED': return t('dashboard.activity.removedMember', { name });
+      case 'MEMBER_LEFT': return t('dashboard.activity.leftWorkspace');
+      default: return `action: ${act.action}`;
     }
   };
 
   return (
     <div>
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>Recruitment Overview</h1>
-        <p className="text-secondary" style={{ marginTop: '0.5rem', fontSize: '1rem' }}>Welcome back. Here is the pulse of your talent pipeline.</p>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.025em' }}>{t('dashboard.title')}</h1>
+        <p className="text-secondary" style={{ marginTop: '0.5rem', fontSize: '1rem' }}>{t('dashboard.subtitle')}</p>
       </div>
 
       {/* Top Metrics Cards */}
@@ -156,7 +161,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{activeJobs.length}</h2>
-            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Jobs</p>
+            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('dashboard.activeJobs')}</p>
           </div>
         </div>
         
@@ -166,7 +171,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{candidates.length}</h2>
-            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Talent Pool</p>
+            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('dashboard.talentPool')}</p>
           </div>
         </div>
         
@@ -176,7 +181,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stageCounts['New'] || 0}</h2>
-            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>New Apps</p>
+            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('dashboard.newApps')}</p>
           </div>
         </div>
 
@@ -186,7 +191,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stageCounts['Interview'] || 0}</h2>
-            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Interviews</p>
+            <p className="text-secondary" style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('dashboard.interviews')}</p>
           </div>
         </div>
       </div>
@@ -197,16 +202,16 @@ export default function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-success">check_circle</span> Top AI Matched Candidates
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-success">check_circle</span> {t('dashboard.topMatches')}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {topMatches.length === 0 ? (
-                <p className="text-muted">No parsed applications matched yet.</p>
+                <p className="text-muted">{t('dashboard.noMatches')}</p>
               ) : topMatches.map((m, idx) => (
                 <div key={idx} className="interactive-row-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--color-surface-border)', borderRadius: 'var(--radius-md)', transition: 'var(--transition-smooth)' }}>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-primary)' }}>{m.candidateInfo?.fullName || 'Unknown Candidate'}</div>
-                    <div className="text-secondary" style={{ fontSize: '0.8125rem', marginTop: '0.125rem' }}>{m.jobInfo?.title || 'Unknown Job'}</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-primary)' }}>{m.candidateInfo?.fullName || t('dashboard.someone')}</div>
+                    <div className="text-secondary" style={{ fontSize: '0.8125rem', marginTop: '0.125rem' }}>{m.jobInfo?.title || 'Job'}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -222,7 +227,7 @@ export default function Dashboard() {
 
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">monitoring</span> Active Funnel Preview
+              <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">monitoring</span> {t('dashboard.funnelPreview')}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {['New', 'Reviewed', 'Interview', 'Offer', 'Hired'].map(stage => {
@@ -248,16 +253,16 @@ export default function Dashboard() {
             {/* Needs Attention Card */}
             <div className="card" style={{ padding: '1.5rem', backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning)', borderRadius: 'var(--radius-lg)' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem', color: 'var(--color-warning)' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">error</span> Needs Attention
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">error</span> {t('dashboard.needsAttention')}
               </h3>
               {jobsAttn.length === 0 ? (
-                 <p className="text-muted" style={{ fontSize: '0.8125rem' }}>All active jobs have pipeline engagement.</p>
+                 <p className="text-muted" style={{ fontSize: '0.8125rem' }}>{t('dashboard.allClear')}</p>
               ) : jobsAttn.map(job => (
                 <div key={job.id} style={{ padding: '1rem', backgroundColor: 'white', borderRadius: 'var(--radius-md)', marginBottom: '0.75rem', boxShadow: 'var(--shadow-sm)' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>{job.title}</div>
-                  <div className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>0 applications</div>
+                  <div className="text-secondary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>{t('dashboard.zeroApps')}</div>
                   <Link to={`/dashboard/w/${workspaceId}/jobs/${job.id}`} className="text-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', marginTop: '0.75rem', fontWeight: 700 }}>
-                    View Mandate <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">chevron_right</span>
+                    {t('dashboard.viewMandate')} <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">chevron_right</span>
                   </Link>
                 </div>
               ))}
@@ -266,7 +271,7 @@ export default function Dashboard() {
             {/* REAL-TIME ACTIVITY FEED */}
             <div className="card" style={{ padding: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">schedule</span> Workspace Activity
+                <span className="material-symbols-outlined flex-shrink-0 !text-[18px] text-primary">schedule</span> {t('dashboard.workspaceActivity')}
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -284,8 +289,8 @@ export default function Dashboard() {
                     border: '1px dashed var(--color-surface-border)'
                   }}>
                     <span className="material-symbols-outlined flex-shrink-0 !text-[40px]" style={{ opacity: 0.2, marginBottom: '1rem' }}>monitoring</span>
-                    <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>No recent activity.</p>
-                    <p style={{ fontSize: '0.75rem', marginTop: '0.25rem', opacity: 0.7 }}>Recent workspace updates will appear here.</p>
+                    <p style={{ margin: 0, fontWeight: 500, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>{t('dashboard.noActivity')}</p>
+                    <p style={{ fontSize: '0.75rem', marginTop: '0.25rem', opacity: 0.7 }}>{t('dashboard.activitySubtitle')}</p>
                   </div>
                 ) : (
                   activities.slice(0, 3).map((act, idx) => (
@@ -301,7 +306,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                          <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.actor?.name || 'Someone'}</span> {getActivityMessage(act)}
+                          <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.actor?.name || t('dashboard.someone')}</span> {getActivityMessage(act)}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                           <span className="material-symbols-outlined flex-shrink-0 !text-[12px]">schedule</span> {formatRelativeTime(act.timestamp)}
@@ -313,7 +318,7 @@ export default function Dashboard() {
               </div>
               
               <Link to={`/dashboard/w/${workspaceId}/settings?tab=activity`} className="btn btn-secondary" style={{ width: '100%', fontSize: '0.8125rem', fontWeight: 700, marginTop: '0.5rem', justifyContent: 'center' }}>
-                View Full Activity
+                {t('dashboard.viewFullActivity')}
               </Link>
             </div>
           </div>

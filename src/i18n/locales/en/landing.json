@@ -1,0 +1,237 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "workflow": "Workflow",
+      "analytics": "Analytics",
+      "faq": "FAQ",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "HR Lite for Independent Recruiters",
+      "title": "Break free from Excel and scattered recruitment data",
+      "description": "Replace clunky spreadsheets with a streamlined dashboard designed for solo recruiters and small teams.",
+      "getStarted": "Get Started Now",
+      "stats": {
+        "activeJobs": "Active Jobs",
+        "matchScore": "Match Score",
+        "candidates": "Candidates",
+        "progress": "Progress"
+      },
+      "preview": {
+        "jobList": "Job List",
+        "status": {
+          "active": "active",
+          "onHold": "on hold"
+        },
+        "job1": {
+          "title": "Product Designer",
+          "owner": "Owner: Minh Nguyen",
+          "deadline": "Due: Dec 20"
+        },
+        "job2": {
+          "title": "Frontend Engineer",
+          "owner": "Owner: Lan Anh",
+          "deadline": "Due: Dec 15"
+        }
+      }
+    },
+    "painPoints": {
+      "title": "Centralized recruiting management, instead of scattered files and unstable spreadsheets.",
+      "items": {
+        "scattered": {
+          "title": "Jobs scattered across tabs",
+          "desc": "Stop wasting time searching through bookmarks and email threads. Store all job mandates and client requirements in one unified system."
+        },
+        "tracking": {
+          "title": "Hard to track candidates",
+          "desc": "Don't let potential talent get lost in your inbox. Manage the entire recruitment lifecycle in one place."
+        },
+        "screening": {
+          "title": "Slow screening process",
+          "desc": "Manual filtering takes hours. Our scoring system does it in seconds."
+        },
+        "pipeline": {
+          "title": "Lost control of the process",
+          "desc": "Track the status of every candidate right on a single dashboard."
+        },
+        "data": {
+          "title": "No data for decisions",
+          "desc": "Measure efficiency and improve hiring rates with real-world data."
+        }
+      }
+    },
+    "workflow": {
+      "title": "Dashboard Workflow",
+      "subtitle": "Seamless transition from sourcing to successful hiring.",
+      "steps": {
+        "createJob": "Create Job",
+        "addCandidate": "Add Candidate",
+        "matching": "Matching",
+        "pipeline": "Pipeline",
+        "analytics": "Analytics"
+      }
+    },
+    "features": {
+      "jobCenter": {
+        "tag": "Structure",
+        "title": "Recruitment Operations Hub",
+        "desc": "Organize roles by client, priority, or status. A modern interface helps you grasp information quickly and take action instantly.",
+        "points": [
+          "Custom tags for specific role types",
+          "Direct sharing via client portal",
+          "One-click job description generation"
+        ],
+        "preview": {
+          "title": "Recruitment Catalog",
+          "add": "+ Add New",
+          "status": {
+            "active": "active",
+            "completed": "completed"
+          }
+        }
+      },
+      "candidateProfile": {
+        "tag": "Profile",
+        "title": "Candidate Profiles, Redefined",
+        "desc": "No more digging through PDFs. The system automatically extracts and displays key information in a clear, readable way.",
+        "points": [
+          "Smart automated CV parsing",
+          "Integrated social profile lookup",
+          "Flexible interview notes format, easy to present."
+        ],
+        "preview": {
+          "exp": "6 years exp",
+          "expLabel": "Experience",
+          "source": "LinkedIn",
+          "sourceLabel": "Source",
+          "quote": "\"Great product thinking, flexible problem solving.\"",
+          "recommend": "Highly Recommended"
+        }
+      },
+      "matchScore": {
+        "tag": "Intelligence",
+        "title": "Algorithmic Fit Scoring",
+        "desc": "Instantly see which candidates best match your job requirements based on skills, experience, and budget expectations.",
+        "points": [
+          "Skill gap identification",
+          "Track and compare candidate compensation expectations.",
+          "Culture fit assessment questions suggested."
+        ],
+        "preview": {
+          "label": "Match Score",
+          "skills": "Skills",
+          "exp": "Experience"
+        }
+      },
+      "visualPipeline": {
+        "tag": "Efficiency",
+        "title": "Visual Pipeline Tracking",
+        "desc": "Smooth Kanban boards, no more spreadsheet fatigue. Drag and drop with ease and track progress visually.",
+        "points": [
+          "Easy drag & drop between stages",
+          "Automatic follow-up reminders",
+          "Time-in-stage analytics"
+        ],
+        "preview": {
+          "screening": "Screening",
+          "interview": "Interview",
+          "offer": "Offer"
+        }
+      },
+      "dataDriven": {
+        "tag": "Transparency",
+        "title": "Data that helps you decide better",
+        "desc": "Understand your entire hiring funnel at a glance. Easily track conversion rates, time-to-hire, and candidate source quality.",
+        "points": [
+          "Track hiring trends over time",
+          "Client satisfaction reports",
+          "Detect funnel leaks"
+        ],
+        "preview": {
+          "conversion": "Conversion Rate",
+          "avgHiring": "Avg Hiring",
+          "hiringTime": "18 days",
+          "workload": "Monthly Workload",
+          "topSource": "Top Source: LinkedIn",
+          "trend": "+2.1% vs last month",
+          "timeDesc": "Average Time to Hire"
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Set up in minutes, not days.",
+      "steps": [
+        {
+          "title": "Create your first job",
+          "desc": "Import requirements from PDF or link. HR Lite automatically builds a recruitment structure ready to start."
+        },
+        {
+          "title": "Add candidates & notes",
+          "desc": "Bulk upload CVs or add manually. Interview notes are saved right next to each candidate."
+        },
+        {
+          "title": "Track the pipeline",
+          "desc": "Visualize the entire journey from screening to selection with Kanban boards and smart analytics."
+        }
+      ]
+    },
+    "useCases": {
+      "title": "Who is HR Lite for?",
+      "items": {
+        "freelance": {
+          "title": "Freelance HR",
+          "desc": "Handle multiple clients simultaneously without losing track of candidates or project details.",
+          "tag": "Project-based workflow"
+        },
+        "independent": {
+          "title": "Independent Recruiters",
+          "desc": "A lean CRM focused on your talent sourcing and selection speed.",
+          "tag": "Talent CRM Focus"
+        },
+        "smallTeam": {
+          "title": "Small Recruiting Teams",
+          "desc": "Collaborate with founders or managers without getting overwhelmed by bulky ATS systems.",
+          "tag": "Team Collaboration"
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Ready to level up your recruitment?",
+      "description": "Experience HR Lite today — be the first to explore the Dashboard.",
+      "btn": "Get Started Now"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "How is HR Lite different from a traditional ATS?",
+          "a": "Traditional ATS systems are built for large corporations with thousands of applicants. HR Lite is built for individuals—emphasizing speed, editorial clarity, and ease of use, rather than bulky enterprise features."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Yes. We use industry-standard encryption and follow strict GDPR regulations to ensure candidate personal data is always protected."
+        },
+        {
+          "q": "Can I import my existing spreadsheets?",
+          "a": "Absolutely. We provide a smart import tool that helps match your Excel or CSV columns to our structured data fields in seconds."
+        },
+        {
+          "q": "Is there a team plan?",
+          "a": "The team plan is currently under development. Soon, you will be able to invite members, share pipelines, and collaborate on notes easily within the same workspace."
+        },
+        {
+          "q": "What is the Dashboard philosophy?",
+          "a": "We believe recruitment is a craft that requires finesse. Therefore, the tool you use should also be carefully designed—worthy of the talent you are seeking."
+        }
+      ]
+    },
+    "footer": {
+      "desc": "Recruiting, simplified.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookie": "Cookie Policy",
+      "support": "Contact Support"
+    }
+  }
+}

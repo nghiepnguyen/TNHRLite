@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { updateJob } from '../services/db';
 import { useToast } from '../contexts/ToastContext';
@@ -10,6 +11,7 @@ import { useToast } from '../contexts/ToastContext';
  */
 const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
   const toast = useToast();
+  const { t } = useTranslation();
   
   // Calculate roles already filled
   const filledRoles = (initialData.totalRoles || 0) - (initialData.openRoles || 0);
@@ -33,11 +35,11 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
     const deadlineDate = new Date(formData.deadline).setHours(0, 0, 0, 0);
 
     if (formData.totalRoles < filledRoles) {
-      newErrors.totalRoles = `Total roles cannot be less than filled roles (${filledRoles}).`;
+      newErrors.totalRoles = t('jobsPage.editForm.errors.headcountTooLow', { count: filledRoles });
     }
 
     if (formData.status === 'Active' && (!formData.deadline || deadlineDate < today)) {
-      newErrors.deadline = "Deadline must be today or in the future for active mandates.";
+      newErrors.deadline = t('jobsPage.editForm.errors.deadlineFuture');
     }
 
     setErrors(newErrors);
@@ -65,11 +67,11 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
         openRoles: Math.max(0, formData.totalRoles - filledRoles)
       };
 
-      toast({ type: 'success', message: 'Mandate updated successfully.' });
+      toast({ type: 'success', message: t('jobsPage.editForm.success') });
       onSuccess?.(updatedMandate);
     } catch (error) {
       console.error(error);
-      toast({ type: 'error', message: 'Failed to update database.' });
+      toast({ type: 'error', message: t('jobsPage.editForm.errors.saveFailed') });
     } finally {
       setIsSubmitting(false);
     }
@@ -91,15 +93,15 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
   return (
     <div className="edit-form-container">
       <div className="form-header">
-        <h3 className="form-title">Edit Mandate Settings</h3>
-        <p className="form-subtitle">Update recruitment parameters for this role</p>
+        <h3 className="form-title">{t('jobsPage.editForm.title')}</h3>
+        <p className="form-subtitle">{t('jobsPage.editForm.subtitle')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="edit-mandate-form">
         <div className="form-grid">
           {/* Status Field */}
           <div className="form-group">
-            <label className="form-label">Mandate Status</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.status')}</label>
             <div className="select-wrapper">
               <select 
                 name="status" 
@@ -107,17 +109,17 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 onChange={handleChange}
                 className="form-control"
               >
-                <option value="Active">Active</option>
-                <option value="On Hold">On Hold</option>
-                <option value="Closed">Closed</option>
-                <option value="Expired">Expired</option>
+                <option value="Active">{t('common.statuses.active')}</option>
+                <option value="On Hold">{t('common.statuses.onHold')}</option>
+                <option value="Closed">{t('common.statuses.closed')}</option>
+                <option value="Expired">{t('common.statuses.expired')}</option>
               </select>
             </div>
           </div>
 
           {/* Deadline Field */}
           <div className="form-group">
-            <label className="form-label">Recruitment Deadline</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.deadline')}</label>
             <div className={`input-with-icon ${errors.deadline ? 'has-error' : ''}`}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">calendar_month</span>
               <input 
@@ -134,7 +136,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
 
           {/* Total Roles Field */}
           <div className="form-group">
-            <label className="form-label">Total Headcount (Roles)</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.headcount')}</label>
             <div className={`input-with-icon ${errors.totalRoles ? 'has-error' : ''}`}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">group</span>
               <input 
@@ -147,13 +149,13 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 required
               />
             </div>
-            <p className="field-hint">Current progress: {filledRoles} filled / {formData.totalRoles} total</p>
+            <p className="field-hint">{t('jobsPage.editForm.progress', { filled: filledRoles, total: formData.totalRoles })}</p>
             {errors.totalRoles && <span className="error-message">{errors.totalRoles}</span>}
           </div>
 
           {/* Working Mode */}
           <div className="form-group">
-            <label className="form-label">Working Mode</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.workingMode')}</label>
             <div className="select-wrapper">
               <span className="input-icon-left"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">public</span></span>
               <select 
@@ -162,16 +164,16 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 onChange={handleChange}
                 className="form-control with-icon"
               >
-                <option value="On-site">On-site</option>
-                <option value="Remote">Remote</option>
-                <option value="Hybrid">Hybrid</option>
+                <option value="On-site">{t('common.workingModes.onsite')}</option>
+                <option value="Remote">{t('common.workingModes.remote')}</option>
+                <option value="Hybrid">{t('common.workingModes.hybrid')}</option>
               </select>
             </div>
           </div>
 
           {/* Salary Range */}
           <div className="form-group">
-            <label className="form-label">Salary Range</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.salary')}</label>
             <div className="input-with-icon">
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">payments</span>
               <input 
@@ -179,7 +181,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 name="salaryRange" 
                 value={formData.salaryRange} 
                 onChange={handleChange}
-                placeholder="e.g. $5,000 - $8,000"
+                placeholder={t('jobsPage.editForm.placeholders.salary')}
                 className="form-control"
               />
             </div>
@@ -187,7 +189,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
 
           {/* HR Contact */}
           <div className="form-group span-2">
-            <label className="form-label">HR Contact Information</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.hrContact')}</label>
             <div className="input-with-icon">
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon">person</span>
               <input 
@@ -195,7 +197,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 name="hrContact" 
                 value={formData.hrContact} 
                 onChange={handleChange}
-                placeholder="Name, Email or Phone of the primary HR contact"
+                placeholder={t('jobsPage.editForm.placeholders.hrContact')}
                 className="form-control"
               />
             </div>
@@ -203,14 +205,14 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
 
           {/* Note Field */}
           <div className="form-group span-2">
-            <label className="form-label">Internal Change Note</label>
+            <label className="form-label">{t('jobsPage.editForm.labels.note')}</label>
             <div className="input-with-icon">
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px] input-icon top">description</span>
               <textarea 
                 name="note" 
                 value={formData.note} 
                 onChange={handleChange}
-                placeholder="Briefly describe the reason for this change (e.g., headcount expansion, budget delay)..."
+                placeholder={t('jobsPage.editForm.placeholders.note')}
                 className="form-control textarea"
                 rows="3"
               />
@@ -220,13 +222,13 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
 
         <div className="form-actions">
           <button type="button" className="btn btn-secondary" onClick={onClose}>
-            Cancel
+            {t('common.actions.cancel')}
           </button>
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
             {isSubmitting ? (
-              <><span className="spinner-loader"></span> Saving...</>
+              <><span className="spinner-loader"></span> {t('common.actions.saving')}</>
             ) : (
-              <><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">save</span> Update Mandate</>
+              <><span className="material-symbols-outlined flex-shrink-0 !text-[18px]">save</span> {t('jobsPage.detail.editSettings')}</>
             )}
           </button>
         </div>

@@ -4,6 +4,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createNotification } from './notification.service';
+import { sendEmail } from './email.service';
+
 
 /**
  * --- USER PROFILE ---
@@ -23,10 +25,64 @@ export const ensureUserProfile = async (user) => {
       photoURL: user.photoURL || '',
       defaultWorkspaceId: null,
       onboarded: false,
+      emailPreferences: {
+        welcome: true,
+        invite: true,
+        newJob: true,
+        newCandidate: true,
+        pipeline: true
+      },
       createdAt: serverTimestamp(),
     };
     await setDoc(doc(db, 'users', user.uid), newProfile);
+
+    // Send Welcome Email
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Welcome to HR-Lite! 🚀",
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <h1 style="color: #2563eb; margin-bottom: 8px;">Welcome to HR-Lite!</h1>
+              <p style="color: #64748b; font-size: 1.2em;">We're excited to have you here.</p>
+            </div>
+            
+            <p>Hi ${user.displayName || 'there'},</p>
+            <p>Your account has been successfully created. HR-Lite is your all-in-one platform for modern recruitment management.</p>
+            
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 24px 0;">
+              <h3 style="margin-top: 0; color: #334155;">Next Steps:</h3>
+              <ul style="color: #475569; padding-left: 20px;">
+                <li>Create or join a <strong>Workspace</strong></li>
+                <li>Post your first <strong>Job Opening</strong></li>
+                <li>Upload candidates and use <strong>AI Parsing</strong></li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="${window.location.origin}/dashboard" style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
+                Get Started
+              </a>
+            </div>
+            
+            <p style="font-size: 0.9em; color: #64748b;">
+              Need help? Just reply to this email or visit our <a href="${window.location.origin}/contact-support" style="color: #2563eb;">support center</a>.
+            </p>
+            
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+            <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">
+              © ${new Date().getFullYear()} HR-Lite. All rights reserved.
+            </p>
+          </div>
+        `
+      });
+    } catch (e) {
+      console.warn("Welcome email skipped or failed:", e);
+    }
+
     return { id: user.uid, ...newProfile };
+
   }
   return profile;
 };
@@ -199,6 +255,47 @@ export const getWorkspaceMembers = async (workspaceId) => {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
+/**
+ * --- EMAIL NOTIFICATIONS HELPERS ---
+ */
+
+/**
+ * Notify all members of a workspace about an event, respecting their email preferences.
+ */
+export const notifyWorkspaceMembers = async (workspaceId, emailData, preferenceKey, excludeUid = null) => {
+  if (!workspaceId) return;
+  
+  try {
+    const members = await getWorkspaceMembers(workspaceId);
+    
+    // Process in parallel with controlled concurrency or just map
+    const notificationPromises = members.map(async (member) => {
+      // Skip the person who performed the action
+      if (excludeUid && member.userId === excludeUid) return;
+
+      try {
+        const profile = await getUserProfile(member.userId);
+        // Default to true if preference is missing (backward compatibility)
+        const isEnabled = profile?.emailPreferences?.[preferenceKey] !== false;
+        
+        if (isEnabled && profile?.email) {
+          return sendEmail({
+            to: profile.email,
+            ...emailData
+          });
+        }
+      } catch (profileErr) {
+        console.error(`Failed to fetch profile or send email to ${member.userId}:`, profileErr);
+      }
+    });
+
+    await Promise.all(notificationPromises);
+  } catch (err) {
+    console.error(`notifyWorkspaceMembers failed for ${preferenceKey}:`, err);
+  }
+};
+
+
 export const removeWorkspaceMember = async (workspaceId, userId, performerId = null, isLeaving = false) => {
   const memberId = `${userId}_${workspaceId}`;
   const batch = writeBatch(db);
@@ -297,8 +394,9 @@ export const inviteMember = async (workspaceId, workspaceName, email, role, invi
   await addDoc(collection(db, 'invites'), {
     workspaceId,
     workspaceName,
-    email: email.toLowerCase(),
+    email: email.trim().toLowerCase(),
     role,
+
     invitedBy: invitedByUid,
     invitedByEmail: invitedByEmail || 'Unknown',
     status: 'pending',
@@ -325,7 +423,58 @@ export const inviteMember = async (workspaceId, workspaceName, email, role, invi
   } catch (err) {
     console.warn("Failed to create invite notification:", err);
   }
+
+  // Send Actual Email via Resend
+  try {
+    // Check preference if user exists in the system
+    const userQuery = query(collection(db, 'users'), where('email', '==', email.toLowerCase()));
+    const userSnap = await getDocs(userQuery);
+    if (!userSnap.empty) {
+      const existingUser = userSnap.docs[0].data();
+      if (existingUser.emailPreferences?.invite === false) {
+        console.log(`Skipping invite email for ${email} due to user preference.`);
+        return;
+      }
+    }
+
+    const inviteLink = `${window.location.origin}/login`;
+    await sendEmail({
+
+      to: email,
+      subject: `Invitation to join ${workspaceName}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2563eb; margin-bottom: 8px;">HR-Lite</h1>
+            <p style="color: #64748b; font-size: 1.1em;">Workspace Invitation</p>
+          </div>
+          
+          <p>Hi there,</p>
+          <p><strong>${invitedByEmail}</strong> has invited you to join the workspace <strong>"${workspaceName}"</strong> as a <strong>${role}</strong>.</p>
+          
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${inviteLink}" style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
+              Accept Invitation
+            </a>
+          </div>
+          
+          <p style="font-size: 0.9em; color: #64748b;">
+            If you already have an account, log in with <strong>${email}</strong> to see your invitation. 
+            If not, please sign up using the same email address.
+          </p>
+          
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+          <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">
+            This invitation was sent by HR-Lite on behalf of ${invitedByEmail}.
+          </p>
+        </div>
+      `
+    });
+  } catch (err) {
+    console.error("Failed to send invitation email:", err);
+  }
 };
+
 
 export const getPendingInvites = async (email) => {
   if (!email) return [];

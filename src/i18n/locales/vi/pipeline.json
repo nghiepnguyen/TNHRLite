@@ -1,0 +1,23 @@
+{
+  "pipelinePage": {
+    "title": "Quy trình tuyển dụng",
+    "subtitle": "Sắp xếp ứng viên bằng cách cập nhật trạng thái hồ sơ của họ.",
+    "searchPlaceholder": "Tìm ứng viên theo tên...",
+    "jobMandate": "Tin tuyển dụng:",
+    "chooseJob": "-- Chọn công việc --",
+    "exportCsv": "Xuất file CSV",
+    "selectJobPrompt": "Vui lòng chọn một tin tuyển dụng đang hoạt động ở trên để xem quy trình.",
+    "errors": {
+      "init": "Không thể tải dữ liệu ban đầu. Vui lòng kiểm tra kết nối hoặc quyền truy cập.",
+      "fetch": "Không thể tải hồ sơ ứng tuyển cho công việc này.",
+      "update": "Cập nhật trạng thái thất bại. Đang khôi phục...",
+      "saveFailed": "Đã xảy ra lỗi khi lưu. Vui lòng thử lại.",
+      "swipeHint": "Vuốt ngang để xem các bước"
+    },
+    "candidateCard": {
+      "noTitle": "Chưa xác định vị trí",
+      "match": "{{score}}% Phù hợp",
+      "today": "Hôm nay"
+    }
+  }
+}

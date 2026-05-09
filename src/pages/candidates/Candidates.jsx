@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
 import { getCandidates } from '../../services/db';
 import Skeleton from '../../components/Skeleton';
 
 export default function Candidates() {
+  const { t, i18n } = useTranslation();
   const { workspaceId } = useParams();
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,17 +26,17 @@ export default function Candidates() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Candidates</h1>
-          <p className="text-secondary">Talent pool and parsed resumes</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>{t('candidatesPage.title')}</h1>
+          <p className="text-secondary">{t('candidatesPage.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Link to={`/dashboard/w/${workspaceId}/candidates/new`} className="btn btn-secondary">
             <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">person_add</span>
-            Manual Entry
+            {t('candidatesPage.manualEntry')}
           </Link>
           <Link to={`/dashboard/w/${workspaceId}/candidates/upload`} className="btn btn-primary">
             <span className="material-symbols-outlined flex-shrink-0 !text-[18px]">upload</span>
-            Upload CV
+            {t('candidatesPage.uploadCv')}
           </Link>
         </div>
       </div>
@@ -44,10 +46,10 @@ export default function Candidates() {
           <table>
             <thead>
               <tr>
-                <th>Candidate Details</th>
-                <th>Current Role</th>
-                <th>Added Date</th>
-                <th style={{ textAlign: 'right' }}>Action</th>
+                <th>{t('candidatesPage.table.details')}</th>
+                <th>{t('candidatesPage.table.role')}</th>
+                <th>{t('candidatesPage.table.addedDate')}</th>
+                <th style={{ textAlign: 'right' }}>{t('candidatesPage.table.action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -79,25 +81,25 @@ export default function Candidates() {
                           <span className="material-symbols-outlined flex-shrink-0 !text-[16px] text-muted">description</span> {cand.fullName}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-                          <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">mail</span> {cand.email || 'No email provided'}
+                          <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">mail</span> {cand.email || t('candidatesPage.noEmail')}
                         </div>
                       </td>
                       <td>
                         <div style={{ fontSize: '0.875rem' }}>
-                          <div style={{ fontWeight: 500 }}>{cand.currentTitle || 'N/A'}</div>
+                          <div style={{ fontWeight: 500 }}>{cand.currentTitle || t('candidatesPage.na')}</div>
                           <span className="text-secondary" style={{ display: 'block', marginTop: '0.125rem' }}>
-                            {cand.currentCompany || 'N/A'}
+                            {cand.currentCompany || t('candidatesPage.na')}
                           </span>
                         </div>
                       </td>
                       <td className="text-secondary" style={{ fontSize: '0.875rem' }}>
                         {cand.createdAt?.toDate 
-                          ? cand.createdAt.toDate().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
-                          : 'Just now'}
+                          ? cand.createdAt.toDate().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                          : t('candidatesPage.justNow')}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <Link to={`/dashboard/w/${workspaceId}/candidates/${cand.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem' }}>
-                          Profile <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">chevron_right</span>
+                          {t('candidatesPage.profile')} <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">chevron_right</span>
                         </Link>
                       </td>
                     </tr>
@@ -106,8 +108,8 @@ export default function Candidates() {
                     <tr>
                       <td colSpan="4" style={{ textAlign: 'center', padding: '3rem' }} className="text-muted">
                         <span className="material-symbols-outlined flex-shrink-0 !text-[32px]" style={{ margin: '0 auto 1rem', opacity: 0.5 }}>description</span>
-                        <p>No candidates found in pool.</p>
-                        <Link to={`/dashboard/w/${workspaceId}/candidates/upload`} className="text-primary" style={{ marginTop: '0.5rem', display: 'inline-block' }}>Upload a CV to parse</Link>
+                        <p>{t('candidatesPage.noCandidates')}</p>
+                        <Link to={`/dashboard/w/${workspaceId}/candidates/upload`} className="text-primary" style={{ marginTop: '0.5rem', display: 'inline-block' }}>{t('candidatesPage.uploadToParse')}</Link>
                       </td>
                     </tr>
                   )}

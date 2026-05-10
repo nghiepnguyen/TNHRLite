@@ -6,6 +6,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import Skeleton from '../../components/Skeleton';
+import { formatDate } from '../../utils/dateUtils';
 
 
 export default function Dashboard() {
@@ -123,7 +124,7 @@ export default function Dashboard() {
     if (diffInSeconds < 60) return t('dashboard.justNow');
     if (diffInSeconds < 3600) return t('dashboard.minsAgo', { count: Math.floor(diffInSeconds / 60) });
     if (diffInSeconds < 86400) return t('dashboard.hoursAgo', { count: Math.floor(diffInSeconds / 3600) });
-    return date.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB');
+    return formatDate(date);
   };
 
   const getActivityMessage = (act) => {

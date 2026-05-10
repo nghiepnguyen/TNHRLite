@@ -4,6 +4,7 @@ import { useToast } from '../contexts/ToastContext';
 
 
 import EditMandateForm from './EditMandateForm';
+import { formatDate } from '../utils/dateUtils';
 
 
 /**
@@ -151,7 +152,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
                 </div>
 
                 <div className="status-deadline">
-                   <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">calendar_month</span> {t('jobsPage.detail.labels.deadline')}: {new Date(mandate.deadline).toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                   <span className="material-symbols-outlined flex-shrink-0 !text-[14px]">calendar_month</span> {t('jobsPage.detail.labels.deadline')}: {formatDate(mandate.deadline)}
                 </div>
               </div>
 
@@ -162,7 +163,7 @@ const MandateDetailModal = ({ mandate, initialMode = 'view', onClose, onAction }
                     <div className="timeline-marker success"></div>
                     <div className="timeline-info">
                       <div className="timeline-title">{t('jobsPage.messages.JOB_CREATED')}</div>
-                       <div className="timeline-date">{new Date(mandate.createdAt).toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+                       <div className="timeline-date">{formatDate(mandate.createdAt)}</div>
                     </div>
                   </div>
                   <div className="timeline-item">

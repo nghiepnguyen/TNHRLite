@@ -36,7 +36,10 @@ export const exportCandidatesToCSV = (applications: any[], candidatesMap: Record
     { header: 'Interview Date', key: 'interviewDate', getter: (app: any) => app.interview?.date },
     { header: 'Interview Status', key: 'interviewStatus', getter: (app: any) => app.interview?.status },
     { header: 'Offer Value', key: 'offerValue', getter: (app: any) => app.offer?.value },
-    { header: 'Applied At', key: 'createdAt', getter: (app: any) => app.createdAt?.seconds ? new Date(app.createdAt.seconds * 1000).toLocaleDateString() : '' }
+    { header: 'Applied At', key: 'createdAt', getter: (app: any) => {
+      const d = app.createdAt?.seconds ? new Date(app.createdAt.seconds * 1000) : null;
+      return d ? new Intl.DateTimeFormat('en-GB').format(d) : '';
+    } }
   ];
 
   // Build CSV Header

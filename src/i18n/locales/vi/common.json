@@ -9,6 +9,21 @@
     "actions": "Thao tác",
     "processing": "Đang xử lý...",
     "recruiter": "Nhà tuyển dụng",
+    "back": "Quay lại",
+    "justNow": "Vừa xong",
+    "roles": {
+      "owner": "Chủ sở hữu",
+      "admin": "Quản trị viên",
+      "member": "Thành viên",
+      "recruiter": "Nhà tuyển dụng"
+    },
+    "statuses": {
+      "active": "Đang hoạt động",
+      "onHold": "Tạm dừng",
+      "closed": "Đã đóng",
+      "expired": "Hết hạn",
+      "draft": "Bản nháp"
+    },
     "stages": {
       "New": "Mới",
       "Reviewed": "Đã duyệt",
@@ -110,6 +125,48 @@
     "tooltips": {
       "markRead": "Đánh dấu đã đọc",
       "delete": "Xóa"
+    },
+    "errors": {
+      "acceptFail": "Không thể chấp nhận lời mời: {{message}}",
+      "declineFail": "Không thể từ chối lời mời: {{message}}"
+    },
+    "history": {
+      "MEMBER_LEFT": {
+        "title": "Đã rời không gian",
+        "message": "Bạn đã rời khỏi \"{{workspaceName}}\" thành công."
+      },
+      "MEMBER_LEFT_OWNER_NOTIFY": {
+        "title": "Thành viên đã rời đi",
+        "message": "{{userEmail}} đã rời khỏi không gian \"{{workspaceName}}\" của bạn."
+      },
+      "MEMBER_REMOVED": {
+        "title": "Quyền thành viên bị thu hồi",
+        "message": "Quyền truy cập của bạn vào \"{{workspaceName}}\" đã bị quản trị viên xóa."
+      },
+      "MEMBER_REMOVED_PERFORMER_NOTIFY": {
+        "title": "Đã xóa thành viên",
+        "message": "Bạn đã xóa thành công {{userEmail}} khỏi \"{{workspaceName}}\"."
+      },
+      "INVITE_RECEIVED": {
+        "title": "Lời mời không gian mới",
+        "message": "Bạn đã được mời tham gia \"{{workspaceName}}\" với vai trò {{role}}."
+      },
+      "INVITE_ACCEPTED": {
+        "title": "Đã chấp nhận lời mời",
+        "message": "Bạn đã tham gia vào \"{{workspaceName}}\"."
+      },
+      "INVITE_ACCEPTED_BY_USER": {
+        "title": "Lời mời đã được chấp nhận",
+        "message": "{{userEmail}} đã chấp nhận lời mời tham gia \"{{workspaceName}}\" của bạn."
+      },
+      "INVITE_DECLINED": {
+        "title": "Đã từ chối lời mời",
+        "message": "Bạn đã từ chối lời mời tham gia \"{{workspaceName}}\"."
+      },
+      "INVITE_DECLINED_BY_USER": {
+        "title": "Lời mời bị từ chối",
+        "message": "{{userEmail}} đã từ chối lời mời tham gia \"{{workspaceName}}\" của bạn."
+      }
     }
   },
   "verify": {

@@ -53,7 +53,7 @@
     "tabs": {
       "all": "Tất cả",
       "active": "Hoạt động",
-      "onhold": "Tạm dừng",
+      "onHold": "Tạm dừng",
       "closed": "Đã đóng"
     },
     "filters": {

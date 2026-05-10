@@ -53,7 +53,7 @@
     "tabs": {
       "all": "All",
       "active": "Active",
-      "onhold": "On Hold",
+      "onHold": "On Hold",
       "closed": "Closed"
     },
     "filters": {

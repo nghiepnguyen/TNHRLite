@@ -103,11 +103,12 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           <div className="form-group">
             <label className="form-label">{t('jobsPage.editForm.labels.status')}</label>
             <div className="select-wrapper">
+              <span className="input-icon-left"><span className="material-symbols-outlined flex-shrink-0 !text-[16px]">info</span></span>
               <select 
                 name="status" 
                 value={formData.status} 
                 onChange={handleChange}
-                className="form-control"
+                className="form-control with-icon"
               >
                 <option value="Active">{t('common.statuses.active')}</option>
                 <option value="On Hold">{t('common.statuses.onHold')}</option>
@@ -127,7 +128,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 name="deadline" 
                 value={formData.deadline} 
                 onChange={handleChange}
-                className="form-control"
+                className="form-control with-icon"
                 required
               />
             </div>
@@ -145,7 +146,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 value={formData.totalRoles} 
                 onChange={handleChange}
                 min={filledRoles}
-                className="form-control"
+                className="form-control with-icon"
                 required
               />
             </div>
@@ -182,7 +183,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 value={formData.salaryRange} 
                 onChange={handleChange}
                 placeholder={t('jobsPage.editForm.placeholders.salary')}
-                className="form-control"
+                className="form-control with-icon"
               />
             </div>
           </div>
@@ -198,7 +199,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 value={formData.hrContact} 
                 onChange={handleChange}
                 placeholder={t('jobsPage.editForm.placeholders.hrContact')}
-                className="form-control"
+                className="form-control with-icon"
               />
             </div>
           </div>
@@ -213,7 +214,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
                 value={formData.note} 
                 onChange={handleChange}
                 placeholder={t('jobsPage.editForm.placeholders.note')}
-                className="form-control textarea"
+                className="form-control textarea with-icon"
                 rows="3"
               />
             </div>
@@ -287,6 +288,7 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           top: 50%;
           transform: translateY(-50%);
           color: var(--color-text-muted);
+          pointer-events: none;
         }
 
         .input-icon.top {
@@ -298,7 +300,8 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           appearance: none;
           -webkit-appearance: none;
           width: 100%;
-          padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+          box-sizing: border-box;
+          padding: 0.625rem 0.75rem 0.625rem 0.75rem;
           border: 1px solid var(--color-surface-border);
           border-radius: var(--radius-md);
           font-size: 0.875rem;
@@ -313,15 +316,20 @@ const EditMandateForm = ({ initialData, onSuccess, onClose }) => {
           transform: translateY(-50%);
           color: var(--color-text-muted);
           z-index: 1;
+          pointer-events: none;
         }
 
         .form-control.with-icon {
-          padding-left: 2.25rem;
+          padding-left: 2.75rem !important;
         }
 
         select.form-control {
           padding-left: 0.75rem;
           padding-right: 2.25rem;
+        }
+
+        select.form-control.with-icon {
+          padding-left: 2.75rem !important;
         }
 
         .form-control:focus {

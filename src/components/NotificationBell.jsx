@@ -10,6 +10,7 @@ import {
   deleteNotification,
   createNotification 
 } from '../services/notification.service';
+import { formatDate } from '../utils/dateUtils';
 import './NotificationBell.css';
 
 export default function NotificationBell() {
@@ -88,7 +89,7 @@ export default function NotificationBell() {
       setShowReviewModal(false);
       setActiveInvite(null);
     } catch (err) {
-      alert("Failed to accept invite: " + err.message);
+      alert(t('notifications.errors.acceptFail', { message: err.message }));
     } finally {
       setIsProcessing(false);
     }
@@ -102,7 +103,7 @@ export default function NotificationBell() {
       setShowReviewModal(false);
       setActiveInvite(null);
     } catch (err) {
-      alert("Failed to decline invite: " + err.message);
+      alert(t('notifications.errors.declineFail', { message: err.message }));
     } finally {
       setIsProcessing(false);
     }
@@ -110,17 +111,38 @@ export default function NotificationBell() {
 
 
   const combinedItems = [
-    ...notifications.map(n => ({ ...n, itemType: 'notification' })),
     ...pendingInvites.map(i => ({
       id: i.id,
       title: t('notifications.invitation.title'),
-      message: t('notifications.invitation.message', { workspaceName: i.workspaceName, role: i.role }),
+      message: t('notifications.invitation.message', { 
+        workspaceName: i.workspaceName, 
+        role: i.role ? t(`common.roles.${i.role.toLowerCase()}`) : '' 
+      }),
       type: 'success',
       status: 'unread',
       createdAt: i.createdAt,
       itemType: 'invite',
       originalInvite: i
-    }))
+    })),
+    ...notifications.map(n => {
+      const action = n.metadata?.action;
+      const roleKey = n.metadata?.role || n.role;
+      const localizedRole = roleKey ? t(`common.roles.${roleKey.toLowerCase()}`) : '';
+      
+      if (action && t(`notifications.history.${action}.title`) !== `notifications.history.${action}.title`) {
+        return {
+          ...n,
+          title: t(`notifications.history.${action}.title`),
+          message: t(`notifications.history.${action}.message`, { 
+            workspaceName: n.workspaceName || n.metadata?.workspaceName, 
+            userEmail: n.metadata?.userEmail,
+            role: localizedRole
+          }),
+          itemType: 'notification'
+        };
+      }
+      return { ...n, itemType: 'notification' };
+    })
   ].sort((a, b) => {
     const timeA = a.createdAt?.seconds || 0;
     const timeB = b.createdAt?.seconds || 0;
@@ -174,7 +196,7 @@ export default function NotificationBell() {
                     <div className="notif-title-row">
                       <span className="notif-title">{item.title}</span>
                       <span className="notif-time">
-                        {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                        {item.createdAt ? formatDate(item.createdAt) : t('common.justNow')}
                       </span>
                     </div>
                     <p className="notif-message">{item.message}</p>
@@ -227,7 +249,7 @@ export default function NotificationBell() {
               </div>
               <div className="invite-detail-row">
                 <span className="label">{t('notifications.invitation.requestedRole')}</span>
-                <span className="value capitalize">{activeInvite.role}</span>
+                <span className="value capitalize">{t(`common.roles.${activeInvite.role.toLowerCase()}`)}</span>
               </div>
             </div>
 

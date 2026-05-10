@@ -13,6 +13,7 @@ import {
 } from '../../services/workspace.service';
 import { useToast } from '../../contexts/ToastContext';
 import { logActivity } from '../../services/db';
+import { formatDate } from '../../utils/dateUtils';
 
 export default function Members() {
   const { workspaceId } = useParams();
@@ -230,7 +231,7 @@ export default function Members() {
                       </td>
                       <td>{getRoleBadge(member.role)}</td>
                       <td className="text-secondary" style={{ fontSize: '0.875rem' }}>
-                        {member.joinedAt?.toDate ? member.joinedAt.toDate().toLocaleDateString() : 'N/A'}
+                        {member.joinedAt ? formatDate(member.joinedAt) : 'N/A'}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         {canManage && member.role !== 'owner' && member.userId !== userProfile?.id && (
@@ -285,7 +286,7 @@ export default function Members() {
                         <td>{getRoleBadge(invite.role)}</td>
                         <td>{getStatusBadge(invite.status)}</td>
                         <td className="text-secondary" style={{ fontSize: '0.875rem' }}>
-                          {invite.createdAt?.toDate ? invite.createdAt.toDate().toLocaleDateString() : 'N/A'}
+                          {invite.createdAt ? formatDate(invite.createdAt) : 'N/A'}
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import { getCandidates } from '../../services/db';
 import Skeleton from '../../components/Skeleton';
+import { formatDate } from '../../utils/dateUtils';
 
 export default function Candidates() {
   const { t, i18n } = useTranslation();
@@ -93,8 +94,8 @@ export default function Candidates() {
                         </div>
                       </td>
                       <td className="text-secondary" style={{ fontSize: '0.875rem' }}>
-                        {cand.createdAt?.toDate 
-                          ? cand.createdAt.toDate().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                        {cand.createdAt 
+                          ? formatDate(cand.createdAt)
                           : t('candidatesPage.justNow')}
                       </td>
                       <td style={{ textAlign: 'right' }}>

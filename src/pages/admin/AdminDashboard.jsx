@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
 import { auth } from '../../firebase';
+import { formatDate } from '../../utils/dateUtils';
 
 const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : '/api';
 
@@ -134,7 +135,7 @@ export default function AdminDashboard() {
                       {u.uid === currentUser?.uid && <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>Bạn</span>}
                     </td>
                     <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>
-                      {new Date(u.creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                      {formatDate(u.creationTime)}
                     </td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.jobsCount}</td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.candidatesCount}</td>

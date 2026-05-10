@@ -8,6 +8,7 @@ import MandateDetailModal from '../../components/MandateDetailModal';
 import MandatesTable from '../../components/MandatesTable';
 import { useToast } from '../../contexts/ToastContext';
 import Skeleton from '../../components/Skeleton';
+import { formatDate } from '../../utils/dateUtils';
 
 /**
  * Optimized Mandates Dashboard
@@ -145,7 +146,7 @@ export default function Jobs() {
         const newDeadline = new Date(mandate.deadline);
         newDeadline.setDate(newDeadline.getDate() + 30);
         await updateJob(mandate.id, { deadline: newDeadline.toISOString() });
-        toast({ type: 'success', message: t('jobsPage.messages.extendSuccess', { date: newDeadline.toLocaleDateString(t('common.locale')) }) });
+        toast({ type: 'success', message: t('jobsPage.messages.extendSuccess', { date: formatDate(newDeadline) }) });
       }
       setRefreshKey(prev => prev + 1);
     } catch (err) {

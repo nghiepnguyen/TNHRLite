@@ -30,3 +30,11 @@ service-account.json
 
 # Firebase
 .firebase/
+
+# Virtual Environments
+myenv/
+venv/
+.venv/
+
+# Knowledge Graph
+graphify-out/

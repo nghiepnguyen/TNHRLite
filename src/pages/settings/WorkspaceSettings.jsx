@@ -7,6 +7,7 @@ import { db } from '../../firebase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { getWorkspaceMembers, inviteMember, updateWorkspace, deleteWorkspace, getWorkspaceInvites, deleteInvite } from '../../services/workspace.service';
 import { useToast } from '../../contexts/ToastContext';
+import { formatDate } from '../../utils/dateUtils';
 
 export default function WorkspaceSettings() {
   const { workspaceId } = useParams();
@@ -95,7 +96,7 @@ export default function WorkspaceSettings() {
     if (diffInSeconds < 60) return t('settings.activity.justNow');
     if (diffInSeconds < 3600) return t('settings.activity.ago', { count: Math.floor(diffInSeconds / 60), unit: 'm' });
     if (diffInSeconds < 86400) return t('settings.activity.ago', { count: Math.floor(diffInSeconds / 3600), unit: 'h' });
-    return date.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB');
+    return formatDate(date);
   };
 
   const getActivityMessage = (act) => {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useToast } from '../contexts/ToastContext';
 import Skeleton from './Skeleton';
+import { formatDate } from '../utils/dateUtils';
 
 /**
  * MandatesTable Component - Phase 2 & 4 Improvement
@@ -48,7 +49,7 @@ const MandatesTable = ({ mandates, onRowClick, onAction, loading }) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     return {
-      formatted: date.toLocaleDateString(t('common.locale') === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      formatted: formatDate(deadline),
       isExpiringSoon: diffDays > 0 && diffDays < 14,
       isExpired: diffDays <= 0
     };

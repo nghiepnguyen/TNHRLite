@@ -9,6 +9,21 @@
     "actions": "Actions",
     "processing": "Processing...",
     "recruiter": "Recruiter",
+    "back": "Back",
+    "justNow": "Just now",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member",
+      "recruiter": "Recruiter"
+    },
+    "statuses": {
+      "active": "Active",
+      "onHold": "On Hold",
+      "closed": "Closed",
+      "expired": "Expired",
+      "draft": "Draft"
+    },
     "stages": {
       "New": "New",
       "Reviewed": "Reviewed",
@@ -110,6 +125,48 @@
     "tooltips": {
       "markRead": "Mark as read",
       "delete": "Delete"
+    },
+    "errors": {
+      "acceptFail": "Failed to accept invite: {{message}}",
+      "declineFail": "Failed to decline invite: {{message}}"
+    },
+    "history": {
+      "MEMBER_LEFT": {
+        "title": "Workspace Left",
+        "message": "You have successfully left \"{{workspaceName}}\"."
+      },
+      "MEMBER_LEFT_OWNER_NOTIFY": {
+        "title": "Member Departed",
+        "message": "{{userEmail}} has left your workspace \"{{workspaceName}}\"."
+      },
+      "MEMBER_REMOVED": {
+        "title": "Membership Revoked",
+        "message": "Your access to \"{{workspaceName}}\" has been removed by an administrator."
+      },
+      "MEMBER_REMOVED_PERFORMER_NOTIFY": {
+        "title": "Member Removed",
+        "message": "You have successfully removed {{userEmail}} from \"{{workspaceName}}\"."
+      },
+      "INVITE_RECEIVED": {
+        "title": "New Workspace Invitation",
+        "message": "You have been invited to join \"{{workspaceName}}\" as a {{role}}."
+      },
+      "INVITE_ACCEPTED": {
+        "title": "Invitation Accepted",
+        "message": "You have joined \"{{workspaceName}}\"."
+      },
+      "INVITE_ACCEPTED_BY_USER": {
+        "title": "Invitation Accepted",
+        "message": "{{userEmail}} has accepted your invitation to join \"{{workspaceName}}\"."
+      },
+      "INVITE_DECLINED": {
+        "title": "Invitation Declined",
+        "message": "You declined the invitation to join \"{{workspaceName}}\"."
+      },
+      "INVITE_DECLINED_BY_USER": {
+        "title": "Invitation Declined",
+        "message": "{{userEmail}} has declined your invitation to join \"{{workspaceName}}\"."
+      }
     }
   },
   "verify": {

@@ -349,6 +349,62 @@ app.post('/api/send-email', authenticate, async (req, res) => {
 });
 
 
+/**
+ * Public Support Email Endpoint
+ */
+app.post('/api/support', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+    
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ error: 'Tất cả các trường đều là bắt buộc.' });
+    }
+
+    const recipient = 'thanhnghiep.top@gmail.com';
+    const supportSubject = `[SUPPORT] ${subject} - Từ: ${name}`;
+    const supportHtml = `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #007bff;">Yêu cầu hỗ trợ mới</h2>
+        <p><strong>Họ tên:</strong> ${name}</p>
+        <p><strong>Email khách hàng:</strong> ${email}</p>
+        <p><strong>Chủ đề:</strong> ${subject}</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p><strong>Nội dung:</strong></p>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">
+          ${message}
+        </div>
+      </div>
+    `;
+
+    if (!resend) {
+      console.log('Mock support email (Local):', { recipient, supportSubject });
+      return res.json({ 
+        success: true, 
+        message: 'Request received (Mock mode - RESEND_API_KEY missing).',
+        mock: true 
+      });
+    }
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      to: [recipient],
+      replyTo: email,
+      subject: supportSubject,
+      html: supportHtml
+    });
+
+    if (error) {
+      return res.status(400).json({ error: 'Resend API Error', details: error });
+    }
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error in /support endpoint:', error);
+    res.status(500).json({ error: 'Lỗi hệ thống khi gửi yêu cầu hỗ trợ.', details: error.message });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`AI Proxy Server running on port ${PORT}`);
 });

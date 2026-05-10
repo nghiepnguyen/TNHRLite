@@ -47,3 +47,37 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     return { success: false, error: error.message };
   }
 };
+
+/**
+ * Sends a public support inquiry.
+ * No authentication required.
+ */
+export const sendSupportEmail = async (formData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/support`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response received:", text);
+      throw new Error("Máy chủ trả về định dạng không hợp lệ. Vui lòng kiểm tra lại backend.");
+    }
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || response.statusText);
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Failed to send support email:", error);
+    return { success: false, error: error.message };
+  }
+};

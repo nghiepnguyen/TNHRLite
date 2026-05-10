@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 
 import { getJob, deleteJob } from '../../services/db';
 import SEO from '../../components/common/SEO';
+import { formatDate } from '../../utils/dateUtils';
 
 export default function JobDetail() {
   const { t, i18n } = useTranslation();
@@ -72,7 +73,7 @@ export default function JobDetail() {
                 <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">work</span> {job.employmentType || t('jobsPage.detail.fullTime')}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">calendar_month</span> {t('jobsPage.detail.created')} {job.createdAt?.toDate ? job.createdAt.toDate().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : t('dashboard.justNow')}
+                <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">calendar_month</span> {t('jobsPage.detail.created')} {job.createdAt ? formatDate(job.createdAt) : t('dashboard.justNow')}
               </div>
             </div>
           </div>

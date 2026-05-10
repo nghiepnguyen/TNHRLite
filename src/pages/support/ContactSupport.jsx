@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import LegalLayout from '../../layouts/LegalLayout';
+import { sendSupportEmail } from '../../services/email.service';
+import { useToast } from '../../contexts/ToastContext';
 
 const ContactSupport = () => {
   const [formData, setFormData] = useState({
@@ -10,14 +12,29 @@ const ContactSupport = () => {
   });
   const [status, setStatus] = useState(null);
 
-  const handleSubmit = (e) => {
+  const toast = useToast();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('sending');
-    // Simulate sending
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 1500);
+    
+    try {
+      const result = await sendSupportEmail(formData);
+      
+      if (result.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error(result.error || 'Failed to send');
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus('error');
+      toast({ 
+        type: 'error', 
+        message: 'Không thể gửi yêu cầu. Vui lòng thử lại sau hoặc gửi email trực tiếp.' 
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -38,7 +55,7 @@ const ContactSupport = () => {
                 </div>
                 <div>
                   <div className="text-xs font-bold uppercase opacity-50">Email</div>
-                  <div className="font-medium">admin@thanhnghiep.top</div>
+                  <div className="font-medium">thanhnghiep.top@gmail.com</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">

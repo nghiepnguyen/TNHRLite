@@ -13,6 +13,10 @@
 - Bộ phận HR của các startup, doanh nghiệp vừa và nhỏ (SME).
 - Quản lý tuyển dụng nội bộ.
 
+## Hệ thống Tri thức & Kiến trúc (Knowledge Graph)
+Dự án áp dụng công nghệ **Graphify** để quản trị tri thức mã nguồn. Bạn có thể tra cứu mối quan hệ giữa các thành phần, xem bản đồ kiến trúc và hỏi các câu hỏi phức tạp về hệ thống thông qua đồ thị tri thức.
+- Chi tiết xem tại: [Knowledge Graph (Graphify)](file:///Users/nghiepnguyen/My%20Files/HR-Lite/docs/9_graphify.md)
+
 ---
 
 *Tham khảo các phần tiếp theo để hiểu rõ hơn về kỹ thuật và luồng nghiệp vụ của hệ thống.*

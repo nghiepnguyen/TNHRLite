@@ -7,6 +7,8 @@ HR-Lite sử dụng các công nghệ hiện đại, kết hợp kiến trúc Se
 - **Kiến trúc:** CSR (Client-Side Rendering) kết hợp với Serverless Backend (Cloud Functions).
 - **Backend-as-a-Service (BaaS):** Firebase.
 - **AI Service:** Google Gemini AI.
+- **Email Service:** Resend (via Cloud Functions).
+- **Knowledge Engine:** Graphify (Architecture Mapping).
 
 ## Các công nghệ cốt lõi
 
@@ -16,5 +18,7 @@ HR-Lite sử dụng các công nghệ hiện đại, kết hợp kiến trúc Se
 4. **Storage:** Firebase Cloud Storage (Lưu trữ ảnh, CV dạng PDF, DOCX).
 5. **Authentication:** Firebase Auth (Email/Password, Google OAuth).
 6. **Backend/API:** Firebase Cloud Functions (Node.js 22).
+7. **Email Notification:** Resend API integration.
+8. **Documentation & Graph:** Graphify CLI.
 
 Với stack này, hệ thống gần như không cần quản lý máy chủ vật lý, khả năng scale (mở rộng) dễ dàng thông qua hệ sinh thái của Google Cloud.

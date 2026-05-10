@@ -23,6 +23,10 @@ Cấu trúc Data được gom nhóm theo Workspace hoặc User nhằm bảo mậ
   3. Gửi văn bản này sang **Google Gemini API** (`@google/genai`).
   4. Lấy cấu trúc JSON trả về (họ tên, email, kỹ năng, kinh nghiệm).
   5. Trả dữ liệu JSON sạch về cho Frontend tạo Candidate.
+**Endpoint Mới:** `/api/send-support-email`
+- **Nhiệm vụ:** Gửi yêu cầu hỗ trợ từ người dùng đến đội ngũ quản trị thông qua **Resend Service**. Tự động đính kèm thông tin context của User (UID, Email) để hỗ trợ nhanh hơn.
+**Endpoint Admin:** `/api/admin/*`
+- **Nhiệm vụ:** Các tác vụ quản trị hệ thống (Quản lý User, Thống kê toàn cục). Yêu cầu Token có quyền `admin` được kiểm tra qua middleware `verifyAdmin`.
 
 ## 3. Quy ước định tuyến API (Routing)
 

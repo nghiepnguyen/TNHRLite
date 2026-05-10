@@ -28,3 +28,9 @@ Mọi hành động quan trọng liên quan đến nhân sự đều kích hoạ
 - **Service:** `src/services/notification.service.js` (Xử lý CRUD thông báo).
 - **Component:** `src/components/NotificationBell.jsx` (Giao diện Chuông & Modal Review).
 - **Security:** Quy tắc Firestore đảm bảo người dùng chỉ có thể đọc/xóa thông báo của chính mình qua `resource.data.userId == request.auth.uid`.
+
+## 5. Thông báo qua Email (Email Notifications)
+Ngoài thông báo trong ứng dụng (In-app), HR-Lite tích hợp dịch vụ **Resend** để gửi email cho các sự kiện quan trọng:
+- **Lời mời Workspace:** Khi một User được mời vào Workspace mới, hệ thống sẽ gửi một email chuyên nghiệp kèm nút "View Invitation".
+- **Yêu cầu hỗ trợ:** Phản hồi xác nhận khi User gửi form Contact Support.
+- **Tính năng mở rộng:** (Sắp ra mắt) Thông báo khi có ứng viên mới phù hợp (AI Matching Alert).

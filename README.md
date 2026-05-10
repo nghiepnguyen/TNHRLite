@@ -18,6 +18,8 @@
   - **Hosting**: Fast and secure web hosting.
   - **Cloud Functions**: Serverless backend for heavy processing (Node.js 22).
 - **AI Integration**: Google Gemini AI (via SDK for candidate analysis and automated screening).
+- **Email Service**: Resend (for system notifications and invitations).
+- **Knowledge Graph**: [Graphify](docs/9_graphify.md) (Architecture mapping and semantic navigation).
 
 ## 📂 Folder Structure
 

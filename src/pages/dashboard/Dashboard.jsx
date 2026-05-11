@@ -4,15 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { getJobs, getCandidates, getAllApplications } from '../../services/db';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { useWorkspace } from '../../contexts/WorkspaceContext';
 import Skeleton from '../../components/Skeleton';
 import { formatDate } from '../../utils/dateUtils';
 
 
 export default function Dashboard() {
   const { workspaceId } = useParams();
-  const { pendingInvites } = useWorkspace();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -74,9 +72,6 @@ export default function Dashboard() {
       const job = jobs.find(j => j.id === app.jobId);
       return { ...app, candidateInfo: cand, jobInfo: job };
     });
-
-  // Recent Activity (Approximated by returning latest sorted applications/candidates)
-  const recentActivity = [...candidates].slice(0, 3);
 
   // Jobs Needing Attention (Active jobs with 0 New/Review applications)
 

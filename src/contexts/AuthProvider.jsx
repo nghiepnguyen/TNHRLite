@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -7,17 +7,12 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
   sendEmailVerification,
   reload
 } from 'firebase/auth';
 
-const AuthContext = createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
+import { AuthContext } from './AuthContext';
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);

@@ -8,32 +8,15 @@
       "getStarted": "Bắt đầu ngay"
     },
     "hero": {
-      "badge": "HR Lite dành cho Nhà tuyển dụng độc lập",
-      "title": "Thoát khỏi Excel và dữ liệu rời rạc trong tuyển dụng",
-      "description": "Thay thế các bảng tính rườm rà bằng một dashboard tinh gọn, được thiết kế riêng cho recruiter độc lập và đội ngũ nhỏ.",
-      "getStarted": "Bắt đầu ngay",
+      "badge": "Trí tuệ Biên tập cho Nhà tuyển dụng",
+      "title": "Thiết kế tuyển dụng thu hút mọi ánh nhìn.",
+      "description": "Loại bỏ bảng tính. Trải nghiệm dashboard tuyển dụng hiệu suất cao được xây dựng cho các kiến trúc sư tài năng hiện đại.",
+      "getStarted": "Khám phá Dashboard",
       "stats": {
-        "activeJobs": "Việc đang tuyển",
-        "matchScore": "Điểm tương thích",
-        "candidates": "Ứng viên",
-        "progress": "Tiến độ"
-      },
-      "preview": {
-        "jobList": "Danh sách công việc",
-        "status": {
-          "active": "đang tuyển",
-          "onHold": "tạm dừng"
-        },
-        "job1": {
-          "title": "Product Designer",
-          "owner": "Phụ trách: Minh Nguyễn",
-          "deadline": "Hạn: 20/12"
-        },
-        "job2": {
-          "title": "Frontend Engineer",
-          "owner": "Phụ trách: Lan Anh",
-          "deadline": "Hạn: 15/12"
-        }
+        "activeJobs": "Vận hành",
+        "matchScore": "Trí tuệ",
+        "candidates": "Nguồn tài năng",
+        "progress": "Tốc độ"
       }
     },
     "painPoints": {
@@ -63,9 +46,8 @@
     },
     "workflow": {
       "title": "Quy trình Dashboard",
-      "subtitle": "Sự chuyển đổi liền mạch từ tìm kiếm đến tuyển dụng thành công.",
       "steps": {
-        "createJob": "Tạo việc",
+        "createJob": "Tạo công việc",
         "addCandidate": "Thêm ứng viên",
         "matching": "Đối soát",
         "pipeline": "Quy trình",
@@ -75,163 +57,90 @@
     "features": {
       "jobCenter": {
         "tag": "Cấu trúc",
-        "title": "Trung tâm điều hành tuyển dụng",
-        "desc": "Tổ chức các vị trí theo khách hàng, mức độ ưu tiên hoặc trạng thái. Giao diện hiện đại giúp bạn nắm bắt nhanh thông tin và thao tác ngay khi cần.",
+        "title": "Trung tâm Điều hành Tuyển dụng",
+        "desc": "Tổ chức các vị trí theo tầm ảnh hưởng, mức độ ưu tiên hoặc khách hàng. Giao diện độ phân giải cao giúp bạn thực thi với sự chính xác tuyệt đối.",
         "points": [
-          "Gán thẻ tùy chỉnh cho các loại vai trò đặc thù",
-          "Chia sẻ trực tiếp qua cổng thông tin khách hàng",
-          "Tạo mô tả công việc chỉ với một cú nhấp chuột"
-        ],
-        "preview": {
-          "title": "Danh mục Tuyển dụng",
-          "add": "+ Thêm mới",
-          "status": {
-            "active": "đang tuyển",
-            "completed": "hoàn thành"
-          }
-        }
+          "Gán thẻ ngữ nghĩa cho các vai trò phức tạp",
+          "Tự động tạo bản tóm tắt yêu cầu",
+          "Chia sẻ cổng thông tin khách hàng chỉ với một cú nhấp"
+        ]
       },
       "candidateProfile": {
-        "tag": "Hồ sơ",
-        "title": "Hồ sơ ứng viên, được tái định nghĩa",
-        "desc": "Không còn phải lục tìm trong file PDF. Hệ thống tự động trích xuất và hiển thị những thông tin quan trọng theo cách rõ ràng, dễ đọc.",
+        "tag": "Tuyển lựa",
+        "title": "Hồ sơ Tài năng, Được Tái định nghĩa",
+        "desc": "Không còn phải lục tìm trong file PDF. Hệ thống của chúng tôi chắt lọc CV thô thành những hồ sơ tinh tế, làm nổi bật con người thực sự đằng sau văn bản.",
         "points": [
-          "Tự động phân tích CV thông minh",
-          "Tích hợp tra cứu hồ sơ mạng xã hội",
-          "Ghi chú phỏng vấn với định dạng linh hoạt, dễ trình bày."
-        ],
-        "preview": {
-          "exp": "6 năm kinh nghiệm",
-          "expLabel": "Kinh nghiệm",
-          "source": "LinkedIn",
-          "sourceLabel": "Nguồn",
-          "quote": "\"Kỹ năng tư duy sản phẩm rất tốt, xử lý vấn đề linh hoạt.\"",
-          "recommend": "Đề xuất cao"
-        }
+          "Công cụ trích xuất CV bằng mạng thần kinh",
+          "Tích hợp tra cứu dấu chân mạng xã hội",
+          "Nhật ký phỏng vấn theo ngữ cảnh"
+        ]
       },
       "matchScore": {
         "tag": "Trí tuệ",
-        "title": "Tính điểm Phù hợp bằng Thuật toán",
-        "desc": "Xem ngay ứng viên nào phù hợp nhất với yêu cầu công việc của bạn dựa trên kỹ năng, kinh nghiệm và kỳ vọng về ngân sách.",
+        "title": "Đối soát Chính xác bằng Thuật toán",
+        "desc": "Nhận diện ngay lập tức nhóm 1% ưu tú trong nguồn ứng viên của bạn. Công cụ tính điểm đánh giá kỹ năng, sự phù hợp văn hóa và kỳ vọng thị trường.",
         "points": [
-          "Nhận diện lỗ hổng kỹ năng",
-          "Theo dõi và đối chiếu kỳ vọng lương thưởng của ứng viên.",
-          "Đề xuất câu hỏi đánh giá mức độ phù hợp văn hóa."
-        ],
-        "preview": {
-          "label": "Điểm tương thích",
-          "skills": "Kỹ năng",
-          "exp": "Kinh nghiệm"
-        }
-      },
-      "visualPipeline": {
-        "tag": "Hiệu quả",
-        "title": "Theo dõi Quy trình Trực quan",
-        "desc": "Bảng Kanban mượt mà, không còn cảm giác gò bó như bảng tính. Kéo thả dễ dàng và theo dõi tiến trình một cách trực quan.",
-        "points": [
-          "Kéo thả ứng viên giữa các giai đoạn dễ dàng",
-          "Tự động nhắc lịch theo dõi",
-          "Phân tích thời gian ở từng giai đoạn"
-        ],
-        "preview": {
-          "screening": "Sàng lọc",
-          "interview": "Phỏng vấn",
-          "offer": "Đề nghị"
-        }
+          "Phân tích lỗ hổng kỹ năng chi tiết",
+          "Đối chiếu mức lương tương xứng thị trường",
+          "Đánh giá mức độ phù hợp hành vi"
+        ]
       },
       "dataDriven": {
-        "tag": "Sự minh bạch",
-        "title": "Dữ liệu giúp bạn ra quyết định tốt hơn",
-        "desc": "Hiểu rõ toàn bộ phễu tuyển dụng trong một cái nhìn. Dễ dàng theo dõi tỷ lệ chuyển đổi, thời gian tuyển dụng và chất lượng nguồn ứng viên.",
+        "tag": "Sự rõ ràng",
+        "title": "Phân tích cho Tuyển dụng Cấp cao",
+        "desc": "Biến trực giác thành bằng chứng. Các chỉ số thời gian thực về tốc độ chuyển đổi, chất lượng nguồn và hiệu quả tuyển dụng ngay trong tầm tay.",
         "points": [
-          "Theo dõi xu hướng tuyển dụng theo thời gian",
-          "Báo cáo mức độ hài lòng của khách hàng",
-          "Phát hiện điểm rò rỉ trong phễu tuyển dụng"
-        ],
-        "preview": {
-          "conversion": "Tỷ lệ chuyển đổi",
-          "avgHiring": "Tuyển dụng TB",
-          "hiringTime": "18 ngày",
-          "workload": "Khối lượng công việc theo tháng",
-          "topSource": "Nguồn tốt nhất: LinkedIn",
-          "trend": "+2.1% so với tháng trước",
-          "timeDesc": "Thời gian tuyển dụng trung bình"
-        }
+          "Theo dõi tốc độ dòng chảy phễu",
+          "Phân tích phân bổ nguồn ứng viên",
+          "Dự báo xu hướng tuyển dụng"
+        ]
       }
     },
     "howItWorks": {
-      "title": "Thiết lập trong vài phút, không phải vài ngày.",
+      "title": "Quy trình của Sự Xuất sắc",
       "steps": [
         {
-          "title": "Tạo công việc đầu tiên",
-          "desc": "Nhập yêu cầu từ PDF hoặc link. HR Lite tự động xây dựng cấu trúc tuyển dụng sẵn sàng để bắt đầu."
+          "title": "Xác định Yêu cầu",
+          "desc": "Nhập yêu cầu từ bất kỳ nguồn nào. HR Lite xây dựng ma trận tuyển dụng có cấu trúc ngay lập tức."
         },
         {
-          "title": "Thêm ứng viên & ghi chú",
-          "desc": "Tải lên CV hàng loạt hoặc thêm thủ công. Ghi chú phỏng vấn được lưu ngay cạnh từng ứng viên."
+          "title": "Tuyển lựa Tài năng",
+          "desc": "Nhập hàng loạt hoặc thêm thủ công. Mọi hồ sơ đều được nâng tầm với thông tin chuyên sâu từ AI và nhật ký phỏng vấn."
         },
         {
-          "title": "Theo dõi quy trình",
-          "desc": "Trực quan hóa toàn bộ hành trình từ sàng lọc đến tuyển chọn với bảng Kanban và phân tích thông minh."
+          "title": "Thực thi Tìm kiếm",
+          "desc": "Trực quan hóa hành trình qua các quy trình hiệu suất cao và bảng lựa chọn dựa trên dữ liệu."
         }
       ]
-    },
-    "useCases": {
-      "title": "HR Lite dành cho ai?",
-      "items": {
-        "freelance": {
-          "title": "HR Tự do",
-          "desc": "Xử lý nhiều khách hàng cùng lúc mà không lo mất dấu ứng viên hay chi tiết dự án.",
-          "tag": "Quy trình theo dự án"
-        },
-        "independent": {
-          "title": "Nhà tuyển dụng độc lập",
-          "desc": "Một CRM tinh gọn tập trung vào nguồn tài năng và tốc độ tuyển chọn của bạn.",
-          "tag": "Tập trung Talent CRM"
-        },
-        "smallTeam": {
-          "title": "Đội ngũ Tuyển dụng nhỏ",
-          "desc": "Cộng tác với những người sáng lập hoặc quản lý mà không bị choáng bởi các hệ thống ATS cồng kềnh.",
-          "tag": "Cộng tác đội ngũ"
-        }
-      }
-    },
-    "finalCta": {
-      "title": "Sẵn sàng để nâng tầm hoạt động tuyển dụng của bạn?",
-      "description": "Trải nghiệm HR Lite ngay hôm nay — trở thành người đầu tiên khám phá Dashboard.",
-      "btn": "Bắt đầu ngay"
     },
     "faq": {
-      "title": "Các câu hỏi thường gặp",
-      "items": [
+      "title": "Các câu hỏi Thường gặp",
+      "questions": [
         {
-          "q": "HR Lite khác gì so với một hệ thống ATS truyền thống?",
-          "a": "Các hệ thống ATS truyền thống được xây dựng cho các tập đoàn lớn với hàng ngàn ứng viên. HR Lite được xây dựng cho cá nhân—nhấn mạnh vào tốc độ, sự rõ ràng mang tính biên tập và sự dễ dùng, thay vì các tính năng cồng kềnh của doanh nghiệp."
+          "q": "Điều gì tạo nên trải nghiệm HR Lite?",
+          "a": "Khác với các hệ thống ATS truyền thống tập trung vào tính tuân thủ, HR Lite được xây dựng cho hiệu suất. Chúng tôi nhấn mạnh vào sự rõ ràng, thẩm mỹ xuất sắc và tốc độ thực thi cao."
         },
         {
-          "q": "Dữ liệu của tôi có được bảo mật không?",
-          "a": "Có. Chúng tôi sử dụng mã hóa tiêu chuẩn ngành và tuân thủ các quy định GDPR nghiêm ngặt để đảm bảo dữ liệu cá nhân của ứng viên luôn được bảo vệ."
+          "q": "Dữ liệu ứng viên của tôi được bảo vệ như thế nào?",
+          "a": "Tính toàn vẹn của dữ liệu là ưu tiên hàng đầu. Chúng tôi sử dụng mã hóa cấp doanh nghiệp và tuân thủ nghiêm ngặt các khung bảo mật toàn cầu bao gồm GDPR."
         },
         {
-          "q": "Tôi có thể nhập bảng tính hiện có của mình không?",
-          "a": "Chắc chắn rồi. Chúng tôi cung cấp công cụ nhập thông minh giúp khớp các cột Excel hoặc CSV của bạn với các trường dữ liệu có cấu trúc của chúng tôi chỉ trong vài giây."
-        },
-        {
-          "q": "Có gói dành cho đội nhóm không?",
-          "a": "Gói dành cho đội nhóm hiện đang được phát triển. Trong thời gian tới, bạn sẽ có thể mời thành viên, chia sẻ quy trình tuyển dụng và cộng tác ghi chú dễ dàng trong cùng một workspace."
-        },
-        {
-          "q": "Triết lý Dashboard là gì?",
-          "a": "Chúng tôi tin rằng tuyển dụng là một công việc mang tính thủ công và cần sự tinh tế. Vì vậy, công cụ bạn dùng cũng nên được thiết kế kỹ lưỡng — để xứng đáng với những tài năng mà bạn đang tìm kiếm."
+          "q": "Tôi có thể chuyển đổi từ hệ thống hiện tại không?",
+          "a": "Công cụ nhập ngữ nghĩa của chúng tôi cho phép bạn di chuyển từ Excel hoặc các cơ sở dữ liệu cũ mà không mất mát dữ liệu và khớp trường thông tin hoàn hảo."
         }
       ]
     },
+    "cta": {
+      "title": "Nâng tầm quy mô tuyển dụng của bạn.",
+      "subtitle": "Gia nhập nhóm nhà tuyển dụng ưu tú đang xây dựng tương lai vận hành tài năng cùng HR Lite.",
+      "button": "Bắt đầu với HR Lite"
+    },
     "footer": {
-      "desc": "Tuyển dụng, đơn giản hơn.",
+      "description": "Kiến tạo tương lai của ngành tuyển dụng thông qua thiết kế và trí tuệ dữ liệu.",
+      "product": "Sản phẩm",
+      "company": "Công ty",
       "privacy": "Chính sách bảo mật",
-      "terms": "Điều khoản dịch vụ",
-      "cookie": "Chính sách Cookie",
-      "support": "Liên hệ hỗ trợ"
+      "terms": "Điều khoản dịch vụ"
     }
   }
 }

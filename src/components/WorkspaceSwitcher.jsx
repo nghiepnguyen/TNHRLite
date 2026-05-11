@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { useToast } from '../contexts/ToastContext';
 import { useTranslation } from 'react-i18next';
 import './WorkspaceSwitcher.css';
 
@@ -31,7 +30,6 @@ export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = f
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const toast = useToast();
   const { t } = useTranslation();
   
   // Form State

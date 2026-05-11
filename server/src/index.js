@@ -62,7 +62,7 @@ function cleanJsonResponse(text) {
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, text];
     const rawJson = jsonMatch[1].trim();
     return JSON.parse(rawJson);
-  } catch (e) {
+  } catch (_e) {
     console.error("Critical: Failed to extract valid JSON from Gemini response. Raw text:", text);
     throw new Error("AI returned an invalid data format.");
   }

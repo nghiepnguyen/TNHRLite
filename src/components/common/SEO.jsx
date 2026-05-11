@@ -12,7 +12,8 @@ const SEO = ({ title: customTitle, description: customDescription }) => {
   const title = customTitle || t('common.seo.title');
   const description = customDescription || t('common.seo.description');
   const keywords = t('common.seo.keywords');
-  const siteUrl = 'https://hr.thanhnghiep.top/';
+  const siteUrl = 'https://hr.thanhnghiep.top';
+  const canonical = `${siteUrl}${window.location.pathname}`;
   const image = 'https://thanhnghiep.top/CVMatcher/thumb-hr-lite.jpeg';
 
   return (
@@ -25,17 +26,18 @@ const SEO = ({ title: customTitle, description: customDescription }) => {
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="author" content="HR Lite" />
+      <link rel="canonical" href={canonical} />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={siteUrl} />
+      <meta property="og:url" content={canonical} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={siteUrl} />
+      <meta name="twitter:url" content={canonical} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />

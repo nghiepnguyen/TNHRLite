@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { 
   getCandidate, 
   updateCandidate, 
@@ -13,7 +12,6 @@ import {
 import { compareCandidateToJob } from '../services/ai';
 
 export function useCandidateDetail(id, workspaceId, userProfile) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const [candidate, setCandidate] = useState(null);

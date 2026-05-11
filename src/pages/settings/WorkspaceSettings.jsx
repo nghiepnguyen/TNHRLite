@@ -12,7 +12,7 @@ import { formatDate } from '../../utils/dateUtils';
 export default function WorkspaceSettings() {
   const { workspaceId } = useParams();
   const { activeWorkspace, userProfile, workspaces } = useWorkspace();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const isOnlyWorkspace = workspaces?.length === 1;
   const toast = useToast();
   
@@ -55,15 +55,15 @@ export default function WorkspaceSettings() {
         ]);
         setMembers(membersData);
         setInvites(invitesData.filter(inv => inv.status === 'pending'));
-      } catch (err) {
-        console.error("Error loading members/invites:", err);
+      } catch (_err) {
+        console.error("Error loading members/invites:", _err);
         toast({ type: 'error', message: t('jobsPage.messages.loadError') });
       } finally {
         setLoading(false);
       }
     }
     loadMembers();
-  }, [workspaceId, toast]);
+  }, [workspaceId, toast, t]);
 
   // Real-time activity listener for Activity Tab
   useEffect(() => {
@@ -100,7 +100,6 @@ export default function WorkspaceSettings() {
   };
 
   const getActivityMessage = (act) => {
-    const name = <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{act.entity?.name}</span>;
     switch (act.action) {
       case 'JOB_CREATED': return t('settings.activity.messages.JOB_CREATED', { name: act.entity?.name });
       case 'CANDIDATE_CREATED': return t('settings.activity.messages.CANDIDATE_CREATED', { name: act.entity?.name });
@@ -171,8 +170,8 @@ export default function WorkspaceSettings() {
       // Reload lists
       const invitesData = await getWorkspaceInvites(workspaceId);
       setInvites(invitesData.filter(inv => inv.status === 'pending'));
-    } catch (err) {
-      console.error("Error inviting member:", err);
+    } catch (_err) {
+      console.error("Error inviting member:", _err);
       toast({ type: 'error', message: t('settings.invite.fail') });
     } finally {
       setInviting(false);
@@ -191,8 +190,8 @@ export default function WorkspaceSettings() {
 
       toast({ type: 'success', message: t('common.success') });
       setInvites(invites.filter(inv => inv.id !== inviteId));
-    } catch (err) {
-      console.error("Error revoking invite:", err);
+    } catch (_err) {
+      console.error("Error revoking invite:", _err);
       toast({ type: 'error', message: t('settings.members.revokeFail') || t('common.error') });
     } finally {
       setRevokingId(null);
@@ -210,8 +209,8 @@ export default function WorkspaceSettings() {
       toast({ type: 'success', message: t('common.success') });
       // Reload page to reflect name changes in context
       window.location.reload(); 
-    } catch (err) {
-      console.error("Error updating workspace name:", err);
+    } catch (_err) {
+      console.error("Error updating workspace name:", _err);
       toast({ type: 'error', message: t('common.error') });
     } finally {
       setUpdatingName(false);
@@ -243,8 +242,8 @@ export default function WorkspaceSettings() {
       // Redirect to dashboard root, WorkspaceProvider will pick the next available workspace
       navigate('/dashboard', { replace: true });
       window.location.reload();
-    } catch (err) {
-      console.error("Error deleting workspace:", err);
+    } catch (_err) {
+      console.error("Error deleting workspace:", _err);
       toast({ type: 'error', message: t('common.error') });
       setIsDeleting(false);
     }
@@ -279,8 +278,8 @@ export default function WorkspaceSettings() {
       // Redirect to dashboard root, WorkspaceProvider will pick the next available workspace or default
       navigate('/dashboard', { replace: true });
       window.location.reload();
-    } catch (err) {
-      console.error("Error leaving workspace:", err);
+    } catch (_err) {
+      console.error("Error leaving workspace:", _err);
       toast({ type: 'error', message: t('common.error') });
       setIsLeaving(false);
     }
@@ -318,8 +317,8 @@ export default function WorkspaceSettings() {
       toast({ type: 'success', message: t('common.success') });
       // Update local state instead of full reload
       setMembers(members.filter(m => m.userId !== member.userId));
-    } catch (err) {
-      console.error("Error removing member in settings:", err);
+    } catch (_err) {
+      console.error("Error removing member in settings:", _err);
       toast({ type: 'error', message: t('common.error') });
     } finally {
       setRemovingMemberId(null);

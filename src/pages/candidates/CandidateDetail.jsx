@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -29,12 +29,13 @@ export default function CandidateDetail() {
 
   const [selectedJob, setSelectedJob] = useState('');
   const [notes, setNotes] = useState('');
+  const [prevCandidateId, setPrevCandidateId] = useState(null);
 
-  useEffect(() => {
-    if (candidate) {
-      setNotes(candidate.recruiterNotes || '');
-    }
-  }, [candidate]);
+  const currentId = candidate?.id ?? null;
+  if (currentId !== prevCandidateId) {
+    setPrevCandidateId(currentId);
+    setNotes(candidate?.recruiterNotes || '');
+  }
 
   const onSaveNotes = async () => {
     const result = await handleSaveNotes(notes);

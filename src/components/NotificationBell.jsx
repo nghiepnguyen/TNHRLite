@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { 
   subscribeToNotifications, 
   markAsRead, 
   markAllAsRead, 
-  deleteNotification,
-  createNotification 
+  deleteNotification
 } from '../services/notification.service';
 import { formatDate } from '../utils/dateUtils';
 import './NotificationBell.css';
@@ -23,8 +21,6 @@ export default function NotificationBell() {
   const [activeInvite, setActiveInvite] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const dropdownRef = useRef(null);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentUser) return;

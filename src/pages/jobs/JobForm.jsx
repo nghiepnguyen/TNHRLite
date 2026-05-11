@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { getJob, createJob, updateJob, logActivity, deleteJob } from '../../services/db';
+import { getJob, createJob, updateJob, logActivity } from '../../services/db';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
@@ -15,7 +15,6 @@ export default function JobForm() {
   const { currentUser } = useAuth();
   
   const [loading, setLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
 
   
@@ -67,20 +66,6 @@ export default function JobForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm(t('jobsPage.form.deleteConfirm'))) {
-      setIsDeleting(true);
-      try {
-        await deleteJob(id, workspaceId);
-        navigate(`/dashboard/w/${workspaceId}/jobs`);
-      } catch (error) {
-        console.error(error);
-        alert(t('membersPage.messages.removeError', { error: error.message }));
-        setIsDeleting(false);
-      }
-    }
   };
 
 

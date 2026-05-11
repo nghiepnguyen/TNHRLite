@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import SEO from '../components/common/SEO';
 
-const LegalLayout = ({ title, children }) => {
+const LegalLayout = ({ title, description, children }) => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'rgb(250, 249, 246)' }}>
+      <SEO title={`${title} | HR Lite`} description={description} />
       {/* Custom Header for Legal Pages */}
       <header className="bg-[#FAF9F6]/85 backdrop-blur-md fixed top-0 w-full z-50 border-b border-[#1F1F1F]/5">
         <nav className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-7xl mx-auto">

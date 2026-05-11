@@ -7,7 +7,7 @@ import SEO from '../../components/common/SEO';
 import { formatDate } from '../../utils/dateUtils';
 
 export default function JobDetail() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { workspaceId, id } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);

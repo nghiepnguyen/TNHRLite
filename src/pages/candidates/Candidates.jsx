@@ -7,7 +7,7 @@ import Skeleton from '../../components/Skeleton';
 import { formatDate } from '../../utils/dateUtils';
 
 export default function Candidates() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { workspaceId } = useParams();
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);

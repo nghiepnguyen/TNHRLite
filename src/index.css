@@ -20,6 +20,9 @@
   --color-surface-hover: #f1f5f9;
   --color-surface-border: #e2e8f0;
   
+  --font-display: 'Be Vietnam Pro', sans-serif;
+  --font-body: 'Be Vietnam Pro', sans-serif;
+  
   --color-text-primary: #191c1e;
   --color-text-secondary: #475569;
   --color-text-muted: #64748b;
@@ -664,3 +667,78 @@ select.form-control {
 .dashboard-kpi-grid > *:nth-child(2) { animation-delay: 0.1s; }
 .dashboard-kpi-grid > *:nth-child(3) { animation-delay: 0.15s; }
 .dashboard-kpi-grid > *:nth-child(4) { animation-delay: 0.2s; }
+
+/* Premium SaaS Utilities */
+.premium-mesh-bg {
+  background-color: #FAF9F6;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(240, 100%, 95%, 1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(280, 100%, 95%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(240, 100%, 98%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(280, 100%, 98%, 1) 0, transparent 50%);
+}
+
+.text-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+.premium-shadow {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.02),
+    0 4px 6px -4px rgba(0, 0, 0, 0.01),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.floating-element {
+  animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.mask-fade-bottom {
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+.editorial-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Scroll Reveal Base */
+.reveal {
+  position: relative;
+  opacity: 0;
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translate(0, 0) !important;
+}
+
+.reveal-up { transform: translateY(40px); }
+.reveal-down { transform: translateY(-40px); }
+.reveal-left { transform: translateX(-40px); }
+.reveal-right { transform: translateX(40px); }
+
+.reveal-delay-100 { transition-delay: 0.1s; }
+.reveal-delay-200 { transition-delay: 0.2s; }
+.reveal-delay-300 { transition-delay: 0.3s; }
+.reveal-delay-400 { transition-delay: 0.4s; }

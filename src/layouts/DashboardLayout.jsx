@@ -32,7 +32,7 @@ export default function DashboardLayout() {
         }).catch(() => null);
         
         setAiStatus(res ? 'online' : 'offline');
-      } catch (e) {
+      } catch (_error) {
         setAiStatus('offline');
       }
     };

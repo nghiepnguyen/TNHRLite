@@ -23,7 +23,11 @@ export const parseCvFromUrl = async (workspaceId, cvUrl) => {
 
     if (!response.ok) {
       let errBody = {};
-      try { errBody = await response.json(); } catch(e) {}
+      try { 
+        errBody = await response.json(); 
+      } catch (error) {
+        console.error("Failed to parse error response JSON", error);
+      }
       throw new Error(`API Error: ${errBody.details || errBody.error || response.statusText}`);
     }
 

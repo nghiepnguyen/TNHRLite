@@ -93,7 +93,7 @@ export default function Jobs() {
       }
     }
     getMandatesData();
-  }, [refreshKey, workspaceId]);
+  }, [refreshKey, workspaceId, t]);
 
   // KPI aggregation
   const activeCount = mandates.filter(m => m.status === 'Active').length;
@@ -133,7 +133,7 @@ export default function Jobs() {
         await updateJob(mandate.id, { status: 'Closed' });
         toast({ type: 'success', message: t('jobsPage.messages.closeSuccess') });
       } else if (type === 'clone' || type === 'duplicate') {
-        const { id, pipeline, createdAt, is_soon_expiring, ...payload } = mandate;
+        const { id: _id, pipeline: _p, createdAt: _ca, is_soon_expiring: _ise, ...payload } = mandate;
         await createJob(workspaceId, { ...payload, title: `${mandate.title} (Copy)`, status: 'Active' });
         toast({ type: 'success', message: t('jobsPage.messages.cloneSuccess') });
       } else if (type === 'update') {
@@ -149,7 +149,7 @@ export default function Jobs() {
         toast({ type: 'success', message: t('jobsPage.messages.extendSuccess', { date: formatDate(newDeadline) }) });
       }
       setRefreshKey(prev => prev + 1);
-    } catch (err) {
+    } catch (_error) {
       toast({ type: 'error', message: t('jobsPage.messages.execError', { type }) });
     }
   };

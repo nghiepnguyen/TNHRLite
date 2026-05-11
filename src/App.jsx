@@ -1,8 +1,9 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { WorkspaceProvider } from './contexts/WorkspaceContext';
-import { ToastProvider } from './contexts/ToastContext';
+import { useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthProvider';
+import { WorkspaceProvider } from './contexts/WorkspaceProvider';
+import { ToastProvider } from './contexts/ToastProvider';
 import { HelmetProvider } from 'react-helmet-async';
 import SEO from './components/common/SEO';
 

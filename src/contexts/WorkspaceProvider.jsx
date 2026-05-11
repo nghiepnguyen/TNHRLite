@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { 
@@ -6,8 +6,6 @@ import {
   getUserWorkspaces, 
   getPendingInvites, 
   createWorkspace, 
-  migrateLegacyData,
-  updateUserProfile,
   acceptInvite,
   declineInvite,
   subscribeToUserWorkspaces
@@ -16,11 +14,7 @@ import { createNotification, markInviteNotificationAsRead } from '../services/no
 import { logActivity } from '../services/db';
 import { useToast } from './ToastContext';
 
-const WorkspaceContext = createContext();
-
-export function useWorkspace() {
-  return useContext(WorkspaceContext);
-}
+import { WorkspaceContext } from './WorkspaceContext';
 
 export function WorkspaceProvider({ children }) {
   const { currentUser } = useAuth();
@@ -34,7 +28,6 @@ export function WorkspaceProvider({ children }) {
   const [pendingInvites, setPendingInvites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
-  const isCreatingRef = useRef(false);
   const hasInitialLoadRef = useRef(false);
   const prevWorkspaceIdsRef = useRef(new Set());
   const toast = useToast();

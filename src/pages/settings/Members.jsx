@@ -31,11 +31,7 @@ export default function Members() {
   const [inviteRole, setInviteRole] = useState('editor');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [workspaceId]);
-
-  async function loadData() {
+  const loadData = React.useCallback(async () => {
     if (!workspaceId) return;
     try {
       setLoading(true);
@@ -51,7 +47,11 @@ export default function Members() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [workspaceId, toast, t]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
@@ -102,7 +102,7 @@ export default function Members() {
       await updateInviteStatus(inviteId, 'revoked');
       toast({ type: 'success', message: t('membersPage.messages.revokeSuccess') });
       loadData();
-    } catch (err) {
+    } catch (_err) {
       toast({ type: 'error', message: t('membersPage.messages.revokeError') });
     }
   };
@@ -113,7 +113,7 @@ export default function Members() {
       await deleteInvite(inviteId);
       toast({ type: 'success', message: t('membersPage.messages.deleteSuccess') });
       loadData();
-    } catch (err) {
+    } catch (_err) {
       toast({ type: 'error', message: t('membersPage.messages.deleteError') });
     }
   };

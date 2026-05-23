@@ -7,15 +7,29 @@ import { parseCvFromUrl } from '../../services/ai';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
+const PLAN_LIMITS = {
+  free: { candidates: 50, cvParsesPerMonth: 10 },
+  pro: { candidates: 500, cvParsesPerMonth: 100 },
+  team: { candidates: -1, cvParsesPerMonth: -1 }
+};
+
 export default function CandidateUpload() {
   const { t } = useTranslation();
   const { workspaceId } = useParams();
-  const { userProfile } = useWorkspace();
+  const { activeWorkspace, userProfile, setIsUpgradeModalOpen } = useWorkspace();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState('');
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+
+  const planInfo = PLAN_LIMITS[activeWorkspace?.plan || 'free'] || PLAN_LIMITS.free;
+  const currentCandidates = activeWorkspace?.usage?.candidates || 0;
+  const currentCVParses = activeWorkspace?.usage?.cvParsesThisMonth || 0;
+
+  const isCandidateLimitReached = planInfo.candidates !== -1 && currentCandidates >= planInfo.candidates;
+  const isCVParseLimitReached = planInfo.cvParsesPerMonth !== -1 && currentCVParses >= planInfo.cvParsesPerMonth;
+  const isLimitReached = isCandidateLimitReached || isCVParseLimitReached;
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,7 +39,7 @@ export default function CandidateUpload() {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || isLimitReached) return;
 
     setLoading(true);
     try {
@@ -78,7 +92,11 @@ export default function CandidateUpload() {
       navigate(`/dashboard/w/${workspaceId}/candidates/${candidateId}`);
     } catch (error) {
       console.error(error);
-      alert(t('candidateUpload.processFail'));
+      if (error.code === 'LIMIT_EXCEEDED') {
+        setIsUpgradeModalOpen(true);
+      } else {
+        alert(t('candidateUpload.processFail'));
+      }
       setLoading(false);
     }
   };
@@ -94,6 +112,27 @@ export default function CandidateUpload() {
       </div>
 
       <div className="card" style={{ maxWidth: '600px', padding: '2.5rem', textAlign: 'center' }}>
+        {isLimitReached && (
+          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', borderRadius: '12px', color: '#fca5a5', textAlign: 'left' }}>
+            <span className="material-symbols-outlined text-danger">warning</span>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff' }}>{t('usage.limitReachedTitle', 'Limit Reached')}</strong>
+              <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
+                {isCVParseLimitReached 
+                  ? t('usage.cvParseLimitReachedDesc', 'You have reached the CV Parsing limit for your plan. Upgrade your plan to parse more CVs.')
+                  : t('usage.candidateLimitReachedDesc', 'You have reached the candidate limit for your plan. Upgrade your plan to add more candidates.')}
+              </span>
+            </div>
+            <button 
+              type="button" 
+              className="btn plan-action-btn pro" 
+              style={{ marginLeft: 'auto', padding: '0.5rem 1rem', fontSize: '0.8rem', width: 'auto', background: '#6366f1', color: '#ffffff', border: 'none', borderRadius: '8px', flexShrink: 0 }}
+              onClick={() => setIsUpgradeModalOpen(true)}
+            >
+              {t('usage.upgradeBtn', 'Upgrade')}
+            </button>
+          </div>
+        )}
         <form onSubmit={handleUpload}>
           <div style={{ 
             border: '2px dashed var(--color-surface-border)', 
@@ -102,13 +141,14 @@ export default function CandidateUpload() {
             backgroundColor: 'var(--color-surface-base)',
             marginBottom: '2rem',
             position: 'relative',
-            cursor: 'pointer'
+            cursor: isLimitReached ? 'not-allowed' : 'pointer'
           }}>
             <input 
               type="file" 
               accept=".pdf,.doc,.docx,.txt"
               onChange={handleFileChange}
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+              disabled={isLimitReached}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: isLimitReached ? 'not-allowed' : 'pointer' }}
             />
             {file ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
@@ -133,7 +173,7 @@ export default function CandidateUpload() {
           )}
 
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <button type="submit" className="btn btn-primary" disabled={!file || loading} style={{ width: '100%' }}>
+            <button type="submit" className="btn btn-primary" disabled={!file || loading || isLimitReached} style={{ width: '100%' }}>
               {loading ? t('candidateUpload.processing') : t('candidateUpload.uploadBtn')}
             </button>
           </div>

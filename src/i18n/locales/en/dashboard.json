@@ -31,7 +31,8 @@
       "acceptedInvite": "accepted the workspace invitation to join as {{role}}",
       "declinedInvite": "declined the workspace invitation",
       "removedMember": "removed {{name}} from the workspace",
-      "leftWorkspace": "left the workspace"
+      "leftWorkspace": "left the workspace",
+      "upgradeRequested": "requested an upgrade to {{name}}"
     }
   }
 }

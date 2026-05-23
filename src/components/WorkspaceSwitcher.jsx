@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '../contexts/ToastContext';
 import './WorkspaceSwitcher.css';
 
 const WORKSPACE_COLORS = [
@@ -26,11 +27,19 @@ const getWorkspaceColor = (id) => {
 };
 
 export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = false }) {
-  const { workspaces, activeWorkspace, switchWorkspace, createWorkspace } = useWorkspace();
+  const { 
+    workspaces, 
+    activeWorkspace, 
+    switchWorkspace, 
+    createWorkspace, 
+    currentUser, 
+    setIsUpgradeModalOpen 
+  } = useWorkspace();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
+  const toast = useToast();
   
   // Form State
   const [formData, setFormData] = useState({
@@ -61,6 +70,24 @@ export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = f
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleCreateClick = () => {
+    const ownedFreeCount = workspaces.filter(
+      ws => ws.ownerId === currentUser?.uid && (ws.plan === 'free' || !ws.plan)
+    ).length;
+
+    if (ownedFreeCount >= 2) {
+      setIsOpen(false);
+      setIsUpgradeModalOpen(true);
+      toast({
+        type: 'warning',
+        message: t('workspace.limitExceededToast', 'Bạn đã đạt giới hạn tối đa 2 Workspace ở gói miễn phí. Vui lòng nâng cấp!')
+      });
+    } else {
+      setShowCreateModal(true);
+      setIsOpen(false);
+    }
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
@@ -84,7 +111,19 @@ export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = f
       setIsOpen(false);
     } catch (error) {
       console.error(error);
-      alert('Failed to create workspace. Please try again.');
+      if (error.code === 'WORKSPACE_LIMIT_EXCEEDED') {
+        setShowCreateModal(false);
+        setIsUpgradeModalOpen(true);
+        toast({
+          type: 'warning',
+          message: error.message || t('workspace.limitExceededToast', 'Bạn đã đạt giới hạn tối đa 2 Workspace ở gói miễn phí. Vui lòng nâng cấp!')
+        });
+      } else {
+        toast({
+          type: 'error',
+          message: t('workspace.createFailedToast', 'Failed to create workspace. Please try again.')
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -141,7 +180,7 @@ export default function WorkspaceSwitcher({ variant = 'default', isCollapsed = f
 
           <div className="dropdown-divider"></div>
           
-          <button className="dropdown-item-action" onClick={() => setShowCreateModal(true)}>
+          <button className="dropdown-item-action" onClick={handleCreateClick}>
             <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">add</span>
             <span>{t('workspace.createNew')}</span>
           </button>

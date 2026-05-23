@@ -93,6 +93,7 @@
         "NOTE_ADDED": "đã cập nhật ghi chú cho: {{name}}",
         "INVITATION_ACCEPTED": "đã chấp nhận lời mời tham gia với vai trò {{role}}",
         "INVITATION_DECLINED": "đã từ chối lời mời tham gia không gian",
+        "UPGRADE_REQUESTED": "đã yêu cầu nâng cấp lên {{name}}",
         "MEMBER_REMOVED": "đã xóa {{name}} khỏi không gian làm việc",
         "MEMBER_LEFT": "đã rời khỏi không gian làm việc"
       }

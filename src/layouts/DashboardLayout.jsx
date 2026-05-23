@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import UsageMeter from '../components/UsageMeter';
+import UpgradeModal from '../components/UpgradeModal';
 import './DashboardLayout.css';
 
 export default function DashboardLayout() {
@@ -125,6 +127,7 @@ export default function DashboardLayout() {
             </NavLink>
           )}
         </nav>
+        <UsageMeter isCollapsed={isSidebarCollapsed} />
       </aside>
 
       {/* Main Content */}
@@ -219,6 +222,7 @@ export default function DashboardLayout() {
           )}
         </main>
       </div>
+      <UpgradeModal />
     </div>
   );
 }

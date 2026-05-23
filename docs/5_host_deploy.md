@@ -47,8 +47,28 @@ Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 
    - Chỉ Deploy giao diện: `firebase deploy --only hosting`
    - Chỉ Deploy Cloud Functions (API): `firebase deploy --only functions`
    - Chỉ Deploy Rules Security Database: `firebase deploy --only firestore:rules`
+   - Gói billing / usage limits (khuyến nghị deploy cùng lúc):
+     ```bash
+     npm run build
+     firebase deploy --only functions,firestore:rules,hosting
+     ```
+
+## 4. Biến môi trường Frontend (`.env`)
+
+| Biến | Mô tả |
+|------|--------|
+| `VITE_ADMIN_EMAIL` | Email được coi là admin toàn hệ thống (hiện link Admin Portal, khớp `ADMIN_EMAIL` backend) |
+
+Các biến Firebase (`VITE_*`) giữ nguyên như cấu hình dự án.
+
+## 5. Kiểm tra sau Deploy
+
+1. Đăng nhập user thường → Dashboard thấy **UsageMeter**; chạm giới hạn → **UpgradeModal** gửi được yêu cầu (Firestore `upgradeRequests` + email nếu đã cấu hình Resend).
+2. Đăng nhập admin → `/admin` → duyệt yêu cầu hoặc đổi `plan` workspace.
+3. Nếu email không gửi: kiểm tra log Functions — chế độ mock khi thiếu `RESEND_API_KEY` vẫn lưu request.
 
 > **Lưu ý quan trọng:** Đối với Backend, phải thiết lập các API Key thông qua Secret Manager của Firebase trước khi Deploy Cloud Functions:
 > - Gemini AI: `firebase functions:secrets:set GEMINI_API_KEY`
 > - Resend API: `firebase functions:secrets:set RESEND_API_KEY`
 > - Resend Sender: `firebase functions:secrets:set RESEND_FROM_EMAIL`
+> - Admin / Billing (tuỳ chọn, có thể set qua `.env` functions hoặc secrets): `ADMIN_EMAIL`, `BILLING_EMAIL`

@@ -93,6 +93,7 @@
         "NOTE_ADDED": "updated notes for: {{name}}",
         "INVITATION_ACCEPTED": "accepted the workspace invitation to join as {{role}}",
         "INVITATION_DECLINED": "declined the workspace invitation",
+        "UPGRADE_REQUESTED": "requested an upgrade to {{name}}",
         "MEMBER_REMOVED": "removed {{name}} from the workspace",
         "MEMBER_LEFT": "left the workspace"
       }

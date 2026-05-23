@@ -11,6 +11,7 @@ import enPipeline from './locales/en/pipeline.json';
 import enMembers from './locales/en/members.json';
 import enReports from './locales/en/reports.json';
 import enSettings from './locales/en/settings.json';
+import enAdmin from './locales/en/admin.json';
 
 import viCommon from './locales/vi/common.json';
 import viLanding from './locales/vi/landing.json';
@@ -21,6 +22,7 @@ import viPipeline from './locales/vi/pipeline.json';
 import viMembers from './locales/vi/members.json';
 import viReports from './locales/vi/reports.json';
 import viSettings from './locales/vi/settings.json';
+import viAdmin from './locales/vi/admin.json';
 
 i18n
   .use(LanguageDetector)
@@ -38,6 +40,7 @@ i18n
           ...enMembers,
           ...enReports,
           ...enSettings,
+          ...enAdmin,
         },
       },
       vi: {
@@ -51,6 +54,7 @@ i18n
           ...viMembers,
           ...viReports,
           ...viSettings,
+          ...viAdmin,
         },
       },
     },

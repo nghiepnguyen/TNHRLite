@@ -7,6 +7,7 @@
 2. **Hiện đại (Modern UX/UI):** Giao diện tập trung vào trải nghiệm người dùng cao cấp với thiết kế Glassmorphism. Hệ thống tích hợp Loading Skeletons đồng bộ và hiệu ứng chuyển cảnh mượt mà để tối ưu hóa phản hồi thị giác và loại bỏ cảm giác chờ đợi.
 3. **Thông minh (AI-Powered):** Tận dụng trí tuệ nhân tạo (Gemini AI) để tự động hóa việc đọc, phân tích CV và đánh giá mức độ phù hợp của ứng viên với công việc.
 4. **Cộng tác (Collaboration):** Áp dụng mô hình Workspace đa phân quyền (Owner, Admin, Editor, Viewer), cho phép làm việc nhóm thời gian thực (Real-time).
+5. **Gói dịch vụ (Plans & Usage):** Mỗi Workspace có gói `free` / `pro` / `team` với hạn mức Jobs, Candidates và lượt parse CV/tháng. Người dùng xem mức dùng trên dashboard, gửi yêu cầu nâng cấp qua email; quản trị viên hệ thống duyệt và đổi gói trong **Admin Portal**.
 
 ## Đối tượng sử dụng (Target Audience)
 - Headhunter cá nhân.

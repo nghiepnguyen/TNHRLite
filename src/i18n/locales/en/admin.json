@@ -1,0 +1,66 @@
+{
+  "adminPage": {
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "You do not have administrative privileges.",
+    "portalTitle": "Admin Portal",
+    "tabs": {
+      "users": "Users",
+      "billing": "Plans & Upgrades"
+    },
+    "users": {
+      "totalUsers": "Total Users",
+      "totalJobs": "Total Jobs Posted",
+      "totalCandidates": "Total Candidates",
+      "registeredUsers": "Registered Users",
+      "you": "You",
+      "loading": "Loading users...",
+      "empty": "No users found.",
+      "deleteConfirm": "Permanently delete {{email}} and ALL of their jobs, candidates, and applications? This cannot be undone.",
+      "columns": {
+        "email": "Email",
+        "joined": "Joined",
+        "jobs": "Jobs",
+        "candidates": "Candidates",
+        "actions": "Actions"
+      }
+    },
+    "billing": {
+      "requestsTitle": "Upgrade requests",
+      "workspacesTitle": "Workspace plans",
+      "filter": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "all": "All"
+      },
+      "loading": "Loading...",
+      "noRequests": "No requests in this category.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectPrompt": "Optional note for the requester (decline reason):",
+      "approveConfirm": "Approve upgrade to {{plan}} for \"{{workspace}}\"?",
+      "rejectConfirm": "Reject this upgrade request?",
+      "approved": "Request approved and plan activated.",
+      "rejected": "Request rejected.",
+      "planUpdated": "Workspace plan updated.",
+      "adminNote": "Admin note",
+      "columns": {
+        "workspace": "Workspace",
+        "requester": "Requester",
+        "current": "Current",
+        "requested": "Requested",
+        "message": "Message",
+        "date": "Submitted",
+        "status": "Status",
+        "actions": "Actions",
+        "owner": "Owner",
+        "plan": "Plan",
+        "usage": "Usage",
+        "changePlan": "Change plan"
+      },
+      "usageSummary": "{{jobs}} jobs · {{candidates}} candidates · {{cv}} CV parses",
+      "savePlan": "Apply",
+      "planNotePlaceholder": "Optional note to workspace owner..."
+    }
+  }
+}

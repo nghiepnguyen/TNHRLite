@@ -15,7 +15,12 @@
   - `ThemeContext`: Chế độ hiển thị (Light/Dark mode).
   - `ToastContext`: Hệ thống thông báo góc màn hình nhỏ gọn.
 - `pages/`: Các màn hình tính năng chính trong luồng người dùng (Dashboard, Login, LandingPage, Candidate, Job...).
+  - `pages/admin/AdminPortal.jsx`: Cổng quản trị (tab **Gói & Nâng cấp**, **Người dùng**) — chỉ hiện khi `isAdmin`.
+  - `pages/admin/AdminUpgradeRequests.jsx`: Duyệt/từ chối yêu cầu nâng cấp, đổi `plan` workspace.
+- `components/UpgradeModal.jsx` + `UsageMeter.jsx`: Modal so sánh gói / gửi yêu cầu nâng cấp; thanh hiển thị mức dùng (jobs, candidates, CV/tháng).
 - `services/`: Các module giao tiếp trực tiếp với Firebase (Database, Storage) và API nội bộ bằng Fetch.
+  - `workspace.service.js`: `submitUpgradeRequest()`, gọi API có giới hạn khi tạo job/candidate.
+  - `admin.service.js`: API `/api/admin/*` cho billing portal.
 - `utils/`: Hàm tiện ích hỗ trợ (export CSV, parse date...).
 
 ## Tối ưu hiệu năng (Performance)
@@ -26,6 +31,8 @@
 ## Đa ngôn ngữ (Internationalization - i18n)
 - **Framework:** Sử dụng **react-i18next** với cấu trúc JSON tách biệt theo namespace (common, jobs, candidates, settings...).
 - **Locales:** Hỗ trợ chính thức tiếng Anh (EN) và tiếng Việt (VI). Toàn bộ text cứng đã được loại bỏ khỏi component và chuyển vào các file JSON trong `src/i18n/locales/`.
+- **Namespace `plans` / `usage`:** Copy gói dịch vụ và modal nâng cấp (`common.json`).
+- **Namespace `admin`:** Copy Admin Portal (`admin.json`).
 - **Date Formatting:** Tự động điều chỉnh định dạng ngày tháng (`DD/MM/YYYY` cho VI và `MM/DD/YYYY` cho EN) dựa trên ngôn ngữ hiện tại của người dùng.
 
 ## Mẫu Component Chuẩn

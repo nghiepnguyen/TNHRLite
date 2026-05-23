@@ -5,12 +5,21 @@ import { useTranslation } from 'react-i18next';
 import { getCandidate, updateCandidate, createCandidate, logActivity } from '../../services/db';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
+const PLAN_LIMITS = {
+  free: { candidates: 50 },
+  pro: { candidates: 500 },
+  team: { candidates: -1 }
+};
+
 export default function CandidateForm() {
   const { t } = useTranslation();
   const { workspaceId, id } = useParams();
-  const { userProfile } = useWorkspace();
+  const { activeWorkspace, userProfile, setIsUpgradeModalOpen } = useWorkspace();
   const isEditing = !!id;
   const navigate = useNavigate();
+
+  const planInfo = PLAN_LIMITS[activeWorkspace?.plan || 'free'] || PLAN_LIMITS.free;
+  const isLimitReached = !isEditing && planInfo.candidates !== -1 && (activeWorkspace?.usage?.candidates || 0) >= planInfo.candidates;
   
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
@@ -98,7 +107,11 @@ export default function CandidateForm() {
       }
     } catch (error) {
       console.error(error);
-      alert(t('candidateForm.saveFail'));
+      if (error.code === 'LIMIT_EXCEEDED') {
+        setIsUpgradeModalOpen(true);
+      } else {
+        alert(t('candidateForm.saveFail') || 'Failed to save candidate');
+      }
     } finally {
       setLoading(false);
     }
@@ -118,6 +131,25 @@ export default function CandidateForm() {
       </div>
 
       <div className="card" style={{ maxWidth: '800px', padding: '2rem' }}>
+        {isLimitReached && (
+          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)', borderRadius: '12px', color: '#fca5a5' }}>
+            <span className="material-symbols-outlined text-danger">warning</span>
+            <div>
+              <strong style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff' }}>{t('usage.limitReachedTitle', 'Limit Reached')}</strong>
+              <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
+                {t('usage.candidateLimitReachedDesc', 'You have reached the candidate limit for your plan. Upgrade your plan to add more candidates.')}
+              </span>
+            </div>
+            <button 
+              type="button" 
+              className="btn plan-action-btn pro" 
+              style={{ marginLeft: 'auto', padding: '0.5rem 1rem', fontSize: '0.8rem', width: 'auto', background: '#6366f1', color: '#ffffff', border: 'none', borderRadius: '8px' }}
+              onClick={() => setIsUpgradeModalOpen(true)}
+            >
+              {t('usage.upgradeBtn', 'Upgrade')}
+            </button>
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             
@@ -180,7 +212,7 @@ export default function CandidateForm() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', borderTop: '1px solid var(--color-surface-border)', paddingTop: '1.5rem' }}>
             <Link to={isEditing ? `/dashboard/w/${workspaceId}/candidates/${id}` : `/dashboard/w/${workspaceId}/candidates`} className="btn btn-secondary">{t('common.cancel')}</Link>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+            <button type="submit" className="btn btn-primary" disabled={loading || isLimitReached}>
               <span className="material-symbols-outlined flex-shrink-0 !text-[16px]">save</span> {loading ? t('candidateForm.saving') : (isEditing ? t('common.save') : t('common.save'))}
             </button>
           </div>

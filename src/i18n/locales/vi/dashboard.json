@@ -31,7 +31,8 @@
       "acceptedInvite": "đã chấp nhận lời mời tham gia với vai trò {{role}}",
       "declinedInvite": "đã từ chối lời mời tham gia",
       "removedMember": "đã xóa {{name}} khỏi không gian làm việc",
-      "leftWorkspace": "đã rời khỏi không gian làm việc"
+      "leftWorkspace": "đã rời khỏi không gian làm việc",
+      "upgradeRequested": "đã yêu cầu nâng cấp lên {{name}}"
     }
   }
 }

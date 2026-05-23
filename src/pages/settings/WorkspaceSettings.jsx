@@ -111,6 +111,7 @@ export default function WorkspaceSettings() {
       case 'INVITATION_DECLINED': return t('settings.activity.messages.INVITATION_DECLINED');
       case 'MEMBER_REMOVED': return t('settings.activity.messages.MEMBER_REMOVED', { name: act.entity?.name });
       case 'MEMBER_LEFT': return t('settings.activity.messages.MEMBER_LEFT');
+      case 'UPGRADE_REQUESTED': return t('settings.activity.messages.UPGRADE_REQUESTED', { name: act.entity?.name });
       default: return <>action: {act.action}</>;
     }
   };

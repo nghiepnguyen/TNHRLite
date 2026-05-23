@@ -1,148 +1,166 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-
-import { auth } from '../../firebase';
+import { fetchAdminUsers, deleteAdminUser } from '../../services/admin.service';
 import { formatDate } from '../../utils/dateUtils';
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : '/api';
-
-export default function AdminDashboard() {
+export default function AdminDashboard({ embedded = false }) {
+  const { t } = useTranslation();
   const { currentUser, isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchUsers();
-  }, [currentUser]);
+    if (isAdmin) fetchUsers();
+  }, [currentUser, isAdmin]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError(null);
-      if (!auth.currentUser) throw new Error('Not authenticated with Firebase');
-      const token = await auth.currentUser.getIdToken();
-      
-      const res = await fetch(`${API_BASE_URL}/admin/users`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || errorData.details || 'Failed to fetch users');
-      }
-      const data = await res.json();
+      const data = await fetchAdminUsers();
       setUsers(data);
     } catch (err) {
       console.error(err);
-      setError(`Error: ${err.message}. Check if you have admin privileges and the server is running.`);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (uid, email) => {
-    if (!window.confirm(`DANGER: Are you sure you want to permanently delete user ${email} and ALL of their jobs, candidates, and applications? This action cannot be undone.`)) {
+    if (
+      !window.confirm(
+        t('adminPage.users.deleteConfirm', { email })
+      )
+    ) {
       return;
     }
-    
+
     try {
       setError(null);
-      if (!auth.currentUser) throw new Error('Not authenticated with Firebase');
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch(`${API_BASE_URL}/admin/users/${uid}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!res.ok) throw new Error('Failed to delete user');
-      
-      setUsers(users.filter(u => u.uid !== uid));
+      await deleteAdminUser(uid);
+      setUsers(users.filter((u) => u.uid !== uid));
     } catch (err) {
       console.error(err);
-      setError('Error deleting user. ' + err.message);
+      setError(err.message);
     }
   };
 
   if (!isAdmin) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-danger"  style={{ margin: '0 auto 1rem' }}>report</span>
-        <h1>Access Denied</h1>
-        <p>You do not have administrative privileges.</p>
+      <div style={{ padding: embedded ? 0 : '2rem', textAlign: 'center' }}>
+        <span className="material-symbols-outlined flex-shrink-0 !text-[48px] text-danger" style={{ margin: '0 auto 1rem' }}>
+          report
+        </span>
+        <h1>{t('adminPage.accessDenied')}</h1>
+        <p>{t('adminPage.accessDeniedDesc')}</p>
       </div>
     );
   }
 
   const totalJobs = Array.isArray(users) ? users.reduce((acc, u) => acc + (u.jobsCount || 0), 0) : 0;
-  const totalCandidates = Array.isArray(users) ? users.reduce((acc, u) => acc + (u.candidatesCount || 0), 0) : 0;
+  const totalCandidates = Array.isArray(users)
+    ? users.reduce((acc, u) => acc + (u.candidatesCount || 0), 0)
+    : 0;
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-        <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-primary">shield</span>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 600 }}>Admin Portal</h1>
-      </div>
+    <div style={{ padding: embedded ? 0 : '2rem' }}>
+      {!embedded && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[32px] text-primary">shield</span>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 600 }}>{t('adminPage.portalTitle')}</h1>
+        </div>
+      )}
 
-      {/* Aggregate Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem',
+          marginBottom: '2rem',
+        }}
+      >
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary"  style={{ margin: '0 auto 0.5rem' }}>group</span>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-primary" style={{ margin: '0 auto 0.5rem' }}>
+            group
+          </span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{users.length}</h3>
-          <p className="text-secondary">Total Users</p>
+          <p className="text-secondary">{t('adminPage.users.totalUsers')}</p>
         </div>
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-info"  style={{ margin: '0 auto 0.5rem' }}>work</span>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-info" style={{ margin: '0 auto 0.5rem' }}>
+            work
+          </span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{totalJobs}</h3>
-          <p className="text-secondary">Total Jobs Posted</p>
+          <p className="text-secondary">{t('adminPage.users.totalJobs')}</p>
         </div>
         <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-success"  style={{ margin: '0 auto 0.5rem' }}>group</span>
+          <span className="material-symbols-outlined flex-shrink-0 !text-[24px] text-success" style={{ margin: '0 auto 0.5rem' }}>
+            group
+          </span>
           <h3 style={{ fontSize: '2rem', fontWeight: 700 }}>{totalCandidates}</h3>
-          <p className="text-secondary">Total Candidates Uploaded</p>
+          <p className="text-secondary">{t('adminPage.users.totalCandidates')}</p>
         </div>
       </div>
 
-      {error && <div className="badge badge-danger" style={{ display: 'block', padding: '1rem', marginBottom: '1.5rem', borderRadius: 'var(--radius-md)' }}>{error}</div>}
+      {error && (
+        <div
+          className="badge badge-danger"
+          style={{ display: 'block', padding: '1rem', marginBottom: '1.5rem', borderRadius: 'var(--radius-md)' }}
+        >
+          {error}
+        </div>
+      )}
 
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-surface-border)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Registered Users</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>{t('adminPage.users.registeredUsers')}</h2>
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ backgroundColor: 'var(--color-surface-hover)', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-                <th style={{ padding: '1rem' }}>Email</th>
-                <th style={{ padding: '1rem' }}>Joined</th>
-                <th style={{ padding: '1rem', textAlign: 'right' }}>Jobs</th>
-                <th style={{ padding: '1rem', textAlign: 'right' }}>Candidates</th>
-                <th style={{ padding: '1rem', textAlign: 'center' }}>Actions</th>
+              <tr
+                style={{
+                  backgroundColor: 'var(--color-surface-hover)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <th style={{ padding: '1rem' }}>{t('adminPage.users.columns.email')}</th>
+                <th style={{ padding: '1rem' }}>{t('adminPage.users.columns.joined')}</th>
+                <th style={{ padding: '1rem', textAlign: 'right' }}>{t('adminPage.users.columns.jobs')}</th>
+                <th style={{ padding: '1rem', textAlign: 'right' }}>{t('adminPage.users.columns.candidates')}</th>
+                <th style={{ padding: '1rem', textAlign: 'center' }}>{t('adminPage.users.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {!Array.isArray(users) || users.length === 0 ? (
-                <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>{loading ? 'Loading users...' : 'No users found.'}</td></tr>
+                <tr>
+                  <td colSpan={5} style={{ padding: '2rem', textAlign: 'center' }}>
+                    {loading ? t('adminPage.users.loading') : t('adminPage.users.empty')}
+                  </td>
+                </tr>
               ) : (
-                users.map(u => (
+                users.map((u) => (
                   <tr key={u.uid} style={{ borderBottom: '1px solid var(--color-surface-border)' }}>
                     <td style={{ padding: '1rem', fontWeight: 500 }}>
                       {u.email}
-                      {u.uid === currentUser?.uid && <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>Bạn</span>}
+                      {u.uid === currentUser?.uid && (
+                        <span className="badge badge-primary" style={{ marginLeft: '0.5rem' }}>
+                          {t('adminPage.users.you')}
+                        </span>
+                      )}
                     </td>
-                    <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>
-                      {formatDate(u.creationTime)}
-                    </td>
+                    <td style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>{formatDate(u.creationTime)}</td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.jobsCount}</td>
                     <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600 }}>{u.candidatesCount}</td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>
-                      <button 
+                      <button
+                        type="button"
                         onClick={() => handleDeleteUser(u.uid, u.email)}
-                        className="btn btn-secondary text-danger" 
+                        className="btn btn-secondary text-danger"
                         title="Delete User"
                         style={{ padding: '0.5rem', border: 'none', backgroundColor: 'transparent' }}
                       >

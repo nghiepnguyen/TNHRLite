@@ -30,7 +30,7 @@ const Reports = lazy(() => import('./pages/reports/Reports'));
 const WorkspaceSettings = lazy(() => import('./pages/settings/WorkspaceSettings'));
 const Members = lazy(() => import('./pages/settings/Members'));
 const UserSettings = lazy(() => import('./pages/settings/UserSettings'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminPortal = lazy(() => import('./pages/admin/AdminPortal'));
 
 const PrivacyPolicy = lazy(() => import('./pages/legal/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/legal/TermsOfService'));
@@ -107,7 +107,7 @@ function App() {
                   <Route path="members" element={<Members />} />
                   <Route path="settings" element={<WorkspaceSettings />} />
                   <Route path="profile" element={<UserSettings />} />
-                  <Route path="admin" element={<AdminDashboard />} />
+                  <Route path="admin" element={<AdminPortal />} />
                 </Route>
               </Route>
 

@@ -195,5 +195,79 @@
     "timezoneLabel": "Múi giờ",
     "avatarLabel": "Link Logo / Ảnh đại diện",
     "creating": "Đang tạo..."
+  },
+  "plans": {
+    "modalTitle": "Chọn sức mạnh cho không gian làm việc",
+    "modalSubtitle": "Mở khóa phân tích CV tự động, quản lý ứng viên quy mô lớn và quy trình tuyển dụng không giới hạn.",
+    "month": "/tháng",
+    "current": "Gói hiện tại",
+    "currentActive": "Đang dùng trong không gian này",
+    "popular": "Phổ biến nhất",
+    "unlimited": "Không giới hạn",
+    "upgradeBtn": "Nâng cấp lên Pro",
+    "contactBtn": "Nâng cấp lên Team",
+    "requestTitle": "Yêu cầu nâng cấp lên",
+    "requestDesc": "Gửi yêu cầu trực tiếp tới quản trị viên không gian và bộ phận thanh toán. Gói sẽ được kích hoạt ngay sau khi được phê duyệt.",
+    "placeholderText": "Ví dụ: Vui lòng nâng cấp không gian để tuyển dụng kỹ sư với khối lượng lớn trong tháng tới.",
+    "sendRequest": "Gửi yêu cầu",
+    "successTitle": "Đã gửi yêu cầu thành công!",
+    "successDesc": "Yêu cầu nâng cấp lên {{planName}} đã được xếp hàng chờ. Đội ngũ quản trị sẽ phê duyệt sớm và thông báo qua email.",
+    "back": "Quay lại bảng giá",
+    "submitError": "Không thể gửi yêu cầu nâng cấp. Vui lòng thử lại sau.",
+    "submitMockNotice": "Đã lưu yêu cầu. Email chưa được gửi (chưa cấu hình RESEND_API_KEY trên server).",
+    "close": "Đóng hộp thoại",
+    "selectedPlan": "Gói đã chọn",
+    "note": "Ghi chú",
+    "free": {
+      "name": "Gói Miễn phí",
+      "desc": "Phù hợp để bắt đầu và tuyển dụng cá nhân.",
+      "f1": "Tối đa 5 tin tuyển dụng đang mở",
+      "f2": "Tối đa 50 ứng viên",
+      "f3": "10 lượt phân tích CV AI mỗi tháng",
+      "f4": "Theo dõi pipeline cơ bản",
+      "f5": "Thông báo qua email"
+    },
+    "pro": {
+      "name": "Chuyên nghiệp",
+      "desc": "Lý tưởng cho doanh nghiệp đang phát triển và tuyển dụng theo nhóm.",
+      "f1": "Tối đa 50 tin tuyển dụng đang mở",
+      "f2": "Tối đa 500 ứng viên",
+      "f3": "100 lượt phân tích CV AI mỗi tháng",
+      "f4": "Bảng điều khiển tuyển dụng nâng cao",
+      "f5": "Mẫu email tùy chỉnh",
+      "f6": "Hỗ trợ email ưu tiên"
+    },
+    "team": {
+      "name": "Doanh nghiệp Team",
+      "desc": "Đầy đủ tính năng cho agency và doanh nghiệp quy mô lớn.",
+      "f1": "Không giới hạn tin tuyển dụng",
+      "f2": "Không giới hạn ứng viên",
+      "f3": "Không giới hạn phân tích CV AI",
+      "f4": "Đồng bộ nhiều không gian làm việc",
+      "f5": "Quản lý tài khoản riêng",
+      "f6": "Tích hợp ATS tùy chỉnh",
+      "f7": "Hỗ trợ điện thoại & SLA 24/7"
+    }
+  },
+  "usage": {
+    "jobs": "Tin tuyển dụng đang mở",
+    "candidates": "Tổng ứng viên",
+    "cvParses": "Phân tích CV (tháng)",
+    "currentPlan": "Gói",
+    "upgrade": "Nâng cấp",
+    "upgradeBtn": "Nâng cấp",
+    "collapsedTooltip": "Nhấn để xem hạn mức",
+    "collapsedTitle": "Gói {{plan}} — nhấn để xem hạn mức",
+    "limitReachedAlert": "Đã chạm hạn mức. Nâng cấp để mở khóa đầy đủ.",
+    "limitNearAlert": "Sắp chạm hạn mức. Nên nâng cấp sớm.",
+    "limitReachedTitle": "Đã đạt hạn mức",
+    "jobLimitReachedDesc": "Bạn đã đạt giới hạn tin tuyển dụng của gói hiện tại. Nâng cấp để đăng thêm tin.",
+    "candidateLimitReachedDesc": "Bạn đã đạt giới hạn ứng viên của gói hiện tại. Nâng cấp để thêm ứng viên.",
+    "cvParseLimitReachedDesc": "Bạn đã đạt giới hạn phân tích CV của gói hiện tại. Nâng cấp để phân tích thêm CV.",
+    "planNames": {
+      "free": "Miễn phí",
+      "pro": "Pro",
+      "team": "Team"
+    }
   }
 }

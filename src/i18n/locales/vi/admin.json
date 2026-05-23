@@ -1,0 +1,66 @@
+{
+  "adminPage": {
+    "accessDenied": "Từ chối truy cập",
+    "accessDeniedDesc": "Bạn không có quyền quản trị viên.",
+    "portalTitle": "Cổng quản trị",
+    "tabs": {
+      "users": "Người dùng",
+      "billing": "Gói & Nâng cấp"
+    },
+    "users": {
+      "totalUsers": "Tổng người dùng",
+      "totalJobs": "Tổng tin tuyển dụng",
+      "totalCandidates": "Tổng ứng viên",
+      "registeredUsers": "Người dùng đã đăng ký",
+      "you": "Bạn",
+      "loading": "Đang tải người dùng...",
+      "empty": "Không có người dùng.",
+      "deleteConfirm": "Xóa vĩnh viễn {{email}} và TOÀN BỘ tin tuyển dụng, ứng viên, hồ sơ ứng tuyển? Không thể hoàn tác.",
+      "columns": {
+        "email": "Email",
+        "joined": "Tham gia",
+        "jobs": "Tin TD",
+        "candidates": "Ứng viên",
+        "actions": "Thao tác"
+      }
+    },
+    "billing": {
+      "requestsTitle": "Yêu cầu nâng cấp",
+      "workspacesTitle": "Gói không gian làm việc",
+      "filter": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Đã từ chối",
+        "all": "Tất cả"
+      },
+      "loading": "Đang tải...",
+      "noRequests": "Không có yêu cầu trong mục này.",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "rejectPrompt": "Ghi chú gửi người yêu cầu (lý do từ chối, tùy chọn):",
+      "approveConfirm": "Duyệt nâng cấp lên {{plan}} cho \"{{workspace}}\"?",
+      "rejectConfirm": "Từ chối yêu cầu nâng cấp này?",
+      "approved": "Đã duyệt và kích hoạt gói.",
+      "rejected": "Đã từ chối yêu cầu.",
+      "planUpdated": "Đã cập nhật gói không gian.",
+      "adminNote": "Ghi chú admin",
+      "columns": {
+        "workspace": "Không gian",
+        "requester": "Người gửi",
+        "current": "Hiện tại",
+        "requested": "Yêu cầu",
+        "message": "Nội dung",
+        "date": "Ngày gửi",
+        "status": "Trạng thái",
+        "actions": "Thao tác",
+        "owner": "Chủ sở hữu",
+        "plan": "Gói",
+        "usage": "Đã dùng",
+        "changePlan": "Đổi gói"
+      },
+      "usageSummary": "{{jobs}} tin · {{candidates}} UV · {{cv}} CV/tháng",
+      "savePlan": "Áp dụng",
+      "planNotePlaceholder": "Ghi chú gửi chủ không gian (tùy chọn)..."
+    }
+  }
+}

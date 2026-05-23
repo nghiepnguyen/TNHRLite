@@ -2,9 +2,21 @@ import {
   collection, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   query, where, serverTimestamp, writeBatch, onSnapshot 
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { createNotification } from './notification.service';
 import { sendEmail } from './email.service';
+
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `http://${window.location.hostname}:3001/api`
+  : '/api';
+
+const getAuthHeaders = async () => {
+  const token = await auth.currentUser?.getIdToken();
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 
 /**
@@ -135,6 +147,13 @@ export const createWorkspace = async (ownerUid, email, workspaceData) => {
     timezone: timezone || 'UTC',
     language: language || 'en',
     ownerId: ownerUid,
+    plan: 'free',
+    usage: {
+      jobs: 0,
+      candidates: 0,
+      cvParsesThisMonth: 0
+    },
+    usageResetAt: serverTimestamp(),
     createdAt: serverTimestamp(),
   });
 
@@ -151,6 +170,17 @@ export const createWorkspace = async (ownerUid, email, workspaceData) => {
   return workspaceRef.id;
 };
 
+export const getUserOwnedFreeWorkspacesCount = async (uid) => {
+  if (!uid) return 0;
+  const q = query(
+    collection(db, 'workspaces'),
+    where('ownerId', '==', uid),
+    where('plan', '==', 'free')
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.size;
+};
+
 export const updateWorkspace = async (workspaceId, data) => {
   if (!workspaceId) throw new Error("Workspace ID required");
   const wsRef = doc(db, 'workspaces', workspaceId);
@@ -163,14 +193,14 @@ export const updateWorkspace = async (workspaceId, data) => {
 export const deleteWorkspace = async (workspaceId) => {
   if (!workspaceId) throw new Error("Workspace ID required");
   
-  // 1. Delete Workspace Members
+  // 1. Delete the workspace itself first (while we still have owner permissions)
+  await deleteDoc(doc(db, 'workspaces', workspaceId));
+  
+  // 2. Delete Workspace Members
   const membersQuery = query(collection(db, 'workspaceMembers'), where('workspaceId', '==', workspaceId));
   const memberDocs = await getDocs(membersQuery);
   const deletePromises = memberDocs.docs.map(d => deleteDoc(doc(db, 'workspaceMembers', d.id)));
   await Promise.all(deletePromises);
-  
-  // 2. Delete the workspace itself
-  await deleteDoc(doc(db, 'workspaces', workspaceId));
   
   // Note: For a production app, we would also clear out jobs/candidates/applications 
   // tied to this workspace, or use a Cloud Function for cascading deletes. 
@@ -580,4 +610,43 @@ export const migrateLegacyData = async (uid, workspaceId) => {
   }
   
   return totalMigrated;
+};
+
+/**
+ * Submit a workspace plan upgrade request (emails admins + billing, stores in Firestore).
+ */
+export const submitUpgradeRequest = async ({
+  workspaceId,
+  targetPlan,
+  planName,
+  message = '',
+}) => {
+  if (!workspaceId || !targetPlan) {
+    return { success: false, error: 'Missing workspace or plan' };
+  }
+
+  try {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/upgrade-request`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        workspaceId,
+        targetPlan,
+        planName,
+        message: message?.trim() || '',
+      }),
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(result.error || result.details || response.statusText);
+    }
+
+    return { success: true, ...result };
+  } catch (error) {
+    console.error('submitUpgradeRequest failed:', error);
+    return { success: false, error: error.message };
+  }
 };

@@ -11,8 +11,10 @@ import {
   subscribeToUserWorkspaces
 } from '../services/workspace.service';
 import { createNotification, markInviteNotificationAsRead } from '../services/notification.service';
-import { logActivity } from '../services/db';
+import { logActivity, syncWorkspaceUsage } from '../services/db';
 import { useToast } from './ToastContext';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 import { WorkspaceContext } from './WorkspaceContext';
 
@@ -28,6 +30,7 @@ export function WorkspaceProvider({ children }) {
   const [pendingInvites, setPendingInvites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const hasInitialLoadRef = useRef(false);
   const prevWorkspaceIdsRef = useRef(new Set());
   const toast = useToast();
@@ -74,6 +77,16 @@ export function WorkspaceProvider({ children }) {
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  // Sync workspace usage counters with actual database counts in the background (Self-Healing)
+  useEffect(() => {
+    if (workspaceId && currentUser) {
+      console.log(`[Sync] Triggering background usage synchronization for workspace: ${workspaceId}`);
+      syncWorkspaceUsage(workspaceId).catch(err => {
+        console.warn("Failed background workspace usage sync:", err);
+      });
+    }
+  }, [workspaceId, currentUser]);
 
   // Separate Effect for Redirects/Migration - only runs when workspaces or path changes
   useEffect(() => {
@@ -137,11 +150,56 @@ export function WorkspaceProvider({ children }) {
     return () => unsubscribe();
   }, [currentUser, workspaceId, navigate, toast]);
 
+  // Subscribe to active workspace document for real-time limits and plan details
+  useEffect(() => {
+    if (!currentUser || !workspaceId) {
+      return;
+    }
+
+    const wsDocRef = doc(db, 'workspaces', workspaceId);
+    const unsubscribe = onSnapshot(wsDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const wsData = snapshot.data();
+        const plan = wsData.plan || 'free';
+        const usage = wsData.usage || { jobs: 0, candidates: 0, cvParsesThisMonth: 0 };
+        
+        // Keep the role from the workspaces list if available
+        const foundInList = workspaces.find(w => w.id === workspaceId);
+        setActiveWorkspace({
+          id: snapshot.id,
+          ...wsData,
+          plan,
+          usage,
+          myRole: foundInList?.myRole || 'member',
+          joinedAt: foundInList?.joinedAt || null
+        });
+      } else {
+        setActiveWorkspace(null);
+      }
+    }, (error) => {
+      console.error("Error subscribing to active workspace:", error);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser, workspaceId, workspaces]);
+
   const switchWorkspace = (id) => {
     navigate(`/dashboard/w/${id}`);
   };
 
   const handleCreateWorkspace = async (workspaceData) => {
+    if (!currentUser) throw new Error("Authentication required");
+    
+    const freeCount = workspaces.filter(
+      ws => ws.ownerId === currentUser.uid && (ws.plan === 'free' || !ws.plan)
+    ).length;
+    
+    if (freeCount >= 2) {
+      const error = new Error('Bạn đã đạt giới hạn tối đa 2 Workspace ở gói miễn phí. Vui lòng nâng cấp!');
+      error.code = 'WORKSPACE_LIMIT_EXCEEDED';
+      throw error;
+    }
+
     const newId = await createWorkspace(currentUser.uid, currentUser.email, workspaceData);
     await refreshData();
     navigate(`/dashboard/w/${newId}`);
@@ -233,6 +291,7 @@ export function WorkspaceProvider({ children }) {
   };
 
   const value = {
+    currentUser,
     workspaces,
     activeWorkspace,
     pendingInvites,
@@ -242,7 +301,9 @@ export function WorkspaceProvider({ children }) {
     createWorkspace: handleCreateWorkspace,
     acceptInvite: handleAcceptInvite,
     declineInvite: handleDeclineInvite,
-    refreshWorkspaces: refreshData
+    refreshWorkspaces: refreshData,
+    isUpgradeModalOpen,
+    setIsUpgradeModalOpen
   };
 
   return (

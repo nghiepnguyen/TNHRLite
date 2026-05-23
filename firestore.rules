@@ -10,14 +10,16 @@ service cloud.firestore {
 
     // Check if the user is a member of a specific workspace
     function isMember(workspaceId) {
+      let memberId = request.auth.uid + '_' + workspaceId;
       return isAuthenticated() && workspaceId != null &&
-        exists(/databases/$(database)/documents/workspaceMembers/$(request.auth.uid + '_' + workspaceId));
+        exists(/databases/$(database)/documents/workspaceMembers/$(memberId));
     }
 
     // Check if user has at least specific role level
     function hasRole(workspaceId, roles) {
+      let memberId = request.auth.uid + '_' + workspaceId;
       return isMember(workspaceId) && 
-             get(/databases/$(database)/documents/workspaceMembers/$(request.auth.uid + '_' + workspaceId)).data.role in roles;
+             get(/databases/$(database)/documents/workspaceMembers/$(memberId)).data.role in roles;
     }
 
     // --- COLLECTIONS ---
@@ -31,7 +33,15 @@ service cloud.firestore {
     match /workspaces/{workspaceId} {
       allow read: if isMember(workspaceId);
       allow create: if isAuthenticated();
-      allow update, delete: if hasRole(workspaceId, ['owner', 'admin']);
+      allow update: if hasRole(workspaceId, ['owner', 'admin']) && 
+                    !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'usage', 'usageResetAt']);
+      allow delete: if hasRole(workspaceId, ['owner']);
+    }
+
+    // PLANS
+    match /plans/{planId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
     }
 
     // WORKSPACE MEMBERS
@@ -47,8 +57,9 @@ service cloud.firestore {
       );
 
       allow update, delete: if isAuthenticated() && (
-        // Case 1: Admins/Owners can manage members, but NO ONE can delete/demote an owner
-        (hasRole(resource.data.workspaceId, ['owner', 'admin']) && resource.data.role != 'owner') ||
+        // Case 1: Owners can manage/delete any membership (including owners). Admins can manage non-owners.
+        hasRole(resource.data.workspaceId, ['owner']) ||
+        (hasRole(resource.data.workspaceId, ['admin']) && resource.data.role != 'owner') ||
         // Case 2: A user can remove themselves (Leave Workspace), but NOT if they are the owner
         (resource.data.userId == request.auth.uid && resource.data.role != 'owner')
       );
@@ -112,6 +123,12 @@ service cloud.firestore {
     match /userNotifications/{notifId} {
       allow read, update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
       allow create: if isAuthenticated(); 
+    }
+
+    // PLAN UPGRADE REQUESTS (written by Cloud Functions; members may read)
+    match /upgradeRequests/{requestId} {
+      allow read: if isAuthenticated() && isMember(resource.data.workspaceId);
+      allow create, update, delete: if false;
     }
   }
 }

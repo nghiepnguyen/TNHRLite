@@ -138,6 +138,7 @@ export default function Dashboard() {
       case 'INVITATION_DECLINED': return t('dashboard.activity.declinedInvite');
       case 'MEMBER_REMOVED': return t('dashboard.activity.removedMember', { name });
       case 'MEMBER_LEFT': return t('dashboard.activity.leftWorkspace');
+      case 'UPGRADE_REQUESTED': return t('dashboard.activity.upgradeRequested', { name });
       default: return `action: ${act.action}`;
     }
   };

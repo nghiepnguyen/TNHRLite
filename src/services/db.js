@@ -12,6 +12,18 @@ const formatDoc = (doc) => ({
   ...doc.data(),
 });
 
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `http://${window.location.hostname}:3001/api`
+  : '/api';
+
+const getAuthHeaders = async () => {
+  const token = await auth.currentUser?.getIdToken();
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+};
+
 // --- JOBS ---
 export const getJobs = async (workspaceId) => {
   try {
@@ -50,42 +62,63 @@ export const getJob = async (jobId, workspaceId) => {
 
 export const createJob = async (workspaceId, jobData) => {
   if (!workspaceId) throw new Error("Workspace ID is required to create a job");
-  const docRef = await addDoc(collection(db, 'jobs'), {
-    ...jobData,
-    workspaceId,
-    createdBy: auth.currentUser?.uid || jobData.createdBy,
-    status: jobData.status || 'Active',
-    createdAt: serverTimestamp(),
-  });
-  
-  const jobId = docRef.id;
 
-  // Trigger Email Notification to Workspace Members
   try {
-    notifyWorkspaceMembers(workspaceId, {
-      subject: `New Job Posted: ${jobData.title}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
-          <h2 style="color: #2563eb; margin-top: 0;">New Job Opening</h2>
-          <p>A new job has been posted in your workspace.</p>
-          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb; margin: 20px 0;">
-            <strong style="font-size: 1.1em; display: block; margin-bottom: 4px; color: #1e293b;">${jobData.title}</strong>
-            <p style="margin: 0; color: #64748b; font-size: 0.9em;">${jobData.department || 'General'} • ${jobData.location || 'Remote'}</p>
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/jobs`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ workspaceId, jobData }),
+    });
+
+    if (!response.ok) {
+      let errBody = {};
+      try {
+        errBody = await response.json();
+      } catch (_) {}
+      
+      const errMsg = errBody.error || response.statusText;
+      const error = new Error(errMsg);
+      if (errBody.code) {
+        error.code = errBody.code;
+        error.plan = errBody.plan;
+        error.limit = errBody.limit;
+      }
+      throw error;
+    }
+
+    const createdJob = await response.json();
+    const jobId = createdJob.id;
+
+    // Trigger Email Notification to Workspace Members
+    try {
+      notifyWorkspaceMembers(workspaceId, {
+        subject: `New Job Posted: ${jobData.title}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
+            <h2 style="color: #2563eb; margin-top: 0;">New Job Opening</h2>
+            <p>A new job has been posted in your workspace.</p>
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb; margin: 20px 0;">
+              <strong style="font-size: 1.1em; display: block; margin-bottom: 4px; color: #1e293b;">${jobData.title}</strong>
+              <p style="margin: 0; color: #64748b; font-size: 0.9em;">${jobData.department || 'General'} • ${jobData.location || 'Remote'}</p>
+            </div>
+            <div style="margin: 25px 0;">
+              <a href="${window.location.origin}/dashboard/w/${workspaceId}/jobs/${jobId}" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Job Details</a>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+            <p style="font-size: 0.75em; color: #94a3b8; text-align: center;">You received this because "New Job Openings" is enabled in your HR-Lite profile settings.</p>
           </div>
-          <div style="margin: 25px 0;">
-            <a href="${window.location.origin}/dashboard/w/${workspaceId}/jobs/${jobId}" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Job Details</a>
-          </div>
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-          <p style="font-size: 0.75em; color: #94a3b8; text-align: center;">You received this because "New Job Openings" is enabled in your HR-Lite profile settings.</p>
-        </div>
-      `
-    }, 'newJob', auth.currentUser?.uid);
-  } catch (e) {
-    console.warn("Job creation email notification skipped:", e);
+        `
+      }, 'newJob', auth.currentUser?.uid);
+    } catch (e) {
+      console.warn("Job creation email notification skipped:", e);
+    }
+
+    return jobId;
+  } catch (error) {
+    console.error("Error in createJob API call:", error);
+    throw error;
   }
-
-  return jobId;
-
 };
 
 export const updateJob = async (id, data) => {
@@ -152,41 +185,63 @@ export const getCandidate = async (candidateId, workspaceId) => {
 
 export const createCandidate = async (workspaceId, candidateData) => {
   if (!workspaceId) throw new Error("Workspace ID is required to create a candidate");
-  const docRef = await addDoc(collection(db, 'candidates'), {
-    ...candidateData,
-    workspaceId,
-    createdBy: auth.currentUser?.uid || candidateData.createdBy,
-    createdAt: serverTimestamp(),
-  });
 
-  const candidateId = docRef.id;
-
-  // Trigger Email Notification to Workspace Members
   try {
-    notifyWorkspaceMembers(workspaceId, {
-      subject: `New Candidate: ${candidateData.fullName}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
-          <h2 style="color: #10b981; margin-top: 0;">New Candidate Added</h2>
-          <p>A new candidate has been added to your workspace.</p>
-          <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
-            <strong style="font-size: 1.1em; display: block; margin-bottom: 4px; color: #1e293b;">${candidateData.fullName}</strong>
-            <p style="margin: 0; color: #64748b; font-size: 0.9em;">${candidateData.currentTitle || 'Candidate'} • ${candidateData.location || 'Unknown'}</p>
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/candidates`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ workspaceId, candidateData }),
+    });
+
+    if (!response.ok) {
+      let errBody = {};
+      try {
+        errBody = await response.json();
+      } catch (_) {}
+      
+      const errMsg = errBody.error || response.statusText;
+      const error = new Error(errMsg);
+      if (errBody.code) {
+        error.code = errBody.code;
+        error.plan = errBody.plan;
+        error.limit = errBody.limit;
+      }
+      throw error;
+    }
+
+    const createdCandidate = await response.json();
+    const candidateId = createdCandidate.id;
+
+    // Trigger Email Notification to Workspace Members
+    try {
+      notifyWorkspaceMembers(workspaceId, {
+        subject: `New Candidate: ${candidateData.fullName}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
+            <h2 style="color: #10b981; margin-top: 0;">New Candidate Added</h2>
+            <p>A new candidate has been added to your workspace.</p>
+            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
+              <strong style="font-size: 1.1em; display: block; margin-bottom: 4px; color: #1e293b;">${candidateData.fullName}</strong>
+              <p style="margin: 0; color: #64748b; font-size: 0.9em;">${candidateData.currentTitle || 'Candidate'} • ${candidateData.location || 'Unknown'}</p>
+            </div>
+            <div style="margin: 25px 0;">
+              <a href="${window.location.origin}/dashboard/w/${workspaceId}/candidates/${candidateId}" style="background-color: #10b981; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Candidate Profile</a>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+            <p style="font-size: 0.75em; color: #94a3b8; text-align: center;">You received this because "New Candidates" is enabled in your HR-Lite profile settings.</p>
           </div>
-          <div style="margin: 25px 0;">
-            <a href="${window.location.origin}/dashboard/w/${workspaceId}/candidates/${candidateId}" style="background-color: #10b981; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Candidate Profile</a>
-          </div>
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-          <p style="font-size: 0.75em; color: #94a3b8; text-align: center;">You received this because "New Candidates" is enabled in your HR-Lite profile settings.</p>
-        </div>
-      `
-    }, 'newCandidate', auth.currentUser?.uid);
-  } catch (e) {
-    console.warn("Candidate creation email notification skipped:", e);
+        `
+      }, 'newCandidate', auth.currentUser?.uid);
+    } catch (e) {
+      console.warn("Candidate creation email notification skipped:", e);
+    }
+
+    return candidateId;
+  } catch (error) {
+    console.error("Error in createCandidate API call:", error);
+    throw error;
   }
-
-  return candidateId;
-
 };
 
 export const updateCandidate = async (candidateId, data) => {
@@ -402,5 +457,24 @@ export const logActivity = async (workspaceId, actor, action, entity, details = 
     });
   } catch (e) {
     console.error("Failed to log activity:", e);
+  }
+};
+
+export const syncWorkspaceUsage = async (workspaceId) => {
+  if (!workspaceId) return null;
+  try {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/workspaces/${workspaceId}/sync-usage`, {
+      method: 'POST',
+      headers
+    });
+    if (!response.ok) {
+      console.warn("Failed to sync workspace usage", response.statusText);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error syncing workspace usage:", error);
+    return null;
   }
 };

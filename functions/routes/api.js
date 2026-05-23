@@ -1,8 +1,11 @@
 const express = require('express');
 const mammoth = require('mammoth');
 const { Resend } = require('resend');
+const admin = require('firebase-admin');
 const { authenticate, validateWorkspace } = require('../middleware/auth');
 const { getModel, cleanJsonResponse, genAI } = require('../utils/ai');
+const { checkWorkspaceLimit } = require('../utils/limits');
+const { handleUpgradeRequest } = require('../utils/upgradeRequest');
 
 const router = express.Router();
 
@@ -13,6 +16,23 @@ router.post('/parse-cv', authenticate, validateWorkspace(['owner', 'admin', 'edi
   try {
     const { cvUrl } = req.body;
     if (!cvUrl) return res.status(400).json({ error: 'cvUrl is required' });
+
+    // Validate limit for cvParsesThisMonth
+    const db = admin.firestore();
+    try {
+      await checkWorkspaceLimit(db, req.workspaceId, 'cvParsesThisMonth');
+    } catch (limitError) {
+      if (limitError.code === 'LIMIT_EXCEEDED') {
+        return res.status(403).json({
+          error: limitError.message,
+          code: 'LIMIT_EXCEEDED',
+          resource: 'cvParsesThisMonth',
+          limit: limitError.limit,
+          plan: limitError.plan
+        });
+      }
+      throw limitError;
+    }
 
     if (!genAI) {
       return res.json({
@@ -222,6 +242,169 @@ router.post('/support', async (req, res) => {
   } catch (error) {
     console.error('Error in /support endpoint:', error);
     res.status(500).json({ error: 'Lỗi hệ thống khi gửi yêu cầu hỗ trợ.', details: error.message });
+  }
+});
+
+/**
+ * Endpoint to create a job securely, checking limits first.
+ */
+router.post('/jobs', authenticate, validateWorkspace(['owner', 'admin', 'editor']), async (req, res) => {
+  try {
+    const { workspaceId, jobData } = req.body;
+    if (!workspaceId || !jobData) {
+      return res.status(400).json({ error: 'workspaceId and jobData are required' });
+    }
+
+    const db = admin.firestore();
+
+    // 1. Check workspace limit
+    try {
+      await checkWorkspaceLimit(db, workspaceId, 'jobs');
+    } catch (limitError) {
+      if (limitError.code === 'LIMIT_EXCEEDED') {
+        return res.status(403).json({
+          error: limitError.message,
+          code: 'LIMIT_EXCEEDED',
+          resource: 'jobs',
+          limit: limitError.limit,
+          plan: limitError.plan
+        });
+      }
+      throw limitError;
+    }
+
+    // 2. Create Job Document
+    const jobRef = db.collection('jobs').doc();
+    const newJob = {
+      ...jobData,
+      workspaceId,
+      createdBy: req.user.uid,
+      status: jobData.status || 'Active',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await jobRef.set(newJob);
+
+    res.json({ id: jobRef.id, ...newJob });
+  } catch (error) {
+    console.error('Error creating job:', error);
+    res.status(500).json({ error: 'Failed to create job', details: error.message });
+  }
+});
+
+/**
+ * Endpoint to create a candidate securely, checking limits first.
+ */
+router.post('/candidates', authenticate, validateWorkspace(['owner', 'admin', 'editor']), async (req, res) => {
+  try {
+    const { workspaceId, candidateData } = req.body;
+    if (!workspaceId || !candidateData) {
+      return res.status(400).json({ error: 'workspaceId and candidateData are required' });
+    }
+
+    const db = admin.firestore();
+
+    // 1. Check workspace limit
+    try {
+      await checkWorkspaceLimit(db, workspaceId, 'candidates');
+    } catch (limitError) {
+      if (limitError.code === 'LIMIT_EXCEEDED') {
+        return res.status(403).json({
+          error: limitError.message,
+          code: 'LIMIT_EXCEEDED',
+          resource: 'candidates',
+          limit: limitError.limit,
+          plan: limitError.plan
+        });
+      }
+      throw limitError;
+    }
+
+    // 2. Create Candidate Document
+    const candidateRef = db.collection('candidates').doc();
+    const newCandidate = {
+      ...candidateData,
+      workspaceId,
+      createdBy: req.user.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await candidateRef.set(newCandidate);
+
+    res.json({ id: candidateRef.id, ...newCandidate });
+  } catch (error) {
+    console.error('Error creating candidate:', error);
+    res.status(500).json({ error: 'Failed to create candidate', details: error.message });
+  }
+});
+
+/**
+ * Workspace plan upgrade request — emails owners/admins + billing, confirms to requester.
+ */
+router.post('/upgrade-request', authenticate, async (req, res) => {
+  try {
+    await handleUpgradeRequest(req, res, resend);
+  } catch (error) {
+    console.error('Error in /upgrade-request:', error);
+    res.status(500).json({
+      error: 'Failed to submit upgrade request',
+      details: error.message,
+    });
+  }
+});
+
+// Workspace Usage Synchronization Endpoint (Self-Healing)
+router.post('/workspaces/:workspaceId/sync-usage', authenticate, validateWorkspace(['owner', 'admin', 'editor', 'viewer']), async (req, res) => {
+  const { workspaceId } = req.params;
+  try {
+    const db = admin.firestore();
+    
+    // 1. Fetch counts
+    const jobsCountSnap = await db.collection('jobs').where('workspaceId', '==', workspaceId).count().get();
+    const candidatesCountSnap = await db.collection('candidates').where('workspaceId', '==', workspaceId).count().get();
+    
+    const actualJobs = jobsCountSnap.data().count;
+    const actualCandidates = candidatesCountSnap.data().count;
+    
+    // 2. Fetch current workspace data
+    const wsRef = db.collection('workspaces').doc(workspaceId);
+    const wsDoc = await wsRef.get();
+    
+    if (!wsDoc.exists) {
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+    
+    const wsData = wsDoc.data();
+    const currentUsage = wsData.usage || {};
+    const cvParses = currentUsage.cvParsesThisMonth || 0;
+    
+    // 3. Update the workspace document using set with merge: true to safely handle missing map/fields
+    const updateData = {
+      usage: {
+        jobs: actualJobs,
+        candidates: actualCandidates,
+        cvParsesThisMonth: cvParses
+      }
+    };
+    
+    if (!wsData.plan) {
+      updateData.plan = 'free';
+    }
+    
+    await wsRef.set(updateData, { merge: true });
+    
+    console.log(`[Sync Cloud] Workspace ${workspaceId} synced: jobs=${actualJobs}, candidates=${actualCandidates}`);
+    res.json({
+      success: true,
+      usage: {
+        jobs: actualJobs,
+        candidates: actualCandidates,
+        cvParsesThisMonth: cvParses
+      }
+    });
+  } catch (error) {
+    console.error("Error syncing workspace usage in cloud:", error);
+    res.status(500).json({ error: 'Failed to sync workspace usage', details: error.message });
   }
 });
 

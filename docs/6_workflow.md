@@ -26,7 +26,14 @@
 - Cho phép xuất danh sách tuyển dụng ra file Excel (CSV) nhanh chóng.
 - Hệ thống log hành vi thay đổi sang bảng `Activity` để cung cấp dòng thời gian toàn diện (Feed) cho các Admin khác theo dõi.
 
-## 7. Hệ thống Thông báo & Phản hồi (Notifications)
+## 7. Gói dịch vụ & Yêu cầu nâng cấp (Plans)
+
+1. Mỗi workspace có gói `free` (mặc định), `pro`, hoặc `team` với hạn mức jobs / candidates / parse CV mỗi tháng.
+2. Khi chạm giới hạn, UI chặn thao tác và mở **UpgradeModal** — user chọn gói cao hơn và gửi yêu cầu.
+3. Hệ thống lưu bản ghi `upgradeRequests`, gửi email tới owner/admin workspace + billing, và thông báo in-app cho admin workspace.
+4. **Global admin** (email trong `ADMIN_EMAIL` / `VITE_ADMIN_EMAIL`) vào **Admin Portal** → tab *Gói & Nâng cấp* → duyệt hoặc từ chối; khi duyệt, `workspaces.plan` được cập nhật. Có thể đổi gói trực tiếp không qua yêu cầu.
+
+## 8. Hệ thống Thông báo & Phản hồi (Notifications)
 - Mọi tương tác quan trọng (Lời mời mới, Chấp nhận/Từ chối tham gia, Thay đổi nhân sự) đều được đẩy về **Notification Center**.
 - Hệ thống áp dụng cơ chế thông báo hai chiều, đảm bảo cả người thực hiện và người nhận đều nhận được phản hồi xác thực về hành động của mình.
 - **Quản lý thành viên nâng cao**: Ngăn chặn gửi nhiều lời mời tới cùng một email (duplicate check). Đồng thời cho phép Admin xóa vĩnh viễn các bản ghi mời cũ để làm sạch Audit Log.

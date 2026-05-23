@@ -195,5 +195,79 @@
     "timezoneLabel": "Timezone",
     "avatarLabel": "Logo / Avatar URL",
     "creating": "Creating..."
+  },
+  "plans": {
+    "modalTitle": "Choose Your Workspace Power",
+    "modalSubtitle": "Unlock automated parsing, larger candidate sheets, and unlimited pipelines.",
+    "month": "/month",
+    "current": "Current Plan",
+    "currentActive": "Active in this workspace",
+    "popular": "Most Popular",
+    "unlimited": "Unlimited Power",
+    "upgradeBtn": "Upgrade to Pro",
+    "contactBtn": "Upgrade to Team",
+    "requestTitle": "Request Upgrade to",
+    "requestDesc": "Send a direct request to your workspace owners and our billing desk. We will activate the plan as soon as it is approved.",
+    "placeholderText": "e.g. Please upgrade our workspace for upcoming high-volume engineering recruitment.",
+    "sendRequest": "Submit Request",
+    "successTitle": "Request Successfully Sent!",
+    "successDesc": "Your upgrade request for {{planName}} has been queued. Our admin team will approve it shortly and notify you via email.",
+    "back": "Back to Pricing",
+    "submitError": "Could not send your upgrade request. Please try again later.",
+    "submitMockNotice": "Request saved. Email was not sent (billing API key not configured on server).",
+    "close": "Close modal",
+    "selectedPlan": "Selected Plan",
+    "note": "Note",
+    "free": {
+      "name": "Free Plan",
+      "desc": "Ideal for getting started and personal recruitment.",
+      "f1": "Up to 5 active jobs",
+      "f2": "Up to 50 total candidates",
+      "f3": "10 AI CV parses per month",
+      "f4": "Basic pipeline tracking",
+      "f5": "Email notifications"
+    },
+    "pro": {
+      "name": "Professional",
+      "desc": "Perfect for growing businesses and team hiring.",
+      "f1": "Up to 50 active jobs",
+      "f2": "Up to 500 total candidates",
+      "f3": "100 AI CV parses per month",
+      "f4": "Advanced hiring dashboard",
+      "f5": "Custom email templates",
+      "f6": "Priority email support"
+    },
+    "team": {
+      "name": "Enterprise Team",
+      "desc": "Ultimate features for agencies and scaling enterprises.",
+      "f1": "Unlimited active jobs",
+      "f2": "Unlimited candidates",
+      "f3": "Unlimited AI CV parses",
+      "f4": "Multi-workspace sync",
+      "f5": "Dedicated Account Manager",
+      "f6": "Custom ATS integrations",
+      "f7": "24/7 phone & SLA support"
+    }
+  },
+  "usage": {
+    "jobs": "Active Jobs",
+    "candidates": "Total Candidates",
+    "cvParses": "CV Parses (Monthly)",
+    "currentPlan": "Plan",
+    "upgrade": "Upgrade",
+    "upgradeBtn": "Upgrade",
+    "collapsedTooltip": "Click to view limits",
+    "collapsedTitle": "{{plan}} plan — click to view limits",
+    "limitReachedAlert": "Resource limits reached. Upgrade to unlock full access.",
+    "limitNearAlert": "Approaching limits. We recommend upgrading soon.",
+    "limitReachedTitle": "Limit Reached",
+    "jobLimitReachedDesc": "You have reached the active job limit for your plan. Upgrade to post more jobs.",
+    "candidateLimitReachedDesc": "You have reached the candidate limit for your plan. Upgrade to add more candidates.",
+    "cvParseLimitReachedDesc": "You have reached the CV parsing limit for your plan. Upgrade to parse more CVs.",
+    "planNames": {
+      "free": "Free",
+      "pro": "Pro",
+      "team": "Team"
+    }
   }
 }

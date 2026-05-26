@@ -39,11 +39,13 @@ const verifyAdmin = async (req, res, next) => {
  * @param {string[]} requiredRoles - List of roles permitted for this action.
  */
 const validateWorkspace = (requiredRoles = []) => async (req, res, next) => {
-  const { workspaceId } = req.body; // Expecting workspaceId in JSON body
+  const workspaceId = req.params?.workspaceId || req.body?.workspaceId;
   const userId = req.user.uid;
 
   if (!workspaceId) {
-    return res.status(400).json({ error: 'workspaceId is required in request body' });
+    return res.status(400).json({
+      error: 'workspaceId is required (URL path or request body)',
+    });
   }
 
   try {

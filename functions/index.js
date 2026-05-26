@@ -41,7 +41,10 @@ async function seedPlans() {
     console.error("❌ Error seeding plans:", error.message);
   }
 }
-seedPlans();
+// Skip during `firebase deploy` local code analysis (no ADC on developer machine).
+if (process.env.K_SERVICE || process.env.FUNCTIONS_EMULATOR === 'true') {
+  seedPlans();
+}
 
 const adminRoutes = require('./routes/admin');
 const apiRoutes = require('./routes/api');

@@ -7,6 +7,7 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   getRedirectResult,
   sendEmailVerification,
   reload
@@ -45,10 +46,18 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function loginWithGoogle() {
+  async function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    // Sử dụng Popup thay vì Redirect để ổn định hơn trên localhost
-    return signInWithPopup(auth, provider);
+    provider.setCustomParameters({ prompt: 'select_account' });
+    try {
+      return await signInWithPopup(auth, provider);
+    } catch (err) {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        // Popup bị trình duyệt chặn (thường gặp trên production domain) — fallback sang redirect
+        return signInWithRedirect(auth, provider);
+      }
+      throw err;
+    }
   }
 
   function logout() {

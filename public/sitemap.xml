@@ -1,38 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://hr.thanhnghiep.top/</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://recuiter.cvfit.pro/?lang=vi" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://recuiter.cvfit.pro/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://recuiter.cvfit.pro/?lang=vi" />
   </url>
   <url>
-    <loc>https://hr.thanhnghiep.top/login</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/login</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://hr.thanhnghiep.top/privacy-policy</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/privacy-policy</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://hr.thanhnghiep.top/terms-of-service</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/terms-of-service</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://hr.thanhnghiep.top/cookie-policy</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/cookie-policy</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://hr.thanhnghiep.top/contact-support</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://recuiter.cvfit.pro/contact-support</loc>
+    <lastmod>2026-06-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

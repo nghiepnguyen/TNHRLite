@@ -4,6 +4,7 @@ import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/common/SEO';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -77,6 +78,7 @@ export default function DashboardLayout() {
 
   return (
     <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <SEO noindex />
       {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
         <div 

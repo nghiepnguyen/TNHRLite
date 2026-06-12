@@ -1,5 +1,6 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
 const { Resend } = require('resend');
 const { verifyAdmin } = require('../middleware/auth');
 const {
@@ -15,10 +16,9 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 // Admin Endpoint: List Users & Stats
 router.get('/users', verifyAdmin, async (req, res) => {
   try {
-    const db = admin.firestore();
+    const db = getFirestore();
     const listUsersResult = await admin.auth().listUsers(1000);
     
-    // Process records
     const usersWithStats = await Promise.all(listUsersResult.users.map(async (userRecord) => {
       const jobsQuery = db.collection('jobs').where('createdBy', '==', userRecord.uid);
       const candsQuery = db.collection('candidates').where('createdBy', '==', userRecord.uid);
@@ -50,7 +50,7 @@ router.get('/users', verifyAdmin, async (req, res) => {
 router.delete('/users/:uid', verifyAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    const db = admin.firestore();
+    const db = getFirestore();
     
     const userJobDocs = await db.collection('jobs').where('createdBy', '==', uid).get();
     const userCandidateDocs = await db.collection('candidates').where('createdBy', '==', uid).get();

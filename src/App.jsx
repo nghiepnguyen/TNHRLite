@@ -9,6 +9,7 @@ import SEO from './components/common/SEO';
 
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Pages - Lazy Loaded
 const Login = lazy(() => import('./pages/Login'));
@@ -62,8 +63,37 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const { currentUser, isAdmin, loading } = useAuth();
+  
+  if (loading) {
+    return <PageLoading />;
+  }
+  
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!currentUser.emailVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', marginTop: '4rem' }}>
+        <h1>403: Forbidden</h1>
+        <p>You do not have admin privileges to access this page.</p>
+        <a href="/dashboard">Return to Dashboard</a>
+      </div>
+    );
+  }
+  
+  return children;
+};
+
 function App() {
   return (
+    <ErrorBoundary>
     <Router>
       <HelmetProvider>
         <SEO />
@@ -107,7 +137,9 @@ function App() {
                   <Route path="members" element={<Members />} />
                   <Route path="settings" element={<WorkspaceSettings />} />
                   <Route path="profile" element={<UserSettings />} />
-                  <Route path="admin" element={<AdminPortal />} />
+                  <Route path="admin" element={
+                    <AdminRoute><AdminPortal /></AdminRoute>
+                  } />
                 </Route>
               </Route>
 
@@ -124,6 +156,7 @@ function App() {
       </ToastProvider>
       </HelmetProvider>
     </Router>
+    </ErrorBoundary>
   );
 }
 

@@ -2,21 +2,12 @@ import {
   collection, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
   query, where, serverTimestamp, writeBatch, onSnapshot 
 } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase';
 import { createNotification } from './notification.service';
 import { sendEmail } from './email.service';
-
-const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? `http://${window.location.hostname}:3001/api`
-  : '/api';
-
-const getAuthHeaders = async () => {
-  const token = await auth.currentUser?.getIdToken();
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  };
-};
+import { API_BASE_URL, getAuthHeaders } from './apiClient';
+import { welcomeEmailTemplate, inviteEmailTemplate } from './emailTemplates';
 
 
 /**
@@ -53,41 +44,7 @@ export const ensureUserProfile = async (user) => {
       await sendEmail({
         to: user.email,
         subject: "Welcome to HR-Lite! 🚀",
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #2563eb; margin-bottom: 8px;">Welcome to HR-Lite!</h1>
-              <p style="color: #64748b; font-size: 1.2em;">We're excited to have you here.</p>
-            </div>
-            
-            <p>Hi ${user.displayName || 'there'},</p>
-            <p>Your account has been successfully created. HR-Lite is your all-in-one platform for modern recruitment management.</p>
-            
-            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 24px 0;">
-              <h3 style="margin-top: 0; color: #334155;">Next Steps:</h3>
-              <ul style="color: #475569; padding-left: 20px;">
-                <li>Create or join a <strong>Workspace</strong></li>
-                <li>Post your first <strong>Job Opening</strong></li>
-                <li>Upload candidates and use <strong>AI Parsing</strong></li>
-              </ul>
-            </div>
-            
-            <div style="text-align: center; margin: 32px 0;">
-              <a href="${window.location.origin}/dashboard" style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
-                Get Started
-              </a>
-            </div>
-            
-            <p style="font-size: 0.9em; color: #64748b;">
-              Need help? Just reply to this email or visit our <a href="${window.location.origin}/contact-support" style="color: #2563eb;">support center</a>.
-            </p>
-            
-            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-            <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">
-              © ${new Date().getFullYear()} HR-Lite. All rights reserved.
-            </p>
-          </div>
-        `
+        html: welcomeEmailTemplate(user.displayName)
       });
     } catch (e) {
       console.warn("Welcome email skipped or failed:", e);
@@ -193,51 +150,51 @@ export const updateWorkspace = async (workspaceId, data) => {
 export const deleteWorkspace = async (workspaceId) => {
   if (!workspaceId) throw new Error("Workspace ID required");
   
-  // 1. Delete the workspace itself first (while we still have owner permissions)
-  await deleteDoc(doc(db, 'workspaces', workspaceId));
-  
-  // 2. Delete Workspace Members
-  const membersQuery = query(collection(db, 'workspaceMembers'), where('workspaceId', '==', workspaceId));
-  const memberDocs = await getDocs(membersQuery);
-  const deletePromises = memberDocs.docs.map(d => deleteDoc(doc(db, 'workspaceMembers', d.id)));
-  await Promise.all(deletePromises);
-  
-  // Note: For a production app, we would also clear out jobs/candidates/applications 
-  // tied to this workspace, or use a Cloud Function for cascading deletes. 
-  // Here, we'll assume soft cleanup or rely on future batch jobs.
+  // Call server-side cascade delete (covers jobs, candidates, applications,
+  // invites, activities, workspaceMembers, upgradeRequests, and the workspace itself)
+  const cascadeDelete = httpsCallable(functions, 'deleteWorkspaceCascade');
+  const result = await cascadeDelete({ workspaceId });
+  console.log(`Workspace ${workspaceId} cascade deleted:`, result.data);
+  return result.data;
 };
 
 export const getUserWorkspaces = async (uid) => {
-  // We need to find all workspaces where the user is a member.
-  // Since members are in a subcollection, we might need a collection group query 
-  // or a more efficient way. For now, let's use a collection group query if possible,
-  // or just search the 'workspaces' collection if we stored memberIds in an array.
-  // BUT the requirements mentioned role-based, so subcollection is better for rules.
-  
-  // Alternative: Keep a top-level `workspaceMembers` collection for easier querying.
-  // Let's use `workspaceMembers` top-level collection for easier "Get my workspaces" query.
+  if (!uid) return [];
   
   try {
+    // Step 1: Get all workspaceMembers for this user
     const q = query(collection(db, 'workspaceMembers'), where('userId', '==', uid));
     const snapshot = await getDocs(q);
     
+    if (snapshot.empty) return [];
+    
+    // Step 2: Batch-read all workspace documents in parallel (no N+1)
+    const workspaceIds = snapshot.docs.map(d => d.data().workspaceId);
+    const memberMap = {};
+    snapshot.docs.forEach(d => {
+      const data = d.data();
+      memberMap[data.workspaceId] = data.role;
+    });
+    
+    // Firestore supports up to 30 documents per getAll
+    const wsRefs = workspaceIds.map(id => doc(db, 'workspaces', id));
+    const wsSnapshots = await Promise.all(
+      wsRefs.map(ref => getDoc(ref).catch(() => null))
+    );
+    
     const workspaces = [];
-    for (const memberDoc of snapshot.docs) {
-      const data = memberDoc.data();
-      try {
-        const wsDoc = await getDoc(doc(db, 'workspaces', data.workspaceId));
-        if (wsDoc.exists()) {
-          workspaces.push({
-            id: wsDoc.id,
-            ...wsDoc.data(),
-            myRole: data.role
-          });
-        }
-      } catch (e) {
-        console.error("Failed to get workspace doc:", data.workspaceId, e);
+    wsSnapshots.forEach((wsSnap, index) => {
+      if (wsSnap && wsSnap.exists()) {
+        const wsId = workspaceIds[index];
+        workspaces.push({
+          id: wsSnap.id,
+          ...wsSnap.data(),
+          myRole: memberMap[wsId]
+        });
       }
-    }
-    return workspaces;
+    });
+    
+    return workspaces.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
   } catch (error) {
     console.error("Failed in getUserWorkspaces:", error);
     throw error;
@@ -253,25 +210,38 @@ export const subscribeToUserWorkspaces = (uid, onUpdate) => {
   const q = query(collection(db, 'workspaceMembers'), where('userId', '==', uid));
   
   return onSnapshot(q, async (snapshot) => {
-    const workspaces = [];
-    
-    // Process each membership record
-    for (const memberDoc of snapshot.docs) {
-      const memberData = memberDoc.data();
-      try {
-        const wsSnap = await getDoc(doc(db, 'workspaces', memberData.workspaceId));
-        if (wsSnap.exists()) {
-          workspaces.push({
-            id: wsSnap.id,
-            ...wsSnap.data(),
-            myRole: memberData.role,
-            joinedAt: memberData.joinedAt
-          });
-        }
-      } catch (e) {
-        console.error("Error fetching workspace details in sub:", memberData.workspaceId, e);
-      }
+    if (snapshot.empty) {
+      onUpdate([]);
+      return;
     }
+    
+    // Build member map and collect workspace IDs
+    const workspaceIds = [];
+    const memberMap = {};
+    snapshot.docs.forEach(d => {
+      const data = d.data();
+      workspaceIds.push(data.workspaceId);
+      memberMap[data.workspaceId] = { role: data.role, joinedAt: data.joinedAt };
+    });
+    
+    // Fetch all workspace documents in parallel (avoid N+1)
+    const wsRefs = workspaceIds.map(id => doc(db, 'workspaces', id));
+    const wsSnapshots = await Promise.all(
+      wsRefs.map(ref => getDoc(ref).catch(() => null))
+    );
+    
+    const workspaces = [];
+    wsSnapshots.forEach((wsSnap, index) => {
+      if (wsSnap && wsSnap.exists()) {
+        const wsId = workspaceIds[index];
+        workspaces.push({
+          id: wsSnap.id,
+          ...wsSnap.data(),
+          myRole: memberMap[wsId].role,
+          joinedAt: memberMap[wsId].joinedAt
+        });
+      }
+    });
     
     onUpdate(workspaces.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)));
   }, (error) => {
@@ -467,38 +437,10 @@ export const inviteMember = async (workspaceId, workspaceName, email, role, invi
       }
     }
 
-    const inviteLink = `${window.location.origin}/login`;
     await sendEmail({
-
       to: email,
       subject: `Invitation to join ${workspaceName}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #1a1a1a;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #2563eb; margin-bottom: 8px;">HR-Lite</h1>
-            <p style="color: #64748b; font-size: 1.1em;">Workspace Invitation</p>
-          </div>
-          
-          <p>Hi there,</p>
-          <p><strong>${invitedByEmail}</strong> has invited you to join the workspace <strong>"${workspaceName}"</strong> as a <strong>${role}</strong>.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${inviteLink}" style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
-              Accept Invitation
-            </a>
-          </div>
-          
-          <p style="font-size: 0.9em; color: #64748b;">
-            If you already have an account, log in with <strong>${email}</strong> to see your invitation. 
-            If not, please sign up using the same email address.
-          </p>
-          
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-          <p style="font-size: 0.8em; color: #94a3b8; text-align: center;">
-            This invitation was sent by HR-Lite on behalf of ${invitedByEmail}.
-          </p>
-        </div>
-      `
+      html: inviteEmailTemplate({ workspaceName, role, invitedByEmail, email })
     });
   } catch (err) {
     console.error("Failed to send invitation email:", err);

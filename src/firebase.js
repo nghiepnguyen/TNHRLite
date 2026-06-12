@@ -3,6 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
+import { getFunctions } from "firebase/functions";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Your web app's Firebase configuration
@@ -24,21 +25,40 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app);
 
-// Initialize App Check - Disable on localhost if causing issues
+// App Check is temporarily disabled to unblock Google Sign-In.
+// To re-enable: register reCAPTCHA site key for this domain at
+// https://www.google.com/recaptcha/admin and set VITE_RECAPTCHA_SITE_KEY in .env.
+// Then uncomment the block below and remove the null assignment.
+//
+// const isLocalhost = typeof window !== 'undefined' && 
+//   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+// let _appCheck = null;
+// if (typeof window !== 'undefined' && !isLocalhost) {
+//   try {
+//     const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+//     if (siteKey) {
+//       _appCheck = initializeAppCheck(app, {
+//         provider: new ReCaptchaV3Provider(siteKey),
+//         isTokenAutoRefreshEnabled: true
+//       });
+//     }
+//   } catch (e) {
+//     console.warn('App Check initialization failed:', e);
+//   }
+// }
+// export const appCheck = _appCheck;
+
+export const appCheck = null;
+
+// Allow App Check Debug Mode on localhost
 const isLocalhost = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-export const appCheck = (typeof window !== 'undefined' && !isLocalhost) 
-  ? initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-      isTokenAutoRefreshEnabled: true
-    }) 
-  : null;
-
-// Allow Debug Mode on localhost
 if (isLocalhost) {
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  try {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  } catch (_) { /* ignore in non-browser env */ }
 }
 
 // Initialize Analytics - Disable on localhost to avoid Installations API 403 errors

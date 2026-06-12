@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
 
 /**
  * Basic authentication: Verifies Firebase ID Token and attaches user to req.user
@@ -24,7 +25,6 @@ const authenticate = async (req, res, next) => {
  * Admin Middleware: Ensures caller is a global administrator.
  */
 const verifyAdmin = async (req, res, next) => {
-  // Use authenticate first, then check email
   await authenticate(req, res, async () => {
     const adminEmail = process.env.ADMIN_EMAIL || 'thanhnghiep@gmail.com';
     if (req.user.email !== adminEmail) {
@@ -49,15 +49,13 @@ const validateWorkspace = (requiredRoles = []) => async (req, res, next) => {
   }
 
   try {
-    const db = admin.firestore();
+    const db = getFirestore();
     
-    // 1. Check if workspace exists
     const wsSnap = await db.collection('workspaces').doc(workspaceId).get();
     if (!wsSnap.exists) {
       return res.status(404).json({ error: 'Workspace not found' });
     }
 
-    // 2. Check membership and role
     const memberId = `${userId}_${workspaceId}`;
     const memberSnap = await db.collection('workspaceMembers').doc(memberId).get();
 
@@ -70,7 +68,6 @@ const validateWorkspace = (requiredRoles = []) => async (req, res, next) => {
       return res.status(403).json({ error: `Forbidden: Sufficient role required (${requiredRoles.join(', ')})` });
     }
 
-    // Attach workspace/member data for the handler
     req.workspaceId = workspaceId;
     req.member = memberData;
     next();

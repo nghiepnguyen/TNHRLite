@@ -1,10 +1,10 @@
-const admin = require('firebase-admin');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 /**
  * Checks if a workspace has exceeded its usage limit for a specific resource,
  * and increments the usage counter atomically in a transaction if allowed.
  * 
- * @param {admin.firestore.Firestore} db - Firestore Admin instance
+ * @param {Firestore} db - Firestore Admin instance
  * @param {string} workspaceId - The workspace ID to verify
  * @param {'jobs' | 'candidates' | 'cvParsesThisMonth'} resource - The resource being added
  * @returns {Promise<{success: boolean, newUsage: number, limit: number}>}
@@ -28,7 +28,6 @@ async function checkWorkspaceLimit(db, workspaceId, resource) {
     const planRef = db.collection('plans').doc(planId);
     const planDoc = await transaction.get(planRef);
     
-    // Fallback default values for plans if Firestore query fails/document doesn't exist
     let planData = { jobs: 5, candidates: 50, cvParsesPerMonth: 10 };
     if (planDoc.exists) {
       planData = planDoc.data();
@@ -50,9 +49,8 @@ async function checkWorkspaceLimit(db, workspaceId, resource) {
       throw error;
     }
     
-    // Atomically increment the specific resource usage field in the map
     transaction.update(workspaceRef, {
-      [`usage.${resource}`]: admin.firestore.FieldValue.increment(1)
+      [`usage.${resource}`]: FieldValue.increment(1)
     });
     
     return { 

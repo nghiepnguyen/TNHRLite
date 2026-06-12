@@ -33,6 +33,7 @@ export function WorkspaceProvider({ children }) {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const hasInitialLoadRef = useRef(false);
   const prevWorkspaceIdsRef = useRef(new Set());
+  const syncedWorkspacesRef = useRef(new Set());
   const toast = useToast();
 
   const refreshData = useCallback(async () => {
@@ -78,15 +79,15 @@ export function WorkspaceProvider({ children }) {
     refreshData();
   }, [refreshData]);
 
-  // Sync workspace usage counters with actual database counts in the background (Self-Healing)
-  useEffect(() => {
-    if (workspaceId && currentUser) {
-      console.log(`[Sync] Triggering background usage synchronization for workspace: ${workspaceId}`);
-      syncWorkspaceUsage(workspaceId).catch(err => {
-        console.warn("Failed background workspace usage sync:", err);
-      });
-    }
-  }, [workspaceId, currentUser]);
+  // Usage counters are maintained atomically via checkWorkspaceLimit transactions.
+  // Sync is disabled to avoid unnecessary API calls and index requirements.
+  // To re-enable: uncomment the block below.
+  // useEffect(() => {
+  //   if (workspaceId && currentUser && !syncedWorkspacesRef.current.has(workspaceId)) {
+  //     syncedWorkspacesRef.current.add(workspaceId);
+  //     syncWorkspaceUsage(workspaceId).catch(() => {});
+  //   }
+  // }, [workspaceId, currentUser]);
 
   // Separate Effect for Redirects/Migration - only runs when workspaces or path changes
   useEffect(() => {

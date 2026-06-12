@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 const PLAN_LABELS = {
   pro: 'Professional',
@@ -9,10 +10,10 @@ const PLAN_RANK = { free: 0, pro: 1, team: 2 };
 
 function escapeHtml(value) {
   return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"');
 }
 
 async function collectAdminEmails(db, workspaceId) {
@@ -55,16 +56,12 @@ async function notifyAdmins(db, adminUids, payload) {
         workspaceName,
         metadata,
         status: 'unread',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       })
     )
   );
 }
 
-/**
- * Handles workspace plan upgrade requests: validates membership, persists request,
- * emails workspace admins + billing, confirms to requester, and notifies admins in-app.
- */
 async function handleUpgradeRequest(req, res, resend) {
   const { workspaceId, targetPlan, planName, message } = req.body || {};
   const userId = req.user.uid;
@@ -79,7 +76,7 @@ async function handleUpgradeRequest(req, res, resend) {
     return res.status(400).json({ error: 'Invalid target plan' });
   }
 
-  const db = admin.firestore();
+  const db = getFirestore();
   const memberId = `${userId}_${workspaceId}`;
   const memberSnap = await db.collection('workspaceMembers').doc(memberId).get();
 
@@ -121,7 +118,7 @@ async function handleUpgradeRequest(req, res, resend) {
     targetPlanName: displayPlanName,
     message: trimmedMessage,
     status: 'pending',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
   const adminsSnap = await db
@@ -157,7 +154,7 @@ async function handleUpgradeRequest(req, res, resend) {
       <p><strong>Workspace:</strong> ${escapeHtml(workspaceName)}</p>
       <p><strong>Current plan:</strong> ${escapeHtml(currentPlan)}</p>
       <p><strong>Requested plan:</strong> ${escapeHtml(displayPlanName)} (${escapeHtml(targetPlan)})</p>
-      <p><strong>Requested by:</strong> ${escapeHtml(userName)} &lt;${escapeHtml(userEmail)}&gt;</p>
+      <p><strong>Requested by:</strong> ${escapeHtml(userName)} <${escapeHtml(userEmail)}></p>
       <p><strong>Request ID:</strong> ${escapeHtml(requestRef.id)}</p>
       ${noteBlock}
       <hr style="border:0;border-top:1px solid #e2e8f0;margin:24px 0;" />

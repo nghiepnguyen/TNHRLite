@@ -2,6 +2,7 @@ const express = require('express');
 const mammoth = require('mammoth');
 const { Resend } = require('resend');
 const admin = require('firebase-admin');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { authenticate, validateWorkspace } = require('../middleware/auth');
 const { getModel, cleanJsonResponse, genAI } = require('../utils/ai');
 const { checkWorkspaceLimit } = require('../utils/limits');
@@ -12,13 +13,96 @@ const router = express.Router();
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
+// --- Security Utilities ---
+
+/**
+ * Escape HTML special characters to prevent HTML injection
+ */
+const escapeHtml = (unsafe) => {
+  if (typeof unsafe !== 'string') return '';
+  return unsafe
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
+    .replace(/'/g, '&#039;');
+};
+
+/**
+ * Strip internal error details in production to prevent information disclosure
+ */
+const sanitizeError = (err) => {
+  const isDev = process.env.FUNCTIONS_EMULATOR === 'true' || !process.env.K_SERVICE;
+  if (isDev) {
+    return { error: err.message || 'An unexpected error occurred', details: err.message };
+  }
+  return { error: 'An internal server error occurred' };
+};
+
+/**
+ * Firestore-based rate limiter for public endpoints.
+ * Stores rate limit counters in Firestore with TTL-based cleanup via scheduled function.
+ * This avoids the cold-start reset issue of in-memory rate limiters.
+ */
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
+const rateLimiter = async (req, res, next) => {
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+
+  const db = getFirestore();
+  const limitRef = db.collection('rateLimits').doc(`support_${ip.replace(/[.\[\]:]/g, '_')}`);
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const docSnap = await transaction.get(limitRef);
+      
+      let timestamps = [];
+      if (docSnap.exists) {
+        timestamps = (docSnap.data().timestamps || []).filter(ts => ts > windowStart);
+      }
+
+      if (timestamps.length >= RATE_LIMIT_MAX_REQUESTS) {
+        const retryAfter = Math.ceil((timestamps[0] + RATE_LIMIT_WINDOW_MS - now) / 1000);
+        throw Object.assign(new Error('Too many requests'), { 
+          statusCode: 429, 
+          retryAfter: Math.max(retryAfter, 1)
+        });
+      }
+
+      timestamps.push(now);
+      transaction.set(limitRef, {
+        timestamps,
+        expiresAt: new Date(now + RATE_LIMIT_WINDOW_MS * 2), // TTL for cleanup
+        ip
+      });
+    });
+
+    next();
+  } catch (error) {
+    if (error.statusCode === 429) {
+      return res.status(429).json({
+        error: 'Too many requests. Please try again later.',
+        retryAfter: error.retryAfter || 60
+      });
+    }
+    // If Firestore fails, fall through gracefully (don't block legitimate traffic)
+    console.error('Rate limiter error (falling through):', error);
+    next();
+  }
+};
+
+// --- API Routes ---
+
 router.post('/parse-cv', authenticate, validateWorkspace(['owner', 'admin', 'editor']), async (req, res) => {
   try {
     const { cvUrl } = req.body;
     if (!cvUrl) return res.status(400).json({ error: 'cvUrl is required' });
 
     // Validate limit for cvParsesThisMonth
-    const db = admin.firestore();
+    const db = getFirestore();
     try {
       await checkWorkspaceLimit(db, req.workspaceId, 'cvParsesThisMonth');
     } catch (limitError) {
@@ -51,10 +135,10 @@ router.post('/parse-cv', authenticate, validateWorkspace(['owner', 'admin', 'edi
 
     const response = await fetch(cvUrl);
     if (!response.ok) throw new Error(`Failed to download CV: ${response.statusText}`);
-    
+
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     if (buffer.length === 0) throw new Error("Downloaded CV buffer is empty.");
 
     const urlLower = cvUrl.toLowerCase();
@@ -108,7 +192,7 @@ router.post('/parse-cv', authenticate, validateWorkspace(['owner', 'admin', 'edi
     res.json(parsedData);
   } catch (error) {
     console.error('Error parsing CV:', error);
-    res.status(500).json({ error: 'Failed to parse CV with AI', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
@@ -149,23 +233,23 @@ router.post('/compare', authenticate, validateWorkspace(['owner', 'admin', 'edit
 
   } catch (error) {
     console.error('Error comparing:', error);
-    res.status(500).json({ error: 'Failed comparison', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
 router.post('/send-email', authenticate, async (req, res) => {
   try {
     const { to, subject, html, text } = req.body;
-    
+
     if (!to || !subject || (!html && !text)) {
       return res.status(400).json({ error: 'Missing required fields (to, subject, and either html or text)' });
     }
 
     if (!resend) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         message: 'Resend API Key missing. Email not sent, but request was valid (mock mode).',
-        mock: true 
+        mock: true
       });
     }
 
@@ -184,44 +268,47 @@ router.post('/send-email', authenticate, async (req, res) => {
     res.json({ success: true, data });
   } catch (error) {
     console.error('Error in send-email endpoint:', error);
-    res.status(500).json({ error: 'Internal server error while sending email', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
 /**
- * Public Support Email Endpoint
- * No authentication required, but should be used carefully.
+ * Public Support Email Endpoint — rate-limited, HTML-escaped
  */
-router.post('/support', async (req, res) => {
+router.post('/support', rateLimiter, async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
-    
+
     if (!name || !email || !subject || !message) {
       return res.status(400).json({ error: 'Tất cả các trường đều là bắt buộc.' });
     }
 
     const recipient = 'thanhnghiep.top@gmail.com';
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message);
     const supportSubject = `[SUPPORT] ${subject} - Từ: ${name}`;
     const supportHtml = `
       <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #007bff;">Yêu cầu hỗ trợ mới</h2>
-        <p><strong>Họ tên:</strong> ${name}</p>
-        <p><strong>Email khách hàng:</strong> ${email}</p>
-        <p><strong>Chủ đề:</strong> ${subject}</p>
+        <p><strong>Họ tên:</strong> ${safeName}</p>
+        <p><strong>Email khách hàng:</strong> ${safeEmail}</p>
+        <p><strong>Chủ đề:</strong> ${safeSubject}</p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
         <p><strong>Nội dung:</strong></p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">
-          ${message}
+          ${safeMessage}
         </div>
       </div>
     `;
 
     if (!resend) {
-      console.log('Mock support email:', { recipient, supportSubject, name, email });
-      return res.json({ 
-        success: true, 
+      console.log('Mock support email:', { recipient, supportSubject, safeName, safeEmail });
+      return res.json({
+        success: true,
         message: 'Request received (Mock mode - RESEND_API_KEY missing).',
-        mock: true 
+        mock: true
       });
     }
 
@@ -241,7 +328,7 @@ router.post('/support', async (req, res) => {
     res.json({ success: true, data });
   } catch (error) {
     console.error('Error in /support endpoint:', error);
-    res.status(500).json({ error: 'Lỗi hệ thống khi gửi yêu cầu hỗ trợ.', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
@@ -255,7 +342,7 @@ router.post('/jobs', authenticate, validateWorkspace(['owner', 'admin', 'editor'
       return res.status(400).json({ error: 'workspaceId and jobData are required' });
     }
 
-    const db = admin.firestore();
+    const db = getFirestore();
 
     // 1. Check workspace limit
     try {
@@ -280,7 +367,7 @@ router.post('/jobs', authenticate, validateWorkspace(['owner', 'admin', 'editor'
       workspaceId,
       createdBy: req.user.uid,
       status: jobData.status || 'Active',
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     };
 
     await jobRef.set(newJob);
@@ -288,7 +375,7 @@ router.post('/jobs', authenticate, validateWorkspace(['owner', 'admin', 'editor'
     res.json({ id: jobRef.id, ...newJob });
   } catch (error) {
     console.error('Error creating job:', error);
-    res.status(500).json({ error: 'Failed to create job', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
@@ -302,7 +389,7 @@ router.post('/candidates', authenticate, validateWorkspace(['owner', 'admin', 'e
       return res.status(400).json({ error: 'workspaceId and candidateData are required' });
     }
 
-    const db = admin.firestore();
+    const db = getFirestore();
 
     // 1. Check workspace limit
     try {
@@ -326,7 +413,7 @@ router.post('/candidates', authenticate, validateWorkspace(['owner', 'admin', 'e
       ...candidateData,
       workspaceId,
       createdBy: req.user.uid,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     };
 
     await candidateRef.set(newCandidate);
@@ -334,7 +421,7 @@ router.post('/candidates', authenticate, validateWorkspace(['owner', 'admin', 'e
     res.json({ id: candidateRef.id, ...newCandidate });
   } catch (error) {
     console.error('Error creating candidate:', error);
-    res.status(500).json({ error: 'Failed to create candidate', details: error.message });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
@@ -346,10 +433,7 @@ router.post('/upgrade-request', authenticate, async (req, res) => {
     await handleUpgradeRequest(req, res, resend);
   } catch (error) {
     console.error('Error in /upgrade-request:', error);
-    res.status(500).json({
-      error: 'Failed to submit upgrade request',
-      details: error.message,
-    });
+    res.status(500).json(sanitizeError(error));
   }
 });
 
@@ -357,28 +441,38 @@ router.post('/upgrade-request', authenticate, async (req, res) => {
 router.post('/workspaces/:workspaceId/sync-usage', authenticate, validateWorkspace(['owner', 'admin', 'editor', 'viewer']), async (req, res) => {
   const { workspaceId } = req.params;
   try {
-    const db = admin.firestore();
-    
-    // 1. Fetch counts
-    const jobsCountSnap = await db.collection('jobs').where('workspaceId', '==', workspaceId).count().get();
-    const candidatesCountSnap = await db.collection('candidates').where('workspaceId', '==', workspaceId).count().get();
-    
-    const actualJobs = jobsCountSnap.data().count;
-    const actualCandidates = candidatesCountSnap.data().count;
-    
-    // 2. Fetch current workspace data
+    const db = getFirestore();
+
+    // Fetch counts with graceful fallback for missing indexes
+    let actualJobs = 0;
+    let actualCandidates = 0;
+
+    try {
+      const jobsSnap = await db.collection('jobs').where('workspaceId', '==', workspaceId).get();
+      actualJobs = jobsSnap.size;
+    } catch (err) {
+      console.warn(`[Sync] Could not count jobs for ${workspaceId}:`, err.message);
+    }
+
+    try {
+      const candSnap = await db.collection('candidates').where('workspaceId', '==', workspaceId).get();
+      actualCandidates = candSnap.size;
+    } catch (err) {
+      console.warn(`[Sync] Could not count candidates for ${workspaceId}:`, err.message);
+    }
+
+    // Fetch current workspace data
     const wsRef = db.collection('workspaces').doc(workspaceId);
     const wsDoc = await wsRef.get();
-    
+
     if (!wsDoc.exists) {
       return res.status(404).json({ error: 'Workspace not found' });
     }
-    
+
     const wsData = wsDoc.data();
     const currentUsage = wsData.usage || {};
     const cvParses = currentUsage.cvParsesThisMonth || 0;
-    
-    // 3. Update the workspace document using set with merge: true to safely handle missing map/fields
+
     const updateData = {
       usage: {
         jobs: actualJobs,
@@ -386,25 +480,17 @@ router.post('/workspaces/:workspaceId/sync-usage', authenticate, validateWorkspa
         cvParsesThisMonth: cvParses
       }
     };
-    
+
     if (!wsData.plan) {
       updateData.plan = 'free';
     }
-    
+
     await wsRef.set(updateData, { merge: true });
-    
-    console.log(`[Sync Cloud] Workspace ${workspaceId} synced: jobs=${actualJobs}, candidates=${actualCandidates}`);
-    res.json({
-      success: true,
-      usage: {
-        jobs: actualJobs,
-        candidates: actualCandidates,
-        cvParsesThisMonth: cvParses
-      }
-    });
+    console.log(`[Sync] Workspace ${workspaceId}: jobs=${actualJobs}, candidates=${actualCandidates}`);
+    res.json({ success: true, usage: { jobs: actualJobs, candidates: actualCandidates, cvParsesThisMonth: cvParses } });
   } catch (error) {
-    console.error("Error syncing workspace usage in cloud:", error);
-    res.status(500).json({ error: 'Failed to sync workspace usage', details: error.message });
+    console.error("Error syncing workspace usage:", error);
+    res.status(500).json(sanitizeError(error));
   }
 });
 

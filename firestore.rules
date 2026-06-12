@@ -130,5 +130,10 @@ service cloud.firestore {
       allow read: if isAuthenticated() && isMember(resource.data.workspaceId);
       allow create, update, delete: if false;
     }
+
+    // RATE LIMITS (server-only via Admin SDK; no client access)
+    match /rateLimits/{limitId} {
+      allow read, write: if false;
+    }
   }
 }

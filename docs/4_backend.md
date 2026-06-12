@@ -55,7 +55,36 @@ Do sử dụng Cloud Functions Gen 2 kết hợp với Firebase Hosting, hệ th
 - **Tiền tố `/api`**: Bắt buộc phải có trong tất cả các định nghĩa route của Express (ví dụ: `app.get('/api/admin/users', ...)`).
 - **Hosting Rewrite**: File `firebase.json` cấu hình chuyển hướng `/api/**` sang cloud function mà không loại bỏ tiền tố. Điều này đảm bảo tính tương thích khi chạy cả ở môi trường local và production (`hr.thanhnghiep.top`).
 
-## 4. Bảo mật (Firebase Data Rules)
+## 4. Bảo mật API (API Security)
+
+Các biện pháp bảo mật được áp dụng trong tầng Cloud Functions để bảo vệ API trước các tấn công phổ biến:
+
+### 4.1. Xác thực & Phân quyền (`functions/middleware/auth.js`)
+- **`authenticate`**: Xác minh Firebase ID Token từ header `Authorization: Bearer <token>`. Mọi request không có token hợp lệ sẽ bị từ chối với `401`.
+- **`verifyAdmin`**: Middleware kết hợp — xác thực trước, sau đó kiểm tra email khớp với `ADMIN_EMAIL`. Trả về `403` nếu không phải admin.
+- **`validateWorkspace(roles)`**: Xác minh user là thành viên của workspace và có role phù hợp (`owner`, `admin`, `editor`, `viewer`). Trả về `403` nếu không đủ quyền.
+
+### 4.2. Chống Injection & XSS (`functions/routes/api.js`)
+- **`escapeHtml()`**: Escape tất cả input người dùng (`<`, `>`, `&`, `"`, `'`) trước khi chèn vào HTML email, ngăn chặn HTML injection qua form `/api/support`.
+- **`sanitizeError()`**: Trong môi trường production, error responses chỉ trả về thông báo chung `"An internal server error occurred"`, không để lộ stack trace, đường dẫn file, hoặc version thư viện.
+- **Input Validation**: Tất cả endpoint đều kiểm tra required fields trước khi xử lý.
+
+### 4.3. Rate Limiting (`functions/routes/api.js`)
+- **In-memory rate limiter** áp dụng cho endpoint công khai `/api/support`:
+  - Giới hạn: **5 requests / phút / IP**
+  - Trả về `429 Too Many Requests` kèm `retryAfter` (giây)
+  - Tự động dọn dẹp stale entries mỗi 5 phút
+- Các endpoint authenticated được bảo vệ bởi Firebase Auth (token verification) và Workspace limits.
+
+### 4.4. CORS Restriction (`functions/index.js`)
+- **Whitelist approach**: Chỉ cho phép origin từ:
+  - `https://tnhrlite.com` (custom domain)
+  - `https://tnhrlite.web.app`, `https://tnhrlite.firebaseapp.com` (Firebase Hosting)
+  - `http://localhost:*`, `http://127.0.0.1:*` (development)
+- Request không có origin (server-to-server, mobile apps, Postman) vẫn được phép.
+- Origin không hợp lệ bị từ chối với lỗi CORS và ghi log cảnh báo.
+
+### 4.5. Bảo mật (Firebase Data Rules)
 File `firestore.rules` quản lý nghiêm ngặt việc truy cập Data. Một Viewer không thể thực hiện thao tác xóa, và chỉ có Owner mới được xóa không gian làm việc (Workspace). Quyền quản trị thành viên cũng được chia tầng rõ ràng thông qua hàm helper `hasRole` và `isMember`.
 
 - **`upgradeRequests`:** Thành viên workspace được **đọc**; **không** cho client `create`/`update`/`delete` — mọi ghi qua Cloud Functions.

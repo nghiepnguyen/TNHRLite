@@ -2,16 +2,34 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow access to CVs path
-    // Supports legacy: cvs/{userId}/{file} 
-    // Supports scoped: cvs/ws_{workspaceId}/{userId}/{file}
-    match /cvs/{allPaths=**} {
-      // Allow write only if the user is authenticated and uploading to their own folder within the path
-      // Note: In ws_scoped paths, researchers can read but only owners/system can write.
-      allow write: if request.auth != null; 
-      allow read: if request.auth != null;
+    // --- HELPER: Check workspace membership via Firestore ---
+    function isMember(workspaceId) {
+      let memberId = request.auth.uid + '_' + workspaceId;
+      return request.auth != null 
+        && workspaceId != null 
+        && firestore.exists(/databases/(default)/documents/workspaceMembers/$(memberId));
     }
-    
+
+    // --- CV Storage ---
+    // Path: cvs/ws_{workspaceId}/{userId}/{timestamp}_{filename}
+    match /cvs/ws_{workspaceId}/{userId}/{file} {
+      // Write: Only workspace members can upload CVs
+      allow write: if isMember(workspaceId);
+      // Read: Only workspace members can read CVs within their workspace
+      allow read: if isMember(workspaceId);
+    }
+
+    // Legacy path: cvs/{userId}/{file} (pre-workspace-scoping)
+    // Restrict to the owner only
+    match /cvs/{userId}/{file} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Deny any other cvs path patterns
+    match /cvs/{allPaths=**} {
+      allow read, write: if false;
+    }
+
     // Default deny for everything else
     match /{allPaths=**} {
       allow read, write: if false;

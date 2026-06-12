@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 
@@ -30,21 +30,16 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   selected
 }) => {
   const { t } = useTranslation();
-  // Calculate days in stage
-  const getDaysInStage = () => {
+
+  const days = useMemo(() => {
     if (!lastStageChangedAt) return 0;
-    // Handle both Firestore Timestamp (with toMillis()) and JS Date/number
     const lastDate = lastStageChangedAt.toMillis 
       ? lastStageChangedAt.toMillis() 
       : (lastStageChangedAt.seconds 
           ? lastStageChangedAt.seconds * 1000 
           : new Date(lastStageChangedAt).getTime());
-    
-    const diff = Date.now() - lastDate;
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-  };
-
-  const days = getDaysInStage();
+    return Math.floor((Date.now() - lastDate) / (1000 * 60 * 60 * 24));
+  }, [lastStageChangedAt]);
   const isBlocked = blocked || priority === 'Block';
 
   return (
@@ -112,4 +107,4 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   );
 };
 
-export default CandidateCard;
+export default React.memo(CandidateCard);

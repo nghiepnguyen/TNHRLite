@@ -25,7 +25,59 @@ Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 
 ```
 *Lưu ý: Firebase Hosting Gen 2 không tự động loại bỏ tiền tố `/api` khi chuyển tiếp request. Do đó, mã nguồn Express bên trong Function phải giữ nguyên `/api` trong định nghĩa route.*
 
-## 3. Quy trình Deploy (Deploy Flow)
+## 3. Security Headers (HTTP Response Headers)
+
+Dự án cấu hình các security headers quan trọng trong `firebase.json` để bảo vệ người dùng:
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Frame-Options` | `DENY` | Ngăn clickjacking — không cho phép nhúng trang vào iframe |
+| `X-Content-Type-Options` | `nosniff` | Ngăn MIME-type sniffing |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Hạn chế thông tin referrer khi cross-origin |
+| `X-XSS-Protection` | `0` | Tắt XSS filter cũ của browser (dùng CSP thay thế nếu cần) |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | Tắt quyền truy cập camera, microphone, vị trí |
+
+Cấu hình trong `firebase.json`:
+```json
+"headers": [
+  {
+    "source": "**",
+    "headers": [
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+      { "key": "X-XSS-Protection", "value": "0" },
+      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+    ]
+  }
+]
+```
+
+## 4. CORS Configuration (Cloud Functions)
+
+Backend API sử dụng CORS whitelist thay vì `origin: '*'` để ngăn chặn cross-origin attacks:
+
+**Allowed Origins:**
+- `https://tnhrlite.com` (custom domain)
+- `https://tnhrlite.web.app`, `https://tnhrlite.firebaseapp.com` (Firebase Hosting)
+- `http://localhost:*`, `http://127.0.0.1:*` (development)
+- Requests không có origin header (server-to-server, mobile apps)
+
+Cấu hình trong `functions/index.js`:
+```javascript
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
+```
+
+## 5. Quy trình Deploy (Deploy Flow)
 
 Để deploy dự án lên môi trường Production, làm theo các bước sau trong Terminal ở thư mục gốc của dự án:
 
@@ -53,7 +105,7 @@ Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 
      firebase deploy --only functions,firestore:rules,hosting
      ```
 
-## 4. Biến môi trường Frontend (`.env`)
+## 6. Biến môi trường Frontend (`.env`)
 
 | Biến | Mô tả |
 |------|--------|
@@ -61,7 +113,7 @@ Một điểm cực kỳ quan trọng khi cộng tác với Cloud Functions Gen 
 
 Các biến Firebase (`VITE_*`) giữ nguyên như cấu hình dự án.
 
-## 5. Kiểm tra sau Deploy
+## 7. Kiểm tra sau Deploy
 
 1. Đăng nhập user thường → Dashboard thấy **UsageMeter**; chạm giới hạn → **UpgradeModal** gửi được yêu cầu (Firestore `upgradeRequests` + email nếu đã cấu hình Resend).
 2. Đăng nhập admin → `/admin` → duyệt yêu cầu hoặc đổi `plan` workspace.

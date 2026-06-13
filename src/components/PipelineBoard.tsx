@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CandidateCard from './CandidateCard';
@@ -26,7 +26,8 @@ interface PipelineBoardProps {
   selectedAppId?: string;
 }
 
-// Move STAGES inside component to use t()
+// Module-level constant — never changes between renders
+const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
 
 const PipelineBoard: React.FC<PipelineBoardProps> = ({
   filteredApplications,
@@ -44,33 +45,31 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const STAGES = ['New', 'Reviewed', 'Shortlisted', 'Interview', 'Offer', 'Hired', 'Rejected'];
-
   // Validation Logic for DND
-  const canMoveTo = (sourceStage: string, targetStage: string) => {
+  const canMoveTo = useCallback((sourceStage: string, targetStage: string) => {
     if (sourceStage === targetStage) return false;
     if (['Hired', 'Rejected'].includes(sourceStage)) return false;
     return true;
-  };
+  }, []);
 
-  // Drag & Drop Handlers
-  const handleDragStart = (e: React.DragEvent, appId: string, stage: string) => {
+  // Drag & Drop Handlers — stabilized with useCallback so React.memo on CandidateCard works
+  const handleDragStart = useCallback((e: React.DragEvent, appId: string, stage: string) => {
     e.dataTransfer.setData('appId', appId);
     e.dataTransfer.setData('sourceStage', stage);
     setDraggedAppId(appId);
     e.dataTransfer.effectAllowed = 'move';
-  };
+  }, []);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDraggedAppId(null);
-  };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent, targetStage: string) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent, targetStage: string) => {
+  const handleDrop = useCallback((e: React.DragEvent, targetStage: string) => {
     e.preventDefault();
     const appId = e.dataTransfer.getData('appId');
     const sourceStage = e.dataTransfer.getData('sourceStage');
@@ -79,7 +78,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
       onStageChange(appId, targetStage);
     }
     setDraggedAppId(null);
-  };
+  }, [canMoveTo, onStageChange]);
 
   // Group filtered applications by stage
   const appsByStage = useMemo(() => {
@@ -150,7 +149,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
             <div 
               key={stage} 
               className="flex flex-col min-w-[280px] sm:min-w-[320px] w-[280px] sm:w-[320px] bg-slate-100/40 rounded-xl border border-slate-200/50"
-              onDragOver={(e) => handleDragOver(e, stage)}
+              onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, stage)}
             >
               {/* Column Header */}
@@ -175,6 +174,7 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
                 {appsInStage.map(app => {
                   const candidate = candidatesMap[app.candidateId];
                   if (!candidate) return null;
+                  const { overdue, blocked } = getAppState(app);
                   
                   return (
                     <div 
@@ -187,22 +187,17 @@ const PipelineBoard: React.FC<PipelineBoardProps> = ({
                         ${draggedAppId === app.id ? 'opacity-40' : 'opacity-100'}
                       `}
                     >
-                      {(() => {
-                        const { overdue, blocked } = getAppState(app);
-                        return (
-                          <CandidateCard 
-                            fullName={candidate.fullName}
-                            currentTitle={candidate.currentTitle}
-                            fitScore={app.fitScore}
-                            lastStageChangedAt={app.lastStageChangedAt || app.createdAt}
-                            overdue={overdue}
-                            blocked={blocked}
-                            priority={app.priority}
-                            selected={selectedAppId === app.id}
-                            onClick={() => onCardClick({ ...app, candidate })}
-                          />
-                        );
-                      })()}
+                      <CandidateCard 
+                        fullName={candidate.fullName}
+                        currentTitle={candidate.currentTitle}
+                        fitScore={app.fitScore}
+                        lastStageChangedAt={app.lastStageChangedAt || app.createdAt}
+                        overdue={overdue}
+                        blocked={blocked}
+                        priority={app.priority}
+                        selected={selectedAppId === app.id}
+                        onClick={() => onCardClick({ ...app, candidate })}
+                      />
                     </div>
                   );
                 })}

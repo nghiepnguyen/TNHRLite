@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { auth } from '../firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -81,7 +81,8 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const value = {
+  // Stabilize context value to prevent cascading re-renders across all consumers
+  const value = useMemo(() => ({
     currentUser,
     isAdmin,
     loading,
@@ -91,7 +92,7 @@ export function AuthProvider({ children }) {
     logout,
     sendVerification,
     reloadUser
-  };
+  }), [currentUser, isAdmin, loading]);
 
   return (
     <AuthContext.Provider value={value}>

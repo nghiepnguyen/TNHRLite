@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
 import './UsageMeter.css';
@@ -28,71 +28,73 @@ export default function UsageMeter({ isCollapsed: _isSidebarCollapsed }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isExpanded]);
 
-  if (!activeWorkspace) return null;
+  // Memoize resource computations — must be called BEFORE early return (Rules of Hooks)
+  // All derived values computed inside useMemo to satisfy the React Compiler
+  const { enrichedResources, isNearLimit, hasHitLimit, currentPlanId } = useMemo(() => {
+    if (!activeWorkspace) return { enrichedResources: [], isNearLimit: false, hasHitLimit: false, currentPlanId: 'free' };
+    
+    const planId = activeWorkspace.plan || 'free';
+    const planInfo = PLAN_LIMITS[planId] || PLAN_LIMITS.free;
+    const usage = activeWorkspace.usage || {};
+    const currentJobs = usage.jobs || 0;
+    const currentCandidates = usage.candidates || 0;
+    const currentCVParses = usage.cvParsesThisMonth || 0;
 
-  const currentPlanId = activeWorkspace.plan || 'free';
-  const planInfo = PLAN_LIMITS[currentPlanId] || PLAN_LIMITS.free;
-
-  // Retrieve current usage safely
-  const usage = activeWorkspace.usage || {};
-  const currentJobs = usage.jobs || 0;
-  const currentCandidates = usage.candidates || 0;
-  const currentCVParses = usage.cvParsesThisMonth || 0;
-
-  // Construct resources with their status
-  const resources = [
-    {
-      key: 'jobs',
-      name: t('usage.jobs', 'Active Jobs'),
-      current: currentJobs,
-      limit: planInfo.jobs,
-      icon: 'work'
-    },
-    {
-      key: 'candidates',
-      name: t('usage.candidates', 'Total Candidates'),
-      current: currentCandidates,
-      limit: planInfo.candidates,
-      icon: 'group'
-    },
-    {
-      key: 'cvParses',
-      name: t('usage.cvParses', 'CV Parses (Monthly)'),
-      current: currentCVParses,
-      limit: planInfo.cvParsesPerMonth,
-      icon: 'description'
-    }
-  ];
-
-  // Check if any resource has hit its limit or is close (>= 80%)
-  let isNearLimit = false;
-  let hasHitLimit = false;
-
-  const enrichedResources = resources.map(res => {
-    const isUnlimited = res.limit === -1;
-    let percentage = 0;
-    let isWarning = false;
-    let isCritical = false;
-
-    if (!isUnlimited) {
-      percentage = Math.min(Math.round((res.current / res.limit) * 100), 100);
-      if (res.current >= res.limit) {
-        isCritical = true;
-        hasHitLimit = true;
-      } else if (res.current / res.limit >= 0.8) {
-        isWarning = true;
-        isNearLimit = true;
+    const resources = [
+      {
+        key: 'jobs',
+        name: t('usage.jobs', 'Active Jobs'),
+        current: currentJobs,
+        limit: planInfo.jobs,
+        icon: 'work'
+      },
+      {
+        key: 'candidates',
+        name: t('usage.candidates', 'Total Candidates'),
+        current: currentCandidates,
+        limit: planInfo.candidates,
+        icon: 'group'
+      },
+      {
+        key: 'cvParses',
+        name: t('usage.cvParses', 'CV Parses (Monthly)'),
+        current: currentCVParses,
+        limit: planInfo.cvParsesPerMonth,
+        icon: 'description'
       }
-    }
+    ];
 
-    return {
-      ...res,
-      isUnlimited,
-      percentage,
-      isWarning,
-      isCritical
-    };
-  });
+    let isNearLimit = false;
+    let hasHitLimit = false;
+
+    const enrichedResources = resources.map(res => {
+      const isUnlimited = res.limit === -1;
+      let percentage = 0;
+      let isWarning = false;
+      let isCritical = false;
+
+      if (!isUnlimited) {
+        percentage = Math.min(Math.round((res.current / res.limit) * 100), 100);
+        if (res.current >= res.limit) {
+          isCritical = true;
+          hasHitLimit = true;
+        } else if (res.current / res.limit >= 0.8) {
+          isWarning = true;
+          isNearLimit = true;
+        }
+      }
+
+      return {
+        ...res,
+        isUnlimited,
+        percentage,
+        isWarning,
+        isCritical
+      };
+    });
+
+    return { enrichedResources, isNearLimit, hasHitLimit, currentPlanId: planId };
+  }, [activeWorkspace, t]);
 
   const planDisplayName = t(`usage.planNames.${currentPlanId}`, currentPlanId);
 

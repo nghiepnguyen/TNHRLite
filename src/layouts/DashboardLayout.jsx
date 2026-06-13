@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../contexts/AuthContext';
@@ -66,7 +66,7 @@ export default function DashboardLayout() {
 
   const navBase = activeWorkspace ? `/dashboard/w/${activeWorkspace.id}` : '/dashboard';
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { name: t('nav.dashboard'), path: navBase, icon: 'dashboard' },
     { name: t('nav.jobs'), path: `${navBase}/jobs`, icon: 'work' },
     { name: t('nav.candidates'), path: `${navBase}/candidates`, icon: 'group' },
@@ -74,7 +74,7 @@ export default function DashboardLayout() {
     { name: t('nav.reports'), path: `${navBase}/reports`, icon: 'bar_chart' },
     { name: t('nav.members'), path: `${navBase}/members`, icon: 'group' },
     { name: t('nav.settings'), path: `${navBase}/settings`, icon: 'settings' },
-  ];
+  ], [t, navBase]);
 
   return (
     <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>

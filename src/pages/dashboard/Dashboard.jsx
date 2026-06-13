@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getJobs, getCandidates, getAllApplications } from '../../services/db';
@@ -7,6 +7,37 @@ import { db } from '../../firebase';
 import Skeleton from '../../components/Skeleton';
 import { formatDate } from '../../utils/dateUtils';
 
+
+// Extracted to module scope to prevent unmount/remount on every Dashboard render
+const SafeImage = ({ src, name, size = '32px' }) => {
+  const [error, setError] = useState(false);
+  if (src && !error) {
+    return (
+      <img 
+        src={src} 
+        alt="" 
+        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }} 
+        onError={() => setError(true)}
+      />
+    );
+  }
+  return (
+    <div style={{ 
+      width: size, 
+      height: size, 
+      borderRadius: '50%', 
+      backgroundColor: 'var(--color-primary-bg)', 
+      color: 'var(--color-primary)', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      fontSize: '0.75rem', 
+      fontWeight: 700 
+    }}>
+      {name?.charAt(0).toUpperCase() || 'U'}
+    </div>
+  );
+};
 
 export default function Dashboard() {
   const { workspaceId } = useParams();
@@ -52,18 +83,15 @@ export default function Dashboard() {
     }
   }, [workspaceId]);
 
-  if (loading) return <DashboardSkeleton />;
-
-  const activeJobs = jobs.filter(j => j.status === 'Active');
+  // Memoized derived data — must be called BEFORE early return (Rules of Hooks)
+  const activeJobs = useMemo(() => jobs.filter(j => j.status === 'Active'), [jobs]);
   
-  // Stages breakdown
-  const stageCounts = applications.reduce((acc, app) => {
+  const stageCounts = useMemo(() => applications.reduce((acc, app) => {
     acc[app.stage] = (acc[app.stage] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [applications]);
 
-  // Top Matched Candidates (highest fitScore across all pipeline apps)
-  const topMatches = [...applications]
+  const topMatches = useMemo(() => [...applications]
     .filter(a => typeof a.fitScore === 'number')
     .sort((a, b) => b.fitScore - a.fitScore)
     .slice(0, 4)
@@ -71,44 +99,14 @@ export default function Dashboard() {
       const cand = candidates.find(c => c.id === app.candidateId);
       const job = jobs.find(j => j.id === app.jobId);
       return { ...app, candidateInfo: cand, jobInfo: job };
-    });
+    }), [applications, candidates, jobs]);
 
-  // Jobs Needing Attention (Active jobs with 0 New/Review applications)
-
-  const SafeImage = ({ src, name, size = '32px' }) => {
-    const [error, setError] = useState(false);
-    if (src && !error) {
-      return (
-        <img 
-          src={src} 
-          alt="" 
-          style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }} 
-          onError={() => setError(true)}
-        />
-      );
-    }
-    return (
-      <div style={{ 
-        width: size, 
-        height: size, 
-        borderRadius: '50%', 
-        backgroundColor: 'var(--color-primary-bg)', 
-        color: 'var(--color-primary)', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        fontSize: '0.75rem', 
-        fontWeight: 700 
-      }}>
-        {name?.charAt(0).toUpperCase() || 'U'}
-      </div>
-    );
-  };
-
-  const jobsAttn = activeJobs.filter(job => {
+  const jobsAttn = useMemo(() => activeJobs.filter(job => {
      const appsForJob = applications.filter(a => a.jobId === job.id);
      return appsForJob.length === 0;
-  });
+  }), [activeJobs, applications]);
+
+  if (loading) return <DashboardSkeleton />;
 
   const formatRelativeTime = (timestamp) => {
     if (!timestamp || typeof timestamp.toDate !== 'function') return t('dashboard.justNow');

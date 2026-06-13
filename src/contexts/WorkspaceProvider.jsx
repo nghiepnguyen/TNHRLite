@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { 
@@ -11,7 +11,7 @@ import {
   subscribeToUserWorkspaces
 } from '../services/workspace.service';
 import { createNotification, markInviteNotificationAsRead } from '../services/notification.service';
-import { logActivity, syncWorkspaceUsage } from '../services/db';
+import { logActivity } from '../services/db';
 import { useToast } from './ToastContext';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -33,7 +33,8 @@ export function WorkspaceProvider({ children }) {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const hasInitialLoadRef = useRef(false);
   const prevWorkspaceIdsRef = useRef(new Set());
-  const syncedWorkspacesRef = useRef(new Set());
+  const workspacesRef = useRef(workspaces);
+  workspacesRef.current = workspaces;
   const toast = useToast();
 
   const refreshData = useCallback(async () => {
@@ -164,8 +165,8 @@ export function WorkspaceProvider({ children }) {
         const plan = wsData.plan || 'free';
         const usage = wsData.usage || { jobs: 0, candidates: 0, cvParsesThisMonth: 0 };
         
-        // Keep the role from the workspaces list if available
-        const foundInList = workspaces.find(w => w.id === workspaceId);
+        // Keep the role from the workspaces list if available — read via ref to avoid re-subscribing
+        const foundInList = workspacesRef.current.find(w => w.id === workspaceId);
         setActiveWorkspace({
           id: snapshot.id,
           ...wsData,
@@ -182,13 +183,13 @@ export function WorkspaceProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, [currentUser, workspaceId, workspaces]);
+  }, [currentUser, workspaceId]);
 
-  const switchWorkspace = (id) => {
+  const switchWorkspace = useCallback((id) => {
     navigate(`/dashboard/w/${id}`);
-  };
+  }, [navigate]);
 
-  const handleCreateWorkspace = async (workspaceData) => {
+  const handleCreateWorkspace = useCallback(async (workspaceData) => {
     if (!currentUser) throw new Error("Authentication required");
     
     const freeCount = workspaces.filter(
@@ -205,9 +206,9 @@ export function WorkspaceProvider({ children }) {
     await refreshData();
     navigate(`/dashboard/w/${newId}`);
     return newId;
-  };
+  }, [currentUser, workspaces, refreshData, navigate]);
 
-  const handleAcceptInvite = async (invite) => {
+  const handleAcceptInvite = useCallback(async (invite) => {
     await acceptInvite(invite, currentUser.uid);
     try {
       const actor = userProfile || { 
@@ -248,9 +249,9 @@ export function WorkspaceProvider({ children }) {
     }
 
     navigate(`/dashboard/w/${invite.workspaceId}`);
-  };
+  }, [currentUser, userProfile, refreshData, navigate]);
 
-  const handleDeclineInvite = async (invite) => {
+  const handleDeclineInvite = useCallback(async (invite) => {
     await declineInvite(invite.id);
     try {
       const actor = userProfile || { 
@@ -289,9 +290,10 @@ export function WorkspaceProvider({ children }) {
         metadata: { action: 'INVITE_DECLINED_BY_USER', userEmail: currentUser.email }
       });
     }
-  };
+  }, [currentUser, userProfile, refreshData]);
 
-  const value = {
+  // Stabilize context value to prevent cascading re-renders across all consumers
+  const value = useMemo(() => ({
     currentUser,
     workspaces,
     activeWorkspace,
@@ -305,7 +307,12 @@ export function WorkspaceProvider({ children }) {
     refreshWorkspaces: refreshData,
     isUpgradeModalOpen,
     setIsUpgradeModalOpen
-  };
+  }), [
+    currentUser, workspaces, activeWorkspace, pendingInvites,
+    loading, userProfile, isUpgradeModalOpen,
+    switchWorkspace,
+    handleCreateWorkspace, handleAcceptInvite, handleDeclineInvite, refreshData
+  ]);
 
   return (
     <WorkspaceContext.Provider value={value}>

@@ -1,0 +1,314 @@
+/* Jobs Page — Portal Styles */
+.mandates-portal-root {
+  /* Inherit background from layout */
+}
+
+.portal-content-container {
+  width: 100%;
+  padding: 0;
+}
+
+.portal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.portal-main-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.portal-sub-title {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+}
+
+/* Dashboard KPI Layout */
+.portal-dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.kpi-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-surface-border);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.kpi-box:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-icon-base {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon-base.active { background: var(--color-primary-bg); color: var(--color-primary); }
+.kpi-icon-base.expiring { background: var(--color-warning-bg); color: var(--color-warning); }
+.kpi-icon-base.roles { background: var(--color-success-bg); color: var(--color-success); }
+
+.kpi-text-base {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kpi-tag-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-value-main {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.kpi-value-main.highlight { color: var(--color-warning); }
+
+.kpi-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.kpi-mini-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Portal Table & Components */
+.portal-table-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-surface-border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.portal-table-header {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid var(--color-surface-border);
+}
+
+.portal-tabs-container {
+  background: var(--color-surface-hover);
+  padding: 4px;
+  border-radius: 12px;
+  display: inline-flex;
+}
+
+.portal-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.portal-tab {
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.portal-tab:hover { color: var(--color-text-primary); }
+
+.portal-tab.active {
+  background: white;
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-count {
+  font-size: 0.6875rem;
+  background: var(--color-surface-border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  margin-left: 4px;
+}
+
+.portal-tab.active .tab-count {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.portal-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--color-surface-border);
+  background: white;
+  transition: var(--transition-smooth);
+}
+
+.portal-filter-btn:hover { background: var(--color-surface-hover); border-color: var(--color-text-muted); }
+.portal-filter-btn.active { background: var(--color-brand-on-surface); color: white; border-color: var(--color-brand-on-surface); }
+
+.portal-accordion {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portal-accordion.visible {
+  max-height: 300px;
+  padding: 1.5rem;
+  background: var(--color-surface-hover);
+  border-bottom: 1px solid var(--color-surface-border);
+}
+
+.portal-accordion-inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.filter-input-field label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.filter-input-field select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: 10px;
+  background: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.portal-table-footer {
+  padding: 1.25rem 1.5rem;
+  background: var(--color-surface-hover);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.results-count { font-size: 0.8125rem; color: var(--color-text-secondary); }
+
+.pagination-controls { display: flex; gap: 6px; }
+
+.page-control {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--color-surface-border);
+  color: var(--color-text-secondary);
+}
+
+.page-control.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+.page-control:not(.active):hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
+
+.portal-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.7);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+}
+
+.portal-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--color-surface-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.error-screen {
+  padding: 5rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .portal-dashboard { grid-template-columns: repeat(2, 1fr); }
+  .portal-accordion-inner { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .portal-header { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .portal-header .btn-lg { width: 100%; justify-content: center; }
+  .portal-dashboard { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .portal-table-header { flex-direction: column; gap: 0.75rem; align-items: stretch; }
+  .portal-tabs-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .portal-tabs { min-width: max-content; }
+  .portal-filter-btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .portal-dashboard { grid-template-columns: 1fr; }
+  .portal-header { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .portal-table-footer { flex-direction: column; gap: 1.25rem; text-align: center; }
+  .kpi-box { padding: 1rem; }
+  .kpi-value-main { font-size: 1.75rem; }
+}

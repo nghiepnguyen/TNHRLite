@@ -129,7 +129,7 @@ export default function DashboardLayout() {
             </NavLink>
           )}
         </nav>
-        <UsageMeter isCollapsed={isSidebarCollapsed} />
+        <UsageMeter />
       </aside>
 
       {/* Main Content */}

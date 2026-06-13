@@ -120,6 +120,12 @@
   gap: 0.5rem;
 }
 
+.usage-meter-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .usage-plan-info {
   display: flex;
   align-items: center;
@@ -458,126 +464,186 @@
   color: #ef4444;
 }
 
-/* Collapsed Sidebar State styles */
+/* Collapsed State - Compact Card with plan name + 3 numbers */
 .usage-meter-collapsed {
-  margin: auto auto 1rem auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: auto 0.85rem 1rem 0.85rem;
   transition: all var(--transition-sidebar);
 }
 
-.usage-collapsed-trigger {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid var(--meter-border);
-  background: var(--meter-bg);
-  color: var(--meter-text-secondary);
+.usage-collapsed-card {
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 0.65rem;
+  border: 1px solid var(--meter-border);
+  border-radius: var(--radius-lg);
+  background: var(--meter-bg);
   cursor: pointer;
   box-shadow: var(--meter-shadow), inset 0 1px 0 0 var(--meter-inner-highlight);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: var(--meter-text-primary);
 }
 
-.usage-collapsed-trigger span {
-  font-size: 18px !important;
-  color: var(--color-primary);
+.usage-collapsed-card:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 10px 20px -8px rgba(79, 70, 229, 0.25);
+  border-color: rgba(79, 70, 229, 0.2);
 }
 
-.usage-collapsed-trigger:hover {
-  color: var(--color-primary-hover);
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 10px 20px -8px rgba(79, 70, 229, 0.35);
-  border-color: rgba(79, 70, 229, 0.3);
-}
-
-.usage-collapsed-trigger.warning {
+.usage-collapsed-card.warning {
   border-color: rgba(245, 158, 11, 0.3);
-  background: rgba(245, 158, 11, 0.05);
-  color: #d97706;
   animation: glowWarning 2.5s infinite alternate;
 }
 
-.usage-collapsed-trigger.warning span {
-  color: #d97706;
-}
-
-.usage-collapsed-trigger.critical {
+.usage-collapsed-card.critical {
   border-color: rgba(220, 38, 38, 0.3);
-  background: rgba(220, 38, 38, 0.05);
-  color: #dc2626;
   animation: glowCritical 1.8s infinite alternate;
 }
 
-.usage-collapsed-trigger.critical span {
+/* Collapsed header: icon + plan badge */
+.usage-collapsed-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.collapsed-plan-icon {
+  font-size: 16px !important;
+  color: var(--color-primary);
+}
+
+.usage-collapsed-card.warning .collapsed-plan-icon {
+  color: #d97706;
+}
+
+.usage-collapsed-card.critical .collapsed-plan-icon {
+  color: #dc2626;
+}
+
+.collapsed-plan-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+}
+
+.collapsed-plan-badge.free {
+  background: var(--badge-free-bg);
+  color: var(--badge-free-text);
+  border: 1px solid var(--badge-free-border);
+}
+
+.collapsed-plan-badge.pro {
+  background: var(--badge-pro-bg);
+  color: var(--badge-pro-text);
+  border: 1px solid var(--badge-pro-border);
+}
+
+.collapsed-plan-badge.team {
+  background: var(--badge-team-bg);
+  color: var(--badge-team-text);
+  border: 1px solid var(--badge-team-border);
+}
+
+/* Collapsed numbers row: 3 items, no text labels */
+.usage-collapsed-numbers {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.collapsed-number-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.collapsed-resource-icon {
+  font-size: 13px !important;
+  color: var(--meter-text-muted, var(--color-text-muted));
+  opacity: 0.7;
+}
+
+.collapsed-number-value {
+  font-size: 0.66rem;
+  font-weight: 700;
+  font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  color: var(--meter-text-primary);
+  letter-spacing: -0.03em;
+}
+
+.collapsed-number-value.warning {
+  color: #ca8a04;
+}
+
+.collapsed-number-value.critical {
   color: #dc2626;
 }
 
 @keyframes glowWarning {
   0% {
-    box-shadow: 0 0 2px rgba(217, 119, 6, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
-    transform: scale(1);
+    box-shadow: 0 0 2px rgba(217, 119, 6, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
   100% {
-    box-shadow: 0 0 12px rgba(217, 119, 6, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
-    transform: scale(1.04);
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
 }
 
 @keyframes glowCritical {
   0% {
-    box-shadow: 0 0 2px rgba(220, 38, 38, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
-    transform: scale(1);
+    box-shadow: 0 0 2px rgba(220, 38, 38, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
   100% {
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
-    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .usage-collapsed-trigger span {
+  .collapsed-plan-icon {
     color: #60a5fa;
   }
-  
-  .usage-collapsed-trigger.warning {
+
+  .usage-collapsed-card.warning .collapsed-plan-icon {
     color: #f59e0b;
   }
-  
-  .usage-collapsed-trigger.warning span {
+
+  .usage-collapsed-card.critical .collapsed-plan-icon {
+    color: #ef4444;
+  }
+
+  .collapsed-number-value.warning {
     color: #f59e0b;
   }
-  
-  .usage-collapsed-trigger.critical {
-    color: #ef4444;
-  }
-  
-  .usage-collapsed-trigger.critical span {
-    color: #ef4444;
+
+  .collapsed-number-value.critical {
+    color: #f87171;
   }
 }
 
-[data-theme='dark'] .usage-collapsed-trigger span {
+[data-theme='dark'] .collapsed-plan-icon {
   color: #60a5fa;
 }
 
-[data-theme='dark'] .usage-collapsed-trigger.warning {
+[data-theme='dark'] .usage-collapsed-card.warning .collapsed-plan-icon {
   color: #f59e0b;
 }
 
-[data-theme='dark'] .usage-collapsed-trigger.warning span {
+[data-theme='dark'] .usage-collapsed-card.critical .collapsed-plan-icon {
+  color: #ef4444;
+}
+
+[data-theme='dark'] .collapsed-number-value.warning {
   color: #f59e0b;
 }
 
-[data-theme='dark'] .usage-collapsed-trigger.critical {
-  color: #ef4444;
-}
-
-[data-theme='dark'] .usage-collapsed-trigger.critical span {
-  color: #ef4444;
+[data-theme='dark'] .collapsed-number-value.critical {
+  color: #f87171;
 }

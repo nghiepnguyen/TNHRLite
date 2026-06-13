@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
 import './UsageMeter.css';
@@ -9,9 +9,24 @@ const PLAN_LIMITS = {
   team: { name: 'Team', jobs: -1, candidates: -1, cvParsesPerMonth: -1 }
 };
 
-export default function UsageMeter({ isCollapsed }) {
+export default function UsageMeter({ isCollapsed: _isSidebarCollapsed }) {
   const { t } = useTranslation();
   const { activeWorkspace, setIsUpgradeModalOpen } = useWorkspace() || {};
+  // Independent collapse state: collapsed by default, expands on click
+  const [isExpanded, setIsExpanded] = useState(false);
+  const expandedRef = useRef(null);
+
+  // Click outside to collapse
+  useEffect(() => {
+    if (!isExpanded) return;
+    function handleClickOutside(event) {
+      if (expandedRef.current && !expandedRef.current.contains(event.target)) {
+        setIsExpanded(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isExpanded]);
 
   if (!activeWorkspace) return null;
 
@@ -81,42 +96,58 @@ export default function UsageMeter({ isCollapsed }) {
 
   const planDisplayName = t(`usage.planNames.${currentPlanId}`, currentPlanId);
 
-  if (isCollapsed) {
-    // Collapsed sidebar state: show a tiny badge or indicator that triggers upgrade
+  if (!isExpanded) {
+    // Collapsed by default: compact card with plan name + 3 numbers, no text labels
     return (
-      <div className="usage-meter-collapsed" onClick={() => setIsUpgradeModalOpen(true)}>
-        <button 
-          className={`usage-collapsed-trigger ${hasHitLimit ? 'critical' : isNearLimit ? 'warning' : ''}`}
+      <div className="usage-meter-collapsed">
+        <button
+          className={`usage-collapsed-card ${hasHitLimit ? 'critical' : isNearLimit ? 'warning' : ''}`}
+          onClick={() => setIsExpanded(true)}
           title={t('usage.collapsedTitle', {
             plan: planDisplayName,
-            defaultValue: '{{plan}} — click to view limits',
+            defaultValue: '{{plan}} — click to view details',
           })}
         >
-          <span className="material-symbols-outlined">
-            {hasHitLimit ? 'warning' : isNearLimit ? 'error' : 'workspace_premium'}
-          </span>
+          <div className="usage-collapsed-header">
+            <span className="material-symbols-outlined collapsed-plan-icon">
+              {hasHitLimit ? 'warning' : isNearLimit ? 'error' : 'workspace_premium'}
+            </span>
+            <span className={`collapsed-plan-badge ${currentPlanId}`}>{planDisplayName}</span>
+          </div>
+          <div className="usage-collapsed-numbers">
+            {enrichedResources.map((res) => (
+              <span key={res.key} className="collapsed-number-item" title={res.name}>
+                <span className="material-symbols-outlined collapsed-resource-icon">{res.icon}</span>
+                <span className={`collapsed-number-value ${res.isCritical ? 'critical' : res.isWarning ? 'warning' : ''}`}>
+                  {res.current}{res.isUnlimited ? '' : `/${res.limit}`}
+                </span>
+              </span>
+            ))}
+          </div>
         </button>
       </div>
     );
   }
 
   return (
-    <div className="usage-meter-expanded">
+    <div className="usage-meter-expanded" ref={expandedRef}>
       <div className="usage-meter-header">
         <div className="usage-plan-info">
           <span className="plan-label">{t('usage.currentPlan', 'Plan')}:</span>
           <span className={`plan-badge ${currentPlanId}`}>{planDisplayName}</span>
         </div>
         
-        {currentPlanId !== 'team' && (
-          <button 
-            className="btn btn-upgrade-link"
-            onClick={() => setIsUpgradeModalOpen(true)}
-          >
-            {t('usage.upgrade', 'Upgrade')}
-            <span className="material-symbols-outlined !text-[12px] inline-block ml-0.5">arrow_forward</span>
-          </button>
-        )}
+        <div className="usage-meter-header-actions">
+          {currentPlanId !== 'team' && (
+            <button 
+              className="btn btn-upgrade-link"
+              onClick={() => setIsUpgradeModalOpen(true)}
+            >
+              {t('usage.upgrade', 'Upgrade')}
+              <span className="material-symbols-outlined !text-[12px] inline-block ml-0.5">arrow_forward</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="usage-resources-container">
